@@ -42,6 +42,7 @@ export default function RootLayout() {
         <Stack.Screen name="departure" />
         <Stack.Screen name="destination" />
         <Stack.Screen name="departuredate" />
+        <Stack.Screen name="flightCreat" />
 
 
       </Stack>

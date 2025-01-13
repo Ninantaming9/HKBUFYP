@@ -7,7 +7,7 @@ import { Text } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { router } from "expo-router";
 
-const WelcomeScreen = () => {
+const adminSearch = () => {
   return (
     <SafeAreaView
       className="flex-1"
@@ -55,7 +55,7 @@ const WelcomeScreen = () => {
             className="h-1/4 w-full justify-start pt-8 px-4"
           >
             <Pressable
-              onPress={() => router.push("/login")}
+              onPress={() => router.push("/adminSearch")}
               className="bg-[#12B3A8] rounded-lg justify-center items-center py-4 "
             >
               <Text className="text-white font-bold text-lg">Discover</Text>
@@ -76,4 +76,4 @@ const WelcomeScreen = () => {
   );
 };
 
-export default WelcomeScreen;
+export default adminSearch;
