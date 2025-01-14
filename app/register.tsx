@@ -20,7 +20,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [fullname, setFullname] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
+  const [role, setRole] = useState('user');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async () => {
@@ -47,14 +47,12 @@ export default function Login() {
         return;
       }
 
-   
-
-
       const userData = {
         fullname:fullname,
         email: email,
         password: password,
-        confirmPassword: confirmPassword
+        confirmPassword: confirmPassword,
+        role: role 
       };
 
       const response = await axios.post(`${API_URL}/register`, userData);

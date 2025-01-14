@@ -21,54 +21,60 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-
   const handleSubmit = async () => {
     try {
-      const userData = {
-    
-        email: email,
-        password: password
-      };
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(email)) {
-        alert("Please enter email format");
-        return;
-      }
-
-      const response = await axios.post(`${API_URL}/login`, userData);
-      if (response.data.message === 'Login successful') {
-        Alert.alert('Login successful', '', [
-            {
-                text: 'OK',
-                onPress: async () => {
-                  await AsyncStorage.setItem('userId', response.data.userId);
-                  await AsyncStorage.setItem('user', JSON.stringify(response.data.fullname));
-                  router.push({
-                    pathname: "/(tabs)/search",
-                    params: { userId: response.data.userId } // 传递 userId
-                  });
-                }
-            }
-        ]);
-    } else {
-        if (response.data.message === 'Invalid email') {
-          Alert.alert('ERROR', 'Invalid email');
-        } else if (response.data.message === 'Invalid password') {
-          Alert.alert('ERROR', 'Invalid password');
-        } else {
-          Alert.alert('ERROR', 'Account and password do not match');
+        const userData = {
+            email: email,
+            password: password
+        };
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            alert("Please enter a valid email format");
+            return;
         }
-        console.log('Login failed');
-      }
-    }  catch (error: any) {
-      if (error.response && error.response.data && error.response.data.message) {
-        Alert.alert('ERROR', error.response.data.message);
-      } else {
-        Alert.alert('ERROR', 'An error occurred during login');
-      }
 
+        const response = await axios.post(`${API_URL}/login`, userData);
+        if (response.data.message === 'Login successful') {
+            Alert.alert('Login successful', '', [
+                {
+                    text: 'OK',
+                    onPress: async () => {
+                        await AsyncStorage.setItem('userId', response.data.userId);
+                        await AsyncStorage.setItem('user', JSON.stringify(response.data.fullname));
+                        
+                        // 根据用户角色跳转到不同页面
+                        const userRole = response.data.role; // 假设角色信息在 response.data.role 中
+     
+
+                        if (userRole === 'admin') {
+                            router.push('/adminSearch'); // 管理员页面
+                        } else if (userRole === 'user') {
+                            router.push('/(tabs)/search'); // 用户页面
+                        } else {
+                            Alert.alert('ERROR', 'Unknown user role');
+                        }
+                    }
+                }
+            ]);
+        } else {
+            if (response.data.message === 'Invalid email') {
+                Alert.alert('ERROR', 'Invalid email');
+            } else if (response.data.message === 'Invalid password') {
+                Alert.alert('ERROR', 'Invalid password');
+            } else {
+                Alert.alert('ERROR', 'Account and password do not match');
+            }
+            console.log('Login failed');
+        }
+    } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.message) {
+            Alert.alert('ERROR', error.response.data.message);
+        } else {
+            Alert.alert('ERROR', 'An error occurred during login');
+        }
     }
-  };
+};
+
   
   return (
     <KeyboardAvoidingView behavior="padding" style={globals.container}>

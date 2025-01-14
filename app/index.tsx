@@ -55,7 +55,7 @@ const adminSearch = () => {
             className="h-1/4 w-full justify-start pt-8 px-4"
           >
             <Pressable
-              onPress={() => router.push("/adminSearch")}
+              onPress={() => router.push("/login")}
               className="bg-[#12B3A8] rounded-lg justify-center items-center py-4 "
             >
               <Text className="text-white font-bold text-lg">Discover</Text>

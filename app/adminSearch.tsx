@@ -467,17 +467,19 @@ const FlightScreen = () => {
 
                         </View>
                         <View className='w-1/2 flex-row space-x-4 justify-end items-center h-14'>
-            <TouchableOpacity    onPress={() => router.push("/flightCreat")}  className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4' >
-                <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
-                    <Text className='text-white font-semibold'>+</Text>
-                </View>
-
-                <View className='justify-start items-start gap-1'>
-                    {/* <Text className='text-base text-gray-400'>Create</Text> */}
-                    <Text className='text-black'>Create flight</Text>
-                </View>
-            </TouchableOpacity>
+    <TouchableOpacity 
+        onPress={() => router.push("/flightCreat")}  
+        className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
+    >
+        <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
+            <Text className='text-white font-semibold'>✈️</Text>
         </View>
+
+        <View className='justify-start items-start gap-1'>
+            <Text className='text-black font-bold text-lg'>Create flight</Text>
+        </View>
+    </TouchableOpacity>
+</View>
 
 
                     </View>

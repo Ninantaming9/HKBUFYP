@@ -554,7 +554,7 @@ const FlightScreen = () => {
                                 mode="date"
                                 onConfirm={handleConfirm}
                                 onCancel={hideDatePicker}
-                                minimumDate={new Date()} // 设置最小日期为今天
+                                // minimumDate={new Date()} // 设置最小日期为今天
                             />
                         </View>
                         {/* Seat */}
