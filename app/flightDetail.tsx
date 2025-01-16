@@ -129,7 +129,7 @@ const seatsArray = selectedSeatsString.split(",");
           seat:selectedSeats
         };
         console.log('Flight Details:', flightDetails);
-        const response = await axios.post(`${API_URL}createFlightbook`, userData);
+        const response = await axios.post(`${API_URL}/createFlightbook`, userData);
         console.log('Flight Details:', flightDetails);
         console.log(response.data); // 处理返回的数据
         router.push("/bookconfirm");
