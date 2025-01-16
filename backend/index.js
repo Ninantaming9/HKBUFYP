@@ -238,24 +238,40 @@ app.post('/createFlight', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
-
 app.post('/searchFlight', async (req, res) => {
   try {
     const db = await connectToDB();
     const flightCollection = db.collection('flight');
 
-    const { ticketType, date, departureLocation, arrivalLocation, cabinClass } = req.body;
+    const { ticketType, date, departureLocation, arrivalLocation, cabinClass, priceRange } = req.body;
 
+    // Parse the price range
+    let priceQuery = {};
+    if (priceRange) {
+      const [minPrice, maxPrice] = priceRange.split('-').map(Number);
+      priceQuery = {
+        $expr: {
+          $and: [
+            { $gte: [{ $toDouble: "$ticketPrice" }, minPrice] },
+            { $lte: [{ $toDouble: "$ticketPrice" }, maxPrice] }
+          ]
+        }
+      };
+    }
 
-    const flightData = await flightCollection.find({
+    // Log the query for debugging
+    const query = {
       ticketType,
       date,
       departureLocation,
       arrivalLocation,
-      cabinClass
-    }).toArray(); 
+      cabinClass,
+      ...priceQuery
+    };
+    console.log('Search Query:', query);
+
+    const flightData = await flightCollection.find(query).toArray(); 
+
     if (flightData.length > 0) {
       const flightCount = flightData.length; 
       res.status(200).json({ flightCount, flights: flightData }); 
@@ -267,6 +283,7 @@ app.post('/searchFlight', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 app.get('/getAllFlightBookings', async (req, res) => {

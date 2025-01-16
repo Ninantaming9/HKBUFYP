@@ -46,6 +46,7 @@ const FlightScreen = () => {
     const [departureLocation, setdepartureLocation] = useState('Beijing');
     const [arrivalLocation, setarrivalLocation] = useState('Shanghai');
     const [cabinClass, setcabinClass] = useState('Economy Class');
+    const [priceRange, setPriceRange] = useState('');
     const [departureTime, setDepartureTime] = useState("");
     const [arrivalTime, setArrivalTime] = useState("");
     const [ticketPrice, setTicketPrice] = useState("");
@@ -173,6 +174,7 @@ const FlightScreen = () => {
                 departureTime: departureTime,
                 arrivalTime: arrivalTime,
                 ticketPrice: ticketPrice,
+                priceRange: priceRange
             };
 
             const response = await fetch(`${API_URL}/searchFlight`, {
@@ -180,9 +182,12 @@ const FlightScreen = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                
                 body: JSON.stringify(searchData)
             });
 
+
+            console.log("adsadsads"+priceRange);
             if (!date) {
                 Alert.alert(
                     'Information',
@@ -600,6 +605,32 @@ const FlightScreen = () => {
                                 </View>
                             </View>
                         </View>
+
+
+                        <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
+    <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 30, position: 'relative' }}>
+        
+        <View style={{ width: '100%', borderWidth: 1, borderColor: '#EAEAEA', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10 }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#333', paddingVertical: 10 }}>Price Range</Text>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+                <MaterialIcons name="attach-money" size={20} color="gray" />
+                <Picker
+                    selectedValue={priceRange}
+                    style={{ height: 50, width: '100%' }}
+                    onValueChange={(itemValue) => setPriceRange(itemValue)}
+                >
+                    <Picker.Item label="100 - 500" value="100-500" />
+                    <Picker.Item label="500 - 1000" value="500-1000" />
+                    <Picker.Item label="1000 - 1500" value="1000-1500" />
+                </Picker>
+            </View>
+        </View>
+    </View>
+</View>
+
+
+
+
                         {/* Search Button */}
                         <TouchableOpacity onPress={() => handleSearch()} style={{ paddingHorizontal: 10, marginTop: 20 }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, backgroundColor: 'green', paddingVertical: 15, borderRadius: 10 }}>
