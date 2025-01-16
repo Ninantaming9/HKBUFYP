@@ -57,11 +57,11 @@ const FlightScreen = () => {
     const [fullName, setFullName] = useState(null);
     const [date, setdate] = useState('');
     const [photoPath, setPhotoPath] = useState<string | null>(null);
-
+    const [userRole, setUserRole] = useState(null);
     // const router = useRouter(); // 使用 useRouter 获取 router 实例
-    const route = useRoute(); // 获取路由信息
-
-
+  
+    const route = useRoute();
+   
     const locations = [
         { label: 'Beijing', value: 'Beijing' },
         { label: 'Shanghai', value: 'Shanghai' },
@@ -121,7 +121,7 @@ const FlightScreen = () => {
     // 获取用户照片的函数
     const fetchUserPhoto = async (userId: string) => {
         const response = await axios.get(`${API_URL}/getPhoto/${userId}`);
-       
+
         setPhotoPath(response.data.photoPath); // 更新状态
 
     };
@@ -133,11 +133,16 @@ const FlightScreen = () => {
                     // 从 AsyncStorage 获取用户 ID 和全名
                     const storedUserId = await AsyncStorage.getItem('userId'); // 从 AsyncStorage 获取用户 ID
                     const storedFullName = await AsyncStorage.getItem('user'); // 从 AsyncStorage 获取用户全名
-
+                    const storedUserRole = await AsyncStorage.getItem('userRole'); // 从 AsyncStorage 获取用户全名
+                    console.log("dasdaadsasas"+storedUserRole);
                     // 如果存在用户 ID，调用获取照片的 API
                     if (storedUserId) {
                         fetchUserPhoto(storedUserId);
                         setUserId(storedUserId); // 更新用户 ID 状态
+                    }
+                    if (storedUserRole) {
+            
+                        setUserRole(JSON.parse(storedUserRole)); // 
                     }
 
                     // 如果存在用户全名，更新状态
@@ -415,7 +420,34 @@ const FlightScreen = () => {
     const handleNavigationChange = (type: string) => setticketType(type);
 
 
-
+    const renderContent = () => {
+        if (userRole === 'user') {
+            return (
+                <View className='w-1/2 flex-row space-x-4 justify-end items-center h-14'>
+                
+                </View>
+            );
+        } else if (userRole === 'admin') {
+            return (
+               <View className='w-1/2 flex-row space-x-4 justify-end items-center h-14'>
+                  <TouchableOpacity 
+                      onPress={() => router.push("/flightCreat")}  
+                      className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
+                  >
+                      <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
+                          <Text className='text-white font-semibold'>✈️</Text>
+                      </View>
+              
+                      <View className='justify-start items-start gap-1'>
+                          <Text className='text-black font-bold text-lg'>Create </Text>
+                      </View>
+                  </TouchableOpacity>
+              </View>
+            );
+        } else {
+            return null; // Handle other roles or cases if necessary
+        }
+    };
 
 
     return (
@@ -460,20 +492,9 @@ const FlightScreen = () => {
 
                         </View>
 
-                        <View className='w-1/2 flex-row space-x-4 justify-end items-center  h-14'>
-                            <View className='bg-gray-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4'>
-                                <View className='bg-gray-500 rounded-full w-8 h-8 justify-center items-center'>
-                                    <Text className='text-white font-semibold'>P</Text>
-                                </View>
-
-                                <View className='justify-start items-start gap-1'>
-                                    <Text className='test-base text-gray-400'>Flight Point</Text>
-                                    <Text className='test-white0'>5000</Text>
-                                </View>
-
-                            </View>
+                        <View className='flex-1 justify-center items-center'>
+                            {renderContent()}
                         </View>
-
 
                     </View>
                 </View>
@@ -554,7 +575,7 @@ const FlightScreen = () => {
                                 mode="date"
                                 onConfirm={handleConfirm}
                                 onCancel={hideDatePicker}
-                                // minimumDate={new Date()} // 设置最小日期为今天
+                            // minimumDate={new Date()} // 设置最小日期为今天
                             />
                         </View>
                         {/* Seat */}
@@ -717,3 +738,7 @@ const FlightScreen = () => {
 }
 
 export default FlightScreen
+
+
+
+

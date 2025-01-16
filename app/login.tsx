@@ -41,13 +41,12 @@ export default function Login() {
                     onPress: async () => {
                         await AsyncStorage.setItem('userId', response.data.userId);
                         await AsyncStorage.setItem('user', JSON.stringify(response.data.fullname));
-                        
+                        await AsyncStorage.setItem('userRole', JSON.stringify(response.data.role));
                         // 根据用户角色跳转到不同页面
                         const userRole = response.data.role; // 假设角色信息在 response.data.role 中
-     
-
+                        
                         if (userRole === 'admin') {
-                            router.push('/adminSearch'); // 管理员页面
+                            router.push('/(tabs)/search'); // 管理员页面
                         } else if (userRole === 'user') {
                             router.push('/(tabs)/search'); // 用户页面
                         } else {
