@@ -45,13 +45,7 @@ export default function Login() {
                         // 根据用户角色跳转到不同页面
                         const userRole = response.data.role; // 假设角色信息在 response.data.role 中
                         
-                        if (userRole === 'admin') {
-                            router.push('/(tabs)/search'); // 管理员页面
-                        } else if (userRole === 'user') {
-                            router.push('/(tabs)/search'); // 用户页面
-                        } else {
-                            Alert.alert('ERROR', 'Unknown user role');
-                        }
+                        router.push('/(tabs)/search'); 
                     }
                 }
             ]);

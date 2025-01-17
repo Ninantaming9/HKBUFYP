@@ -26,7 +26,7 @@ const MyAccountScreen = () => {
 
   const [number1, Setnumber1] = useState('Edit Password');
   const [number2, Setnumber2] = useState('Logout');
-
+  const [number3, Setnumber3] = useState('DetailAccount');
   
 
   const handleChoosePhoto = async () => {
@@ -155,6 +155,10 @@ const MyAccountScreen = () => {
   };
 
 
+
+  const handleEditaccount = () => {
+    router.push('/login');
+  };
 
 
 
@@ -303,6 +307,20 @@ const MyAccountScreen = () => {
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>{number2}</Text>
+                    <Ionicons name='chevron-forward' size={24} color="black" />
+                  </View>
+                </View>
+              </TouchableOpacity>
+
+
+              <TouchableOpacity onPress={() => handleEditaccount()} style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#000', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+
+                    <MaterialIcons name="edit" size={20} color="#fff" />
+                  </View>
+                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>{number3}</Text>
                     <Ionicons name='chevron-forward' size={24} color="black" />
                   </View>
                 </View>
