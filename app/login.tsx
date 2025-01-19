@@ -23,56 +23,56 @@ export default function Login() {
 
   const handleSubmit = async () => {
     try {
-        const userData = {
-            email: email,
-            password: password
-        };
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(email)) {
-            alert("Please enter a valid email format");
-            return;
-        }
+      const userData = {
+        email: email,
+        password: password
+      };
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        alert("Please enter a valid email format");
+        return;
+      }
 
-        const response = await axios.post(`${API_URL}/login`, userData);
-        if (response.data.message === 'Login successful') {
-            Alert.alert('Login successful', '', [
-                {
-                    text: 'OK',
-                    onPress: async () => {
-                        await AsyncStorage.setItem('userId', response.data.userId);
-                        await AsyncStorage.setItem('user', JSON.stringify(response.data.fullname));
-                        await AsyncStorage.setItem('userRole', JSON.stringify(response.data.role));
-                        // 根据用户角色跳转到不同页面
-                        const userRole = response.data.role; // 假设角色信息在 response.data.role 中
-                        
-                        router.push('/(tabs)/search'); 
-                    }
-                }
-            ]);
-        } else {
-            if (response.data.message === 'Invalid email') {
-                Alert.alert('ERROR', 'Invalid email');
-            } else if (response.data.message === 'Invalid password') {
-                Alert.alert('ERROR', 'Invalid password');
-            } else {
-                Alert.alert('ERROR', 'Account and password do not match');
+      const response = await axios.post(`${API_URL}/login`, userData);
+      if (response.data.message === 'Login successful') {
+        Alert.alert('Login successful', '', [
+          {
+            text: 'OK',
+            onPress: async () => {
+              await AsyncStorage.setItem('userId', response.data.userId);
+              await AsyncStorage.setItem('user', JSON.stringify(response.data.fullname));
+              await AsyncStorage.setItem('userRole', JSON.stringify(response.data.role));
+              // 根据用户角色跳转到不同页面
+              const userRole = response.data.role; // 假设角色信息在 response.data.role 中
+
+              router.push('/(tabs)/search');
             }
-            console.log('Login failed');
-        }
-    } catch (error: any) {
-        if (error.response && error.response.data && error.response.data.message) {
-            Alert.alert('ERROR', error.response.data.message);
+          }
+        ]);
+      } else {
+        if (response.data.message === 'Invalid email') {
+          Alert.alert('ERROR', 'Invalid email');
+        } else if (response.data.message === 'Invalid password') {
+          Alert.alert('ERROR', 'Invalid password');
         } else {
-            Alert.alert('ERROR', 'An error occurred during login');
+          Alert.alert('ERROR', 'Account and password do not match');
         }
+        console.log('Login failed');
+      }
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        Alert.alert('ERROR', error.response.data.message);
+      } else {
+        Alert.alert('ERROR', 'An error occurred during login');
+      }
     }
-};
+  };
 
-  
+
   return (
     <KeyboardAvoidingView behavior="padding" style={globals.container}>
       <ScrollView contentContainerStyle={globals.container}>
-  
+
 
         <VStack flex={1} justifyContent='center' alignItems='center' p={40} gap={40}>
 
@@ -82,34 +82,40 @@ export default function Login() {
           </HStack >
 
           <VStack w={"100%"} gap={30}>
-
             <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">Email</Text>
-              <Input
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Email"
-                placeholderTextColor="darkgray"
-                autoCapitalize="none"
-                autoCorrect={false}
-                h={48}
-                p={14}
-              />
+
+              <HStack alignItems="center" w="100%">
+                <Ionicons name="mail-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+                <Input
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="Email"
+                  placeholderTextColor="darkgray"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  h={48}
+                  p={14}
+                  w="80%" // 设置输入框宽度为屏幕的三分之二
+                />
+              </HStack>
             </VStack>
-
             <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">Password</Text>
-              <Input
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                placeholder="Password"
-                placeholderTextColor="darkgray"
-                autoCapitalize="none"
-                autoCorrect={false}
-                h={48}
-                p={14}
-              />
+
+              <HStack alignItems="center" w="100%">
+                <Ionicons name="lock-closed-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+                <Input
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  placeholder="Password"
+                  placeholderTextColor="darkgray"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  h={48}
+                  p={14}
+                  w="80%" // 设置输入框宽度为屏幕的三分之二
+                />
+              </HStack>
             </VStack>
 
             {/* <Button isLoading={ isLoadingAuth } onPress={ onAuthenticate }>{ authMode }</Button> */}
@@ -123,7 +129,7 @@ export default function Login() {
 
           <View className='h-1/4 w-full justify-start pt-8 px-4'>
             <Pressable
-                onPress={()=>handleSubmit()}
+              onPress={() => handleSubmit()}
               // onPress={() => router.push("/search")}
               className="bg-[#12B3A8] rounded-lg justify-center items-center py-4">
               <Text className="text-white font-bold text-lg">Login
@@ -136,15 +142,15 @@ export default function Login() {
               <Text className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
                 Don't have account?
               </Text>
-        
-              <Pressable
-              onPress={() => router.push("/register")}>
-                <Text style={{ color: '#FF7F7F' }} className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
-                
-                Register
-              </Text>
 
-            </Pressable>
+              <Pressable
+                onPress={() => router.push("/register")}>
+                <Text style={{ color: '#FF7F7F' }} className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
+
+                  Register
+                </Text>
+
+              </Pressable>
 
             </View>
 
