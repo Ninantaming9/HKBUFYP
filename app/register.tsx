@@ -21,12 +21,15 @@ export default function Login() {
   const [fullname, setFullname] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('user');
+
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   const handleSubmit = async () => {
     try {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-   
+
 
       if (!fullname || !email || !password || !confirmPassword) {
         Alert.alert('Error', 'Please fill in all fields');
@@ -48,28 +51,28 @@ export default function Login() {
       }
 
       const userData = {
-        fullname:fullname,
+        fullname: fullname,
         email: email,
         password: password,
         confirmPassword: confirmPassword,
-        role: role 
+        role: role
       };
 
       const response = await axios.post(`${API_URL}/register`, userData);
- 
+
 
       if (response.data.message === 'User registered successfully') {
         Alert.alert('User register successful', '', [
           {
-              text: 'OK',
-              onPress: async () => {
-               
-                router.push("/login")
-              }
+            text: 'OK',
+            onPress: async () => {
+
+              router.push("/login")
+            }
           }
-      ]);
+        ]);
       } else {
-  
+
         if (response.status === 400 && response.data.message === 'Email is already registered') {
           Alert.alert('Error', 'Email is already registered');
         } else {
@@ -84,7 +87,7 @@ export default function Login() {
 
   return (
     <KeyboardAvoidingView behavior="padding" style={globals.container}>
-      <ScrollView contentContainerStyle={globals.container}>
+
 
       <View style={{ width: '100%', position: 'relative', zIndex: 50, paddingTop: Constants.statusBarHeight }}>
         {/* header */}
@@ -107,107 +110,128 @@ export default function Login() {
         </View>
         {/* end header */}
       </View>
-        <VStack flex={1} justifyContent='center' alignItems='center' p={40} gap={40}>
-          <HStack gap={10}>
-            <Text fontSize={30} bold mb={20}>Register Account</Text>
-            <TabBarIcon name="ticket" size={50} />
-          </HStack>
+      <VStack flex={1} justifyContent='center' alignItems='center' p={40} gap={40}>
+        <HStack gap={10}>
+          <Text fontSize={30} bold mb={20}>Register Account</Text>
+          <TabBarIcon name="ticket" size={50} />
+        </HStack>
 
-          <VStack w={"100%"} gap={30}>
+        <VStack w={"100%"} gap={30}>
 
           <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">Full name</Text>
+            <Text ml={10} fontSize={14} color="gray">Full name</Text>
+            <Input
+              value={fullname}
+              onChangeText={setFullname}
+              placeholder="Your full name"
+              placeholderTextColor="darkgray"
+              autoCapitalize="none"
+              autoCorrect={false}
+              h={48}
+              p={14}
+            />
+          </VStack>
+
+          <VStack gap={5}>
+            <Text ml={10} fontSize={14} color="gray">Email</Text>
+            <Input
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Email"
+              placeholderTextColor="darkgray"
+              autoCapitalize="none"
+              autoCorrect={false}
+              h={48}
+              p={14}
+            />
+          </VStack>
+
+          <VStack gap={5}>
+            <Text ml={10} fontSize={14} color="gray">Password</Text>
+            <View style={{ position: 'relative' }}>
               <Input
-                value={fullname}
-                onChangeText={setFullname}
-                placeholder="Your full name"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                placeholder="Password"
                 placeholderTextColor="darkgray"
                 autoCapitalize="none"
                 autoCorrect={false}
                 h={48}
                 p={14}
               />
-            </VStack>
+              <Pressable
+                onPress={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  top: 12, // 调整位置以适应输入框
+                }}
+              >
+                <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={30} color="gray" />
+              </Pressable>
+            </View>
 
-            <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">Email</Text>
-              <Input
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Email"
-                placeholderTextColor="darkgray"
-                autoCapitalize="none"
-                autoCorrect={false}
-                h={48}
-                p={14}
-              />
-            </VStack>
+          </VStack>
 
-            <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">Password</Text>
-           
-                <Input
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                  placeholder="Password"
-                  placeholderTextColor="darkgray"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  h={48}
-                  p={14}
-                // 删除不支持的属性
-                />
-               
-            </VStack>
 
-            <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">Confirm Password</Text>
+          <VStack gap={5}>
+            <Text ml={10} fontSize={14} color="gray">Confirm Password</Text>
+            <View style={{ position: 'relative' }}>
               <Input
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
-                secureTextEntry
+                secureTextEntry={!showConfirmPassword}
                 placeholder="Confirm Password"
                 placeholderTextColor="darkgray"
                 autoCapitalize="none"
                 autoCorrect={false}
                 h={48}
                 p={14}
-
               />
-
-            </VStack>
-          </VStack>
-
-          <View className='h-1/4 w-full justify-start pt-8 px-4'>
-            <Pressable
-              onPress={handleSubmit}
-              className="bg-[#12B3A8] rounded-lg justify-center items-center py-4">
-              <Text className="text-white font-bold text-lg">Confirm</Text>
-            </Pressable>
-
-            <View className='flex-row mt-4 w-full justify-center gap-2'>
-              <Text className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
-                Already have account?
-              </Text>
-        
               <Pressable
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  top: 12, // 调整位置以适应输入框
+                }}
+              >
+                <Ionicons name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} size={30} color="gray" />
+              </Pressable>
+            </View>
+          </VStack>
+        </VStack>
+
+        <View className='h-1/4 w-full justify-start pt-8 px-4'>
+          <Pressable
+            onPress={handleSubmit}
+            className="bg-[#12B3A8] rounded-lg justify-center items-center py-4">
+            <Text className="text-white font-bold text-lg">Confirm</Text>
+          </Pressable>
+
+          <View className='flex-row mt-4 w-full justify-center gap-2'>
+            <Text className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
+              Already have account?
+            </Text>
+
+            <Pressable
               onPress={() => router.push("/login")}>
-                <Text style={{ color: '#FF7F7F' }} className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
-                
+              <Text style={{ color: '#FF7F7F' }} className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
+
                 Go Back!
               </Text>
 
             </Pressable>
 
-            </View>
           </View>
+        </View>
 
 
 
 
-        </VStack>
-      </ScrollView>
+      </VStack>
+
     </KeyboardAvoidingView>
   );
 

@@ -7,7 +7,7 @@ import { Text } from '@/components/Text';
 import { VStack } from '@/components/VStack';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 // import { useAuth } from '@/context/AuthContext';
-import { Alert, KeyboardAvoidingView, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import { globals } from '@/styles/_global';
 import { router } from 'expo-router';
 import axios, { AxiosError } from 'axios';
@@ -20,7 +20,7 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const [showPassword, setShowPassword] = useState(false); // 新增状态变量
   const handleSubmit = async () => {
     try {
       const userData = {
@@ -70,20 +70,18 @@ export default function Login() {
 
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={globals.container}>
-      <ScrollView contentContainerStyle={globals.container}>
+    <KeyboardAvoidingView behavior="padding" style={globals.container} keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
 
+      
 
         <VStack flex={1} justifyContent='center' alignItems='center' p={40} gap={40}>
-
           <HStack gap={10}>
             <Text fontSize={30} bold mb={20}>Airline Ticket Booking</Text>
             <TabBarIcon name="ticket" size={50} />
-          </HStack >
+          </HStack>
 
           <VStack w={"100%"} gap={30}>
             <VStack gap={5}>
-
               <HStack alignItems="center" w="100%">
                 <Ionicons name="mail-outline" size={30} color="gray" style={{ marginRight: 15 }} />
                 <Input
@@ -93,73 +91,63 @@ export default function Login() {
                   placeholderTextColor="darkgray"
                   autoCapitalize="none"
                   autoCorrect={false}
-                  h={48}
+                  h={55}
                   p={14}
-                  w="80%" // 设置输入框宽度为屏幕的三分之二
+                  w="83%"
                 />
               </HStack>
             </VStack>
             <VStack gap={5}>
-
               <HStack alignItems="center" w="100%">
                 <Ionicons name="lock-closed-outline" size={30} color="gray" style={{ marginRight: 15 }} />
-                <Input
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  placeholder="Password"
-                  placeholderTextColor="darkgray"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  h={48}
-                  p={14}
-                  w="80%" // 设置输入框宽度为屏幕的三分之二
-                />
+                <View style={{ flex: 1, position: 'relative' }}>
+                  <Input
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword} // 根据状态变量控制密码可见性
+                    placeholder="Password"
+                    placeholderTextColor="darkgray"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    h={55}
+                    p={14}
+                    w="98%"
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: 10,
+                      top: 12, // 调整位置以适应输入框
+                    }}
+                  >
+                    <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={30} color="gray" />
+                  </Pressable>
+                </View>
               </HStack>
             </VStack>
-
-            {/* <Button isLoading={ isLoadingAuth } onPress={ onAuthenticate }>{ authMode }</Button> */}
-
           </VStack>
-
-          {/* <Divider w={ "90%" } />
-          <Text onPress={ onToggleAuthMode } fontSize={ 16 } underline>
-            Login
-          </Text> */}
 
           <View className='h-1/4 w-full justify-start pt-8 px-4'>
             <Pressable
-              onPress={() => handleSubmit()}
-              // onPress={() => router.push("/search")}
+              onPress={handleSubmit}
               className="bg-[#12B3A8] rounded-lg justify-center items-center py-4">
-              <Text className="text-white font-bold text-lg">Login
-
-              </Text>
-
+              <Text className="text-white font-bold text-lg">Login</Text>
             </Pressable>
 
             <View className='flex-row mt-4 w-full justify-center gap-2'>
               <Text className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
                 Don't have account?
               </Text>
-
-              <Pressable
-                onPress={() => router.push("/register")}>
+              <Pressable onPress={() => router.push("/register")}>
                 <Text style={{ color: '#FF7F7F' }} className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
-
                   Register
                 </Text>
-
               </Pressable>
-
             </View>
-
           </View>
-          {/* <Text onPress={onToggleAuthMode} fontSize={16} underline>
-            {authMode === 'login' ? 'Register new account' : 'Login to account'}
-          </Text> */}
         </VStack>
-      </ScrollView>
+
     </KeyboardAvoidingView >
   );
 }
