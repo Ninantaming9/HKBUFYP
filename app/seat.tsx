@@ -37,8 +37,8 @@ const SeatSelection: React.FC = () => {
            setcabinClass(JSON.parse(storeCabinclass)); // 解析 JSON 字符串
          }
 
-         console.log("asdsadasdas"+ cabinClass)
-
+       
+         
         if (flightResponse.ok) {
           const flightData = await flightResponse.json();
           setFlightDetails(flightData);
@@ -97,63 +97,136 @@ const SeatSelection: React.FC = () => {
     }
   };
 
-  const isSeatSelected = (seat: string) => selectedSeats.includes(seat);
 
-  const renderSeats = () => {
-    const rows = 6;
+
+  const renderSeats = (cabinClass: string | undefined) => {
+    const rows = 2;
     const seatsPerRow = 5; // 保持为5，方便处理空白
     const renderedSeats = [];
     const seatLetters = ['A', 'B', 'C', 'D', 'E']; // 包含C列
-  
+
+    // 判断舱位类型
+    const isBusinessClass = cabinClass === 'Economy Class'; // 修改为判断商务舱
+
     for (let i = 0; i < rows; i++) {
+        const rowSeats = [];
+        for (let j = 0; j < seatsPerRow; j++) {
+            const seat = `${i + 1}${seatLetters[j]}`;
+            
+            // 如果是C列，显示空白
+            if (seatLetters[j] === 'C') {
+                rowSeats.push(
+                    <View key={seat} style={{ width: 60, height: 60 }} /> // 空白占位
+                );
+            } else {
+                const seatColor = isBusinessClass
+                    ? "#808080" // 灰色表示商务舱
+                    : seatStatus[seat] === 'selected'
+                        ? "#808080" // 灰色表示已被他人选中
+                        : selectedSeats.includes(seat)
+                            ? "#FF0000" // 红色表示已被选中
+                            : "#00FF00"; // 绿色表示可选
+
+                rowSeats.push(
+                    <Pressable
+                        key={seat}
+                        style={[
+                            styles.seatButton,
+                            { backgroundColor: seatColor },
+                            seatStatus[seat] === 'selected' && { opacity: 1 }
+                        ]}
+                        onPress={() => {  
+                            if (seatStatus[seat] === 'selected') {
+                                alert(`Seat ${seat} has already been selected by someone else!`);
+                            } else {
+                                onSeatSelect(seat);
+                            }
+                        }}
+                        disabled={seatStatus[seat] === 'selected' || isBusinessClass} // 添加商务舱的条件
+                    >
+                        <Text>{seat}</Text>
+                    </Pressable>
+                );
+            }
+        }
+
+        renderedSeats.push(
+            <View key={`row-${i}`} style={{ flexDirection: "row" }}>
+                {rowSeats}
+            </View>
+        );
+    }
+
+    return renderedSeats;
+};
+
+
+const renderSeats1 = (cabinClass: string | undefined) => {
+  const rows = 4; // 总行数
+  const seatsPerRow = 5; // 每行座位数
+  const renderedSeats = [];
+  const seatLetters = ['A', 'B', 'C', 'D', 'E']; // 包含C列
+
+  // 判断舱位类型
+  const isBusinessClass = cabinClass === 'Business Class';
+
+  // 从第3行开始渲染
+  for (let i = 2; i < rows + 2; i++) { // 从2开始，表示第3行
       const rowSeats = [];
       for (let j = 0; j < seatsPerRow; j++) {
-        const seat = `${i + 1}${seatLetters[j]}`;
-        
-        // 如果是C列，显示空白
-        if (seatLetters[j] === 'C') {
-          rowSeats.push(
-            <View key={seat} style={{ width: 60, height: 60 }} /> // 空白占位
-          );
-        } else {
-          const seatColor = seatStatus[seat] === 'selected'
-            ? "#808080" // 灰色表示已被他人选中
-            : selectedSeats.includes(seat)
-              ? "#FF0000" // 红色表示已被选中
-              : "#00FF00"; // 绿色表示可选
-  
-          rowSeats.push(
-            <Pressable
-              key={seat}
-              style={[
-                styles.seatButton,
-                { backgroundColor: seatColor },
-                seatStatus[seat] === 'selected' && { opacity: 0.5 }
-              ]}
-              onPress={() => {
-                if (seatStatus[seat] === 'selected') {
-                  alert(`Seat ${seat} has already been selected by someone else!`);
-                } else {
-                  onSeatSelect(seat);
-                }
-              }}
-              disabled={seatStatus[seat] === 'selected'}
-            >
-              <Text>{seat}</Text>
-            </Pressable>
-          );
-        }
+          const seat = `${i + 1}${seatLetters[j]}`;
+          
+          // 如果是C列，显示空白
+          if (seatLetters[j] === 'C') {
+              rowSeats.push(
+                  <View key={seat} style={{ width: 60, height: 60 }} /> // 空白占位
+              );
+          } else {
+              const seatColor = isBusinessClass
+                  ? "#808080" // 灰色表示商务舱
+                  : seatStatus[seat] === 'selected'
+                      ? "#808080" // 灰色表示已被他人选中
+                      : selectedSeats.includes(seat)
+                          ? "#FF0000" // 红色表示已被选中
+                          : "#00FF00"; // 绿色表示可选
+
+              rowSeats.push(
+                  <Pressable
+                      key={seat}
+                      style={[
+                          styles.seatButton,
+                          { backgroundColor: seatColor },
+                          seatStatus[seat] === 'selected' && { opacity: 1 }
+                      ]}
+                      onPress={() => {
+                          if (seatStatus[seat] === 'selected') {
+                              alert(`Seat ${seat} has already been selected by someone else!`);
+                          } else {
+                              onSeatSelect(seat);
+                          }
+                      }}
+                      disabled={seatStatus[seat] === 'selected'}
+                  >
+                      <Text>{seat}</Text>
+                  </Pressable>
+              );
+          }
       }
-  
-      renderedSeats.push(
-        <View key={`row-${i}`} style={{ flexDirection: "row" }}>
-          {rowSeats}
-        </View>
-      );
+
+
+        renderedSeats.push(
+            <View key={`row-${i}`} style={{ flexDirection: "row", justifyContent: "center" }}>
+                {rowSeats}
+            </View>
+        );
     }
-  
+
     return renderedSeats;
-  };
+};
+
+
+
+  
 
 
   const handleContinue = () => {
@@ -196,8 +269,11 @@ const SeatSelection: React.FC = () => {
 
       {/* Main Content */}
       <View style={styles.container}>
-        <Text style={styles.headerText}>Select Your Seats</Text>
-        <View style={styles.seatContainer}>{renderSeats()}</View>
+        <Text style={styles.headerText}>Business Class</Text>
+        <View style={styles.seatContainer}>{renderSeats(cabinClass)}</View>
+        <Text style={styles.headerText}>Economy Class</Text>
+        <View style={styles.seatContainer}>{renderSeats1(cabinClass)}</View>
+
         <Text style={styles.selectedSeatsText}>
           Selected Seats: {selectedSeats.join(", ") || "None"}
         </Text>
