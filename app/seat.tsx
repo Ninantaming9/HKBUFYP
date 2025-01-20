@@ -4,6 +4,7 @@ import { router, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
 import { API_URL } from '../backend/address';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const SeatSelection: React.FC = () => {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const router = useRouter(); // 使用 useRouter 获取 router 实例
@@ -12,8 +13,14 @@ const SeatSelection: React.FC = () => {
   const [seatStatus, setSeatStatus] = useState<{ [key: string]: string }>({});
   const { flightId } = route.params as { flightId: string };
 
+  const [cabinClass, setcabinClass] = useState('');
+
+ 
+
+
   useEffect(() => {
     const fetchData = async () => {
+  
       try {
         const flightResponse = await fetch(`${API_URL}/findFlightId`, {
           method: 'POST',
@@ -22,6 +29,15 @@ const SeatSelection: React.FC = () => {
           },
           body: JSON.stringify({ flightId }),
         });
+
+         // 从 AsyncStorage 中获取用户全名
+         const storeCabinclass = await AsyncStorage.getItem('cabinClass');
+         // 如果存在，更新状态
+         if (storeCabinclass) {
+           setcabinClass(JSON.parse(storeCabinclass)); // 解析 JSON 字符串
+         }
+
+         console.log("asdsadasdas"+ cabinClass)
 
         if (flightResponse.ok) {
           const flightData = await flightResponse.json();

@@ -135,7 +135,7 @@ const FlightScreen = () => {
                     const storedUserId = await AsyncStorage.getItem('userId'); // 从 AsyncStorage 获取用户 ID
                     const storedFullName = await AsyncStorage.getItem('user'); // 从 AsyncStorage 获取用户全名
                     const storedUserRole = await AsyncStorage.getItem('userRole'); // 从 AsyncStorage 获取用户全名
-                    console.log("dasdaadsasas"+storedUserRole);
+       
                     // 如果存在用户 ID，调用获取照片的 API
                     if (storedUserId) {
                         fetchUserPhoto(storedUserId);
@@ -206,6 +206,22 @@ const FlightScreen = () => {
             else if (response.ok) {
                 Alert.alert('Search success');
                 const flightData = await response.json();
+                console.log('Flight Data:', flightData); // Log the flight data
+                if (flightData.flights && flightData.flights.length > 0) {
+                    // Access the cabinClass of the first flight (or any specific flight)
+                    const cabinClass = flightData.flights[0].cabinClass; // Change the index as needed
+            
+                    // Check if cabinClass is defined before storing
+                    if (cabinClass !== undefined) {
+                        await AsyncStorage.setItem('cabinClass', JSON.stringify(cabinClass));
+                 
+                    } else {
+                        console.warn('cabinClass is undefined, not storing in AsyncStorage');
+                    }
+                } else {
+                    console.warn('No flights available in the response');
+                }
+
                 const searchResultsArray = Array.isArray(flightData.flights) ? flightData.flights : [];
                 setSearchResults(searchResultsArray);
                 setFlightCount(flightData.flightCount);
