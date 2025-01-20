@@ -26,7 +26,7 @@ const MyAccountScreen = () => {
 
   const [number1, Setnumber1] = useState('Edit Password');
   const [number2, Setnumber2] = useState('Logout');
-  const [number3, Setnumber3] = useState('DetailAccount');
+  const [number3, Setnumber3] = useState('Detail  Account');
   
 
   const handleChoosePhoto = async () => {
