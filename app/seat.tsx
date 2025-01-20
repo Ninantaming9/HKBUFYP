@@ -162,7 +162,7 @@ const SeatSelection: React.FC = () => {
 
 
 const renderSeats1 = (cabinClass: string | undefined) => {
-  const rows = 4; // 总行数
+  const rows = 3; // 总行数
   const seatsPerRow = 5; // 每行座位数
   const renderedSeats = [];
   const seatLetters = ['A', 'B', 'C', 'D', 'E']; // 包含C列

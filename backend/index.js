@@ -348,10 +348,42 @@ const transporter = nodemailer.createTransport({
 const mailOptions = {
   from: 'zmhaoo2@gmail.com',
   to: 'zmhaoo@gmail.com', // 您要发送的目标邮箱
-      subject: 'Flight Booking Confirmation',
-      text: `Dear ${fullName},\n\nYour flight booking has been confirmed!\n\nFlight Number: ${flightNumber}\nDate: ${date}\nDeparture: ${departureLocation} at ${departureTime}\nArrival: ${arrivalLocation} at ${arrivalTime}\nSeat: ${seat}\nTotal Price: ${totalPrice}\n\nThank you for booking with us!\n\nBest regards,\nAirplane Company`
-    };
-
+  subject: 'Flight Booking Confirmation',
+  html: `
+    <div style="font-family: Arial, sans-serif; line-height: 1.4;">
+      <h2 style="font-size: 18px;">Dear ${fullName},</h2>
+      <p>Your flight booking has been confirmed!</p>
+      <table style="width: 45%; border-collapse: collapse; margin: 10px 0;">
+        <tr>
+          <th style="border: 1px solid #dddddd; padding: 4px; text-align: left; font-size: 14px;">Flight Number</th>
+          <td style="border: 1px solid #dddddd; padding: 4px; font-size: 14px;">${flightNumber}</td>
+        </tr>
+        <tr>
+          <th style="border: 1px solid #dddddd; padding: 4px; text-align: left; font-size: 14px;">Date</th>
+          <td style="border: 1px solid #dddddd; padding: 4px; font-size: 14px;">${date}</td>
+        </tr>
+        <tr>
+          <th style="border: 1px solid #dddddd; padding: 4px; text-align: left; font-size: 14px;">Departure</th>
+          <td style="border: 1px solid #dddddd; padding: 4px; font-size: 14px;">${departureLocation} at ${departureTime}</td>
+        </tr>
+        <tr>
+          <th style="border: 1px solid #dddddd; padding: 4px; text-align: left; font-size: 14px;">Arrival</th>
+          <td style="border: 1px solid #dddddd; padding: 4px; font-size: 14px;">${arrivalLocation} at ${arrivalTime}</td>
+        </tr>
+        <tr>
+          <th style="border: 1px solid #dddddd; padding: 4px; text-align: left; font-size: 14px;">Seat</th>
+          <td style="border: 1px solid #dddddd; padding: 4px; font-size: 14px;">${seat}</td>
+        </tr>
+        <tr>
+          <th style="border: 1px solid #dddddd; padding: 4px; text-align: left; font-size: 14px;">Total Price</th>
+          <td style="border: 1px solid #dddddd; padding: 4px; font-size: 14px;">${totalPrice}</td>
+        </tr>
+      </table>
+      <p>Thank you for booking with us!</p>
+      <p>Best regards,<br>Airplane Company</p>
+    </div>
+  `
+};
     // 等待邮件发送完成
     await transporter.sendMail(mailOptions);
 
@@ -487,9 +519,21 @@ app.post('/deleteFlightById', async (req, res) => {
         from: 'zmhaoo2@gmail.com',
         to: 'zmhaoo@gmail.com', // 使用用户的邮箱
         subject: 'Flight Cancellation Confirmation',
-        text: `Dear ${fullName},\n\nYour flight booking has been cancelled.\n\nFlight Number: ${flightNumber}\n\nThank you for using our service!\n\nBest regards,\nAirplane Company`
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.4;">
+            <h2 style="font-size: 18px;">Dear ${fullName},</h2>
+            <p>Your flight booking has been cancelled.</p>
+            <table style="width: 60%; border-collapse: collapse; margin: 10px 0;">
+              <tr>
+                <th style="border: 1px solid #dddddd; padding: 4px; text-align: left; font-size: 14px;">Flight Number</th>
+                <td style="border: 1px solid #dddddd; padding: 4px; font-size: 14px;">${flightNumber}</td>
+              </tr>
+            </table>
+            <p>Thank you for using our service!</p>
+            <p>Best regards,<br>Airplane Company</p>
+          </div>
+        `
       };
-
       // 等待邮件发送完成
       await transporter.sendMail(mailOptions);
 
