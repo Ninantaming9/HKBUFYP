@@ -353,7 +353,7 @@ const mailOptions = {
     <div style="font-family: Arial, sans-serif; line-height: 1.4;">
       <h2 style="font-size: 18px;">Dear ${fullName},</h2>
       <p>Your flight booking has been confirmed!</p>
-      <table style="width: 45%; border-collapse: collapse; margin: 10px 0;">
+      <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
         <tr>
           <th style="border: 1px solid #dddddd; padding: 4px; text-align: left; font-size: 14px;">Flight Number</th>
           <td style="border: 1px solid #dddddd; padding: 4px; font-size: 14px;">${flightNumber}</td>
@@ -384,6 +384,7 @@ const mailOptions = {
     </div>
   `
 };
+
     // 等待邮件发送完成
     await transporter.sendMail(mailOptions);
 
@@ -523,7 +524,7 @@ app.post('/deleteFlightById', async (req, res) => {
           <div style="font-family: Arial, sans-serif; line-height: 1.4;">
             <h2 style="font-size: 18px;">Dear ${fullName},</h2>
             <p>Your flight booking has been cancelled.</p>
-            <table style="width: 60%; border-collapse: collapse; margin: 10px 0;">
+            <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
               <tr>
                 <th style="border: 1px solid #dddddd; padding: 4px; text-align: left; font-size: 14px;">Flight Number</th>
                 <td style="border: 1px solid #dddddd; padding: 4px; font-size: 14px;">${flightNumber}</td>
@@ -534,6 +535,7 @@ app.post('/deleteFlightById', async (req, res) => {
           </div>
         `
       };
+      
       // 等待邮件发送完成
       await transporter.sendMail(mailOptions);
 
