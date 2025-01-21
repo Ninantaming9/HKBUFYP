@@ -20,7 +20,7 @@ import Constants from 'expo-constants';
 export default function Login() {
   const router = useRouter(); // 使用 useRouter 获取 router 实例
 const route = useRoute(); // 获取路由信息
-
+  const [showPassword, setShowPassword] = useState(false);
 
 
   const [oldPassword, setOldPassword] = useState('');
@@ -105,65 +105,89 @@ const route = useRoute(); // 获取路由信息
 
           <VStack w={"100%"} gap={30}>
 
+<HStack alignItems="center" w="100%">
+        <Ionicons name="lock-open-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+        <View style={{ flex: 1, position: 'relative' }}>
+          <Input
+            value={oldPassword}
+            onChangeText={setOldPassword}
+            secureTextEntry={!showPassword} // Control password visibility based on state
+            placeholder="Old Password"
+            placeholderTextColor="darkgray"
+            autoCapitalize="none"
+            autoCorrect={false}
+            h={55}
+            p={14}
+            w="100%"
+          />
+          <Pressable
+            onPress={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              right: 10,
+              top: 12, // Adjust position to fit the input box
+            }}
+          >
+            <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={30} color="gray" />
+          </Pressable>
+        </View>
+      </HStack>
 
-          <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">Old password</Text>
-              <Input
-                value={oldPassword}
-                onChangeText={setOldPassword}
-                placeholder="Old Password"
-                placeholderTextColor="darkgray"
-                autoCapitalize="none"
-                autoCorrect={false}
-                h={48}
-                p={14}
-              />
-            </VStack>
+          <HStack alignItems="center" w="100%">
+                  <Ionicons name="lock-closed-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+                  <View style={{ flex: 1, position: 'relative' }}>
+                    <Input
+                      value={newPassword}
+                      onChangeText={setNewPassword}
+                      secureTextEntry={!showPassword} // Control password visibility based on state
+                      placeholder="New Password"
+                      placeholderTextColor="darkgray"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      h={55}
+                      p={14}
+                      w="100%"
+                    />
+                    <Pressable
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: 10,
+                        top: 12, // Adjust position to fit the input box
+                      }}
+                    >
+                      <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={30} color="gray" />
+                    </Pressable>
+                  </View>
+                </HStack>
 
-            {/* <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">Name</Text>
-              <Input
-                value={name}
-                onChangeText={setName}
-                secureTextEntry
-                placeholder="Phone"
-                placeholderTextColor="darkgray"
-                autoCapitalize="none"
-                autoCorrect={false}
-                h={48}
-                p={14}
-              />
-            </VStack> */}
-
-            <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">New password</Text>
-              <Input
-                value={newPassword}
-                onChangeText={setNewPassword}
-                secureTextEntry
-                placeholder="password"
-                placeholderTextColor="darkgray"
-                autoCapitalize="none"
-                autoCorrect={false}
-                h={48}
-                p={14}
-              />
-            </VStack>
-
-            <VStack gap={5}>
-              <Text ml={10} fontSize={14} color="gray">Confirm password</Text>
-              <Input
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                placeholder="password"
-                placeholderTextColor="darkgray"
-                autoCapitalize="none"
-                autoCorrect={false}
-                h={48}
-                p={14}
-              />
-            </VStack>
+           <HStack alignItems="center" w="100%">
+                   <Ionicons name="lock-closed-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+                   <View style={{ flex: 1, position: 'relative' }}>
+                     <Input
+                       value={confirmPassword}
+                       onChangeText={setConfirmPassword}
+                       secureTextEntry={!showPassword} // Control password visibility based on state
+                       placeholder="Confirm Password"
+                       placeholderTextColor="darkgray"
+                       autoCapitalize="none"
+                       autoCorrect={false}
+                       h={55}
+                       p={14}
+                       w="100%"
+                     />
+                     <Pressable
+                       onPress={() => setShowPassword(!showPassword)}
+                       style={{
+                         position: 'absolute',
+                         right: 10,
+                         top: 12, // Adjust position to fit the input box
+                       }}
+                     >
+                       <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={30} color="gray" />
+                     </Pressable>
+                   </View>
+                 </HStack>
 
 
             {/* <VStack gap={5}>
