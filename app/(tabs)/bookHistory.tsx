@@ -150,9 +150,8 @@ export default function searchresult() {
   };
 
   const handleViewQRCode = (flightId: string) => {
-    // Logic to view the QR code for the flight
+    router.push("/login");
     console.log(`Viewing QR Code for flight ID: ${flightId}`);
-    // You can navigate to a QR code screen or display a modal here
   };
 
 

@@ -450,20 +450,31 @@ const FlightScreen = () => {
             );
         } else if (userRole === 'admin') {
             return (
-                <View className='w-full flex-row justify-end items-center h-14'>
-                    <TouchableOpacity 
-                        onPress={() => router.push("/flightCreat")}  
-                        className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
-                    >
-                        <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
-                            <Text className='text-white font-semibold'>✈️</Text>
-                        </View>
-                        
-                        <View className='justify-start items-start gap-1'>
-                            <Text className='text-black font-bold text-lg'>Create</Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
+                <View className='w-full flex-row justify-between items-center h-14'>
+                <TouchableOpacity
+                    onPress={() => router.push("/flightCreat")}
+                    className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
+                >
+                    <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
+                        <Text className='text-white font-semibold'>🎫</Text>
+                    </View>
+                    
+                </TouchableOpacity>
+            
+                <TouchableOpacity 
+                    onPress={() => router.push("/flightCreat")}  
+                    className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
+                >
+                    <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
+                        <Text className='text-white font-semibold'>✈️</Text>
+                    </View>
+                    
+                    <View className='justify-start items-start gap-1'>
+                        <Text className='text-black font-bold text-lg'>Create</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+            
             );
         } else {
             return null; // 处理其他角色或情况
