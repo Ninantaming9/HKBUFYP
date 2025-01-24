@@ -560,6 +560,66 @@ app.post('/payment', async (req, res) => {
 });
 
 
+const confirmationCodes = {};
 
+// Configure your email transport
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'zmhaoo2@gmail.com', // 您的 Gmail 地址
+    pass: 'yjzj xdme bovq ouua' // 您的 Gmail 密码或应用专用密码
+  }
+});
 
+// Route to request a password reset
+app.post('/requestPasswordReset', async (req, res) => {
+  const { email } = req.body;
+
+  // Generate a random confirmation code
+  const confirmationCode = crypto.randomBytes(3).toString('hex'); // Generates a 6-character hex code
+
+  // Store the confirmation code (you should store it in a database with an expiration time)
+  confirmationCodes[email] = confirmationCode;
+
+  // Send the confirmation code to the user's email
+  const mailOptions = {
+    from: 'zmhaoo2@gmail.com',
+    to: 'zmhaoo@gmail.com', // 使用用户的邮箱
+    subject: 'Password Reset Confirmation Code',
+    text: `Your confirmation code is: ${confirmationCode}`
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Confirmation code sent to your email.' });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ error: 'Failed to send confirmation code.' });
+  }
+});
+
+app.post('/resetPassword', async (req, res) => {
+  const db = await connectToDB();
+  const flightCollection = db.collection('users');
+
+  const { email, confirmationCode, newPassword } = req.body;
+
+  // Check if the confirmation code is valid
+  if (confirmationCodes[email] && confirmationCodes[email] === confirmationCode) {
+    try {
+      // 直接将新密码存储到数据库中（不使用 bcrypt）
+      await flightCollection.updateOne({ email }, { $set: { password: newPassword } });
+
+      // 移除确认代码
+      delete confirmationCodes[email];
+
+      res.status(200).json({ message: 'Password has been reset successfully.' });
+    } catch (error) {
+      console.error('Error updating password:', error); // 打印完整的错误信息
+      res.status(500).json({ error: 'Internal server error.' });
+    }
+  } else {
+    res.status(400).json({ error: 'Invalid confirmation code.' });
+  }
+});
 

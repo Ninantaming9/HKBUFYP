@@ -145,6 +145,20 @@ export default function Login() {
                 </Text>
               </Pressable>
             </View>
+
+            <View className='flex-row mt-4 w-full justify-center gap-2'>
+              <Text className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
+                    Forget password?
+              </Text>
+              <Pressable onPress={() => router.push("/forgetpassword")}>
+                <Text style={{ color: '#FF7F7F' }} className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
+                  Click here
+                </Text>
+              </Pressable>
+            </View>
+
+
+
           </View>
         </VStack>
 
