@@ -482,6 +482,8 @@ const FlightScreen = () => {
     };
     
 
+    
+
     return (
         <ScrollView>
             <View className="flex-1 items-center bg-[#F5F7FA] relative">

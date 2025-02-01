@@ -76,44 +76,63 @@ export default function Login() {
 
   return (
     <KeyboardAvoidingView behavior="padding" style={globals.container}>
-    <View style={{ width: '100%', position: 'relative', zIndex: 50, paddingTop: Constants.statusBarHeight }}>
-      <TouchableOpacity onPress={() => router.back()}>
-        <View style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#888', justifyContent: 'center', alignItems: 'center' }}>
-          <Ionicons name='chevron-back' size={20} color={'black'} />
-        </View>
-      </TouchableOpacity>
-    </View>
+      <View style={{ width: '100%', position: 'relative', zIndex: 50, paddingTop: Constants.statusBarHeight }}>
+        {/* header */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <View style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#888', justifyContent: 'center', alignItems: 'center' }}>
+              <Ionicons name='chevron-back' size={20} color={'black'} />
+            </View>
+          </TouchableOpacity>
 
-    <VStack flex={1} justifyContent='center' alignItems='center' p={40} gap={40}>
-      <Text fontSize={30} bold mb={20}>Password Reset</Text>
-      <VStack w={"100%"} gap={30}>
-        {step === 1 && (
-          <>
-            <HStack alignItems="center" w="100%">
-              <Ionicons name="mail-outline" size={30} color="gray" style={{ marginRight: 15 }} />
-              <View style={{ flex: 1 }}>
-                <Text ml={10} fontSize={14} color="gray">Email</Text>
-                <Input
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="Email"
-                  placeholderTextColor="darkgray"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  h={48}
-                  p={14}
-                />
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+
+            <TouchableOpacity>
+              <View style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
+                <AntDesign name="sharealt" size={20} color="black" />
               </View>
-            </HStack>
-            <Pressable onPress={handleRequestCode} className="bg-[#12B3A8] rounded-lg justify-center items-center py-4">
-              <Text className="text-white font-bold text-lg">Send Confirmation Code</Text>
-            </Pressable>
-          </>
-        )}
+            </TouchableOpacity>
 
-{step === 2 && (
+
+          </View>
+
+        </View>
+        {/* end header */}
+
+      </View>
+      <VStack flex={1} justifyContent='center' alignItems='center' p={40} gap={40}>
+        <HStack gap={10}>
+          <Text fontSize={30} bold mb={20}>Password Reset</Text>
+          <TabBarIcon name="ticket" size={50} />
+        </HStack>
+        <VStack w={"100%"} gap={30}>
+          {step === 1 && (
             <>
-              <HStack alignItems="center" w="100%">      
+              <HStack alignItems="center" w="100%">
+                <Ionicons name="mail-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+                <View style={{ flex: 1 }}>
+                  <Text ml={10} fontSize={14} color="gray">Email</Text>
+                  <Input
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="Email"
+                    placeholderTextColor="darkgray"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    h={48}
+                    p={14}
+                  />
+                </View>
+              </HStack>
+              <Pressable onPress={handleRequestCode} className="bg-[#12B3A8] rounded-lg justify-center items-center py-4">
+                <Text className="text-white font-bold text-lg">Send Confirmation Code</Text>
+              </Pressable>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <HStack alignItems="center" w="100%">
                 <Ionicons name="key-outline" size={30} color="gray" style={{ marginRight: 15 }} />
                 <View style={{ flex: 1 }}>
                   <Text ml={10} fontSize={14} color="gray">Confirmation Code</Text>

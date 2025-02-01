@@ -1,8 +1,8 @@
 import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
-import { router, useRouter } from "expo-router";
+import { router, useFocusEffect, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
+import { View, Text, Pressable, StyleSheet, TouchableOpacity, ImageBackground, ActivityIndicator } from "react-native";
 import { API_URL } from '../backend/address';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const SeatSelection: React.FC = () => {
@@ -14,80 +14,90 @@ const SeatSelection: React.FC = () => {
   const { flightId } = route.params as { flightId: string };
 
   const [cabinClass, setcabinClass] = useState('');
-
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<string | null>(null);
  
-
-
-  useEffect(() => {
-    const fetchData = async () => {
   
-      try {
-        const flightResponse = await fetch(`${API_URL}/findFlightId`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ flightId }),
-        });
-
-         // 从 AsyncStorage 中获取用户全名
-         const storeCabinclass = await AsyncStorage.getItem('cabinClass');
-         // 如果存在，更新状态
-         if (storeCabinclass) {
-           setcabinClass(JSON.parse(storeCabinclass)); // 解析 JSON 字符串
-         }
-
-       
-         
-        if (flightResponse.ok) {
-          const flightData = await flightResponse.json();
-          setFlightDetails(flightData);
-
-          const seatResponse = await fetch(`${API_URL}/getSelectedSeatsByFlight`, {
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true); // 开始加载
+        try {
+          const flightResponse = await fetch(`${API_URL}/findFlightId`, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              flightNumber: flightData.flightNumber,
-              date: flightData.date,
-              departureLocation: flightData.departureLocation,
-              arrivalLocation: flightData.arrivalLocation,
-              departureTime: flightData.departureTime,
-              arrivalTime: flightData.arrivalTime,
-              ticketPrice: flightData.ticketPrice
-            })
+            body: JSON.stringify({ flightId }),
           });
 
-          if (seatResponse.ok) {
-            const seatData = await seatResponse.json();
-            // 假设 seatData.selectedSeats 是一个数组，可能包含嵌套数组
-            const seats: string[] = seatData.selectedSeats.flatMap((seat: string) =>
-              seat.split(',').map((s: string) => s.trim())
-            );
-            console.log(seats); // 打印座位状态
+          // 从 AsyncStorage 中获取用户全名
+          const storeCabinclass = await AsyncStorage.getItem('cabinClass');
+          if (storeCabinclass) {
+            setcabinClass(JSON.parse(storeCabinclass)); // 解析 JSON 字符串
+          }
 
-            // 创建一个座位状态对象
-            const updatedSeatStatus: { [key: string]: string } = {};
-            seats.forEach((seat: string) => {
-              updatedSeatStatus[seat] = 'selected'; // 标记为已被选中
+          if (flightResponse.ok) {
+            const flightData = await flightResponse.json();
+            setFlightDetails(flightData);
+
+            const seatResponse = await fetch(`${API_URL}/getSelectedSeatsByFlight`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                flightNumber: flightData.flightNumber,
+                date: flightData.date,
+                departureLocation: flightData.departureLocation,
+                arrivalLocation: flightData.arrivalLocation,
+                departureTime: flightData.departureTime,
+                arrivalTime: flightData.arrivalTime,
+                ticketPrice: flightData.ticketPrice,
+              }),
             });
 
-            setSeatStatus(updatedSeatStatus); // 更新座位状态
+            if (seatResponse.ok) {
+              const seatData = await seatResponse.json();
+              const seats: string[] = seatData.selectedSeats.flatMap((seat: string) =>
+                seat.split(',').map((s: string) => s.trim())
+              );
+
+              // 创建一个座位状态对象
+              const updatedSeatStatus: { [key: string]: string } = {};
+              seats.forEach((seat: string) => {
+                updatedSeatStatus[seat] = 'selected'; // 标记为已被选中
+              });
+
+              setSeatStatus(updatedSeatStatus); // 更新座位状态
+            } else {
+              console.log('Error fetching seat status');
+            }
           } else {
-            console.log('Error fetching seat status');
+            console.log('Error fetching flight details');
           }
-        } else {
-          console.log('Error fetching flight details');
+        } catch (error) {
+          console.error('Error:', error);
+        } finally {
+          // 强制延迟 2 秒
+          setTimeout(() => {
+            setLoading(false); // 完成加载
+          }, 2000);
         }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    };
+      };
 
-    fetchData();
-  }, [flightId]);
+      fetchData();
+    }, [flightId])
+  );
 
+  if (loading) {
+    return (
+      <View style={{ flex: 3, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   const onSeatSelect = (seat: string) => {
     if (selectedSeats.includes(seat)) {

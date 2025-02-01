@@ -72,95 +72,92 @@ export default function Login() {
   return (
     <KeyboardAvoidingView behavior="padding" style={globals.container} keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
 
-      
 
-        <VStack flex={1} justifyContent='center' alignItems='center' p={40} gap={40}>
-          <HStack gap={10}>
-            <Text fontSize={30} bold mb={20}>Airline Ticket Booking</Text>
-            <TabBarIcon name="ticket" size={50} />
-          </HStack>
 
-          <VStack w={"100%"} gap={30}>
-            <VStack gap={5}>
-              <HStack alignItems="center" w="100%">
-                <Ionicons name="mail-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+      <VStack flex={1} justifyContent='center' alignItems='center' p={40} gap={40}>
+        <HStack gap={10}>
+          <Text fontSize={30} bold mb={20}>Airline Ticket Booking</Text>
+          <TabBarIcon name="ticket" size={50} />
+        </HStack>
+
+        <VStack w={"100%"} gap={30}>
+          <VStack gap={5}>
+            <HStack alignItems="center" w="100%">
+              <Ionicons name="mail-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+              <Input
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Email"
+                placeholderTextColor="darkgray"
+                autoCapitalize="none"
+                autoCorrect={false}
+                h={55}
+                p={14}
+                w="83%"
+              />
+            </HStack>
+          </VStack>
+          <VStack gap={5}>
+            <HStack alignItems="center" w="100%">
+              <Ionicons name="lock-closed-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+              <View style={{ flex: 1, position: 'relative' }}>
                 <Input
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="Email"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword} // 根据状态变量控制密码可见性
+                  placeholder="Password"
                   placeholderTextColor="darkgray"
                   autoCapitalize="none"
                   autoCorrect={false}
                   h={55}
                   p={14}
-                  w="83%"
+                  w="98%"
                 />
-              </HStack>
-            </VStack>
-            <VStack gap={5}>
-              <HStack alignItems="center" w="100%">
-                <Ionicons name="lock-closed-outline" size={30} color="gray" style={{ marginRight: 15 }} />
-                <View style={{ flex: 1, position: 'relative' }}>
-                  <Input
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword} // 根据状态变量控制密码可见性
-                    placeholder="Password"
-                    placeholderTextColor="darkgray"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    h={55}
-                    p={14}
-                    w="98%"
-                  />
-                  <Pressable
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: 10,
-                      top: 12, // 调整位置以适应输入框
-                    }}
-                  >
-                    <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={30} color="gray" />
-                  </Pressable>
-                </View>
-              </HStack>
-            </VStack>
+                <Pressable
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: 12, // 调整位置以适应输入框
+                  }}
+                >
+                  <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={30} color="gray" />
+                </Pressable>
+              </View>
+            </HStack>
           </VStack>
-
-          <View className='h-1/4 w-full justify-start pt-8 px-4'>
-            <Pressable
-              onPress={handleSubmit}
-              className="bg-[#12B3A8] rounded-lg justify-center items-center py-4">
-              <Text className="text-white font-bold text-lg">Login</Text>
-            </Pressable>
-
-            <View className='flex-row mt-4 w-full justify-center gap-2'>
-              <Text className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
-                Don't have account?
-              </Text>
-              <Pressable onPress={() => router.push("/register")}>
-                <Text style={{ color: '#FF7F7F' }} className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
-                  Register
-                </Text>
-              </Pressable>
-            </View>
-
-            <View className='flex-row mt-4 w-full justify-center gap-2'>
-              <Text className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
-                    Forget password?
-              </Text>
-              <Pressable onPress={() => router.push("/forgetpassword")}>
-                <Text style={{ color: '#FF7F7F' }} className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
-                  Click here
-                </Text>
-              </Pressable>
-            </View>
-
-
-
-          </View>
         </VStack>
+
+        <View style={{ marginTop: -10 }} className='h-1/4 w-full justify-start pt-8 px-4'>
+          <Pressable
+            onPress={handleSubmit}
+            className="bg-[#12B3A8] rounded-lg justify-center items-center py-4">
+            <Text className="text-white font-bold text-lg">Login</Text>
+          </Pressable>
+
+          <View className='flex-row mt-4 w-full justify-end gap-2'>
+            <Pressable onPress={() => router.push("/forgetpassword")}>
+              <Text className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
+                Forget password?
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+
+
+
+        <View className='flex-row mt-4 w-full justify-center gap-2'>
+          <Text className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
+            Don't have account?
+          </Text>
+          <Pressable onPress={() => router.push("/register")}>
+            <Text style={{ color: '#FF7F7F' }} className="text-neutral-300 font-medium text-lg leading-[38px] text-center">
+              Register
+            </Text>
+          </Pressable>
+        </View>
+
+      </VStack>
 
     </KeyboardAvoidingView >
   );
