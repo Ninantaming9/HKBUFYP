@@ -98,20 +98,21 @@ export default function Login() {
 
         </View>
         {/* end header */}
+        <HStack gap={10} style={{ marginLeft: 80, marginTop: 80 }}>
+  <Text fontSize={30} bold mb={20}>Password Reset</Text>
+  <TabBarIcon name="ticket" size={50} />
+</HStack>
 
       </View>
       <VStack flex={1} justifyContent='center' alignItems='center' p={40} gap={40}>
-        <HStack gap={10}>
-          <Text fontSize={30} bold mb={20}>Password Reset</Text>
-          <TabBarIcon name="ticket" size={50} />
-        </HStack>
-        <VStack w={"100%"} gap={30}>
+        
+        <VStack w={"100%"} gap={30} style={{  marginTop: -200 }}>
           {step === 1 && (
             <>
               <HStack alignItems="center" w="100%">
                 <Ionicons name="mail-outline" size={30} color="gray" style={{ marginRight: 15 }} />
                 <View style={{ flex: 1 }}>
-                  <Text ml={10} fontSize={14} color="gray">Email</Text>
+                  <Text ml={10} fontSize={14} color="gray">Input need reset email</Text>
                   <Input
                     value={email}
                     onChangeText={setEmail}
@@ -135,7 +136,7 @@ export default function Login() {
               <HStack alignItems="center" w="100%">
                 <Ionicons name="key-outline" size={30} color="gray" style={{ marginRight: 15 }} />
                 <View style={{ flex: 1 }}>
-                  <Text ml={10} fontSize={14} color="gray">Confirmation Code</Text>
+                  
                   <Input
                     value={confirmationCode}
                     onChangeText={setConfirmationCode}

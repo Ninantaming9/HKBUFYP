@@ -282,7 +282,7 @@ const MyAccountScreen = () => {
                     <MaterialIcons name="preview" size={20} color="#fff" />
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>{number1}</Text>
+                    <Text style={{ fontSize: 16, color: '#000' }}>Edit Password</Text>
                     <Ionicons name='chevron-forward' size={24} color="black" />
                   </View>
                 </View>
@@ -293,7 +293,7 @@ const MyAccountScreen = () => {
                     <AntDesign name="setting" size={20} color="#fff" />
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>Settings</Text>
+                    <Text style={{ fontSize: 16, color: '#000' }}>Settings</Text>
                     <Ionicons name='chevron-forward' size={24} color="black" />
                   </View>
                 </View>
@@ -306,7 +306,7 @@ const MyAccountScreen = () => {
                     <MaterialIcons name="grid-view" size={20} color="#fff" />
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>{number2}</Text>
+                    <Text style={{ fontSize: 16, color: '#000' }}>View QR code</Text>
                     <Ionicons name='chevron-forward' size={24} color="black" />
                   </View>
                 </View>
@@ -320,7 +320,7 @@ const MyAccountScreen = () => {
                     <MaterialIcons name="edit" size={20} color="#fff" />
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>{number3}</Text>
+                    <Text style={{ fontSize: 16, color: '#000' }}>Logout</Text>
                     <Ionicons name='chevron-forward' size={24} color="black" />
                   </View>
                 </View>

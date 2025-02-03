@@ -118,7 +118,7 @@ export default function Login() {
           <HStack alignItems="center" w="100%">
         <Ionicons name="person-outline" size={30} color="gray" style={{ marginRight: 15 }} />
         <View style={{ flex: 1 }}>
-          <Text ml={10} fontSize={14} color="gray">Full name</Text>
+         
           <Input
             value={fullname}
             onChangeText={setFullname}
@@ -135,7 +135,7 @@ export default function Login() {
       <HStack alignItems="center" w="100%">
         <Ionicons name="mail-outline" size={30} color="gray" style={{ marginRight: 15 }} />
         <View style={{ flex: 1 }}>
-          <Text ml={10} fontSize={14} color="gray">Email</Text>
+       
           <Input
             value={email}
             onChangeText={setEmail}
@@ -150,7 +150,7 @@ export default function Login() {
       </HStack>
 
       <HStack alignItems="center" w="100%">
-        <Ionicons name="lock-closed-outline" size={30} color="gray" style={{ marginRight: 15 }} />
+        <Ionicons name="key-outline" size={30} color="gray" style={{ marginRight: 15 }} />
         <View style={{ flex: 1, position: 'relative' }}>
           <Input
             value={password}
