@@ -67,20 +67,33 @@ const FlightScreen = () => {
     
  // Effect to set initial sorted results
 
-const handleFilter = () => {
-    console.log("asdasdasdsad")
-    const newDescending = !isDescending;
-    setIsDescending(newDescending);
+ const handleFilter = () => {
+    Alert.alert(
+        "Filter",
+        "Filter applied successfully!",
+        [
+            {
+                text: "OK",
+                onPress: () => {
+                    const newDescending = !isDescending;
+                    setIsDescending(newDescending);
 
-    const sorted = [...searchResults].sort((a, b) => {
-        const priceA = parseFloat(a.ticketPrice) || 0; // Convert to number
-        const priceB = parseFloat(b.ticketPrice) || 0; // Convert to number
+                    const sorted = [...searchResults].sort((a, b) => {
+                        const priceA = parseFloat(a.ticketPrice) || 0; // Convert to number
+                        const priceB = parseFloat(b.ticketPrice) || 0; // Convert to number
 
-        return newDescending ? priceB - priceA : priceA - priceB; // Sort based on the new order
-    });
-    console.log(sorted);
-    setSearchResults(sorted);
+                        return newDescending ? priceB - priceA : priceA - priceB; // Sort based on the new order
+                    });
+
+                    setSearchResults(sorted); // Make sure to set sorted results
+                }
+            }
+        ],
+        { cancelable: false }
+    );
 };
+
+
 
     const locations = [
         { label: 'Beijing', value: 'Beijing' },
