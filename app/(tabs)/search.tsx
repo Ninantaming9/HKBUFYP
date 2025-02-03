@@ -62,7 +62,26 @@ const FlightScreen = () => {
     // const router = useRouter(); // 使用 useRouter 获取 router 实例
   
     const route = useRoute();
-   
+
+    const [isDescending, setIsDescending] = useState(false);
+    
+ // Effect to set initial sorted results
+
+const handleFilter = () => {
+    console.log("asdasdasdsad")
+    const newDescending = !isDescending;
+    setIsDescending(newDescending);
+
+    const sorted = [...searchResults].sort((a, b) => {
+        const priceA = parseFloat(a.ticketPrice) || 0; // Convert to number
+        const priceB = parseFloat(b.ticketPrice) || 0; // Convert to number
+
+        return newDescending ? priceB - priceA : priceA - priceB; // Sort based on the new order
+    });
+    console.log(sorted);
+    setSearchResults(sorted);
+};
+
     const locations = [
         { label: 'Beijing', value: 'Beijing' },
         { label: 'Shanghai', value: 'Shanghai' },
@@ -81,7 +100,6 @@ const FlightScreen = () => {
         date: string,
         cabinClass: string,
     }
-
 
     const handleDateChange = (date: React.SetStateAction<string>) => {
         setdate(date);
@@ -481,8 +499,8 @@ const FlightScreen = () => {
         }
     };
     
+   
 
-    
 
     return (
         <ScrollView>
@@ -677,15 +695,15 @@ const FlightScreen = () => {
 
                     {/* show content search */}
                     <View style={{ paddingHorizontal: 20, paddingBottom: 100 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Text style={{ fontSize: 16, fontWeight: 500 }}>Search result : {flightCount}</Text>
-                            <TouchableOpacity onPress={() => router.push("/flightDetail")}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                    <Text style={{ fontSize: 16, paddingRight: 10, fontWeight: 500 }}>Filter</Text>
-                                    <MaterialIcons name="filter-list-alt" size={24} color="black" />
-                                </View>
-                            </TouchableOpacity>
-                        </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={{ fontSize: 16, fontWeight: '500' }}>Search result : {flightCount}</Text>
+                <TouchableOpacity onPress={handleFilter}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 16, paddingRight: 10, fontWeight: '500' }}>Filter</Text>
+                        <MaterialIcons name="filter-list-alt" size={24} color="black" />
+                    </View>
+                </TouchableOpacity>
+            </View>
 
                         {/* show content card */}
 

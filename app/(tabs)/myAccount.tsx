@@ -287,6 +287,8 @@ const MyAccountScreen = () => {
                   </View>
                 </View>
               </TouchableOpacity>}
+
+              
               <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#370ca9', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -306,7 +308,7 @@ const MyAccountScreen = () => {
                     <MaterialIcons name="grid-view" size={20} color="#fff" />
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, color: '#000' }}>View QR code</Text>
+                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>View QR code</Text>
                     <Ionicons name='chevron-forward' size={24} color="black" />
                   </View>
                 </View>
@@ -320,7 +322,7 @@ const MyAccountScreen = () => {
                     <MaterialIcons name="edit" size={20} color="#fff" />
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, color: '#000' }}>Logout</Text>
+                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>Log out</Text>
                     <Ionicons name='chevron-forward' size={24} color="black" />
                   </View>
                 </View>
