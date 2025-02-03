@@ -1,4 +1,4 @@
-import { View, Text, useWindowDimensions,TextInput, ScrollView, TouchableOpacity , Image} from 'react-native'
+import { View, Text, useWindowDimensions,TextInput, ScrollView, TouchableOpacity , Image, Alert} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Constants from "expo-constants";
 import Svg, { Defs, Path , LinearGradient,Stop} from "react-native-svg";
@@ -10,9 +10,11 @@ import axios from 'axios';
 import { API_URL } from '../backend/address';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StyleSheet } from 'react-native';
+
 const FlightDetailScreen = () => {
     const { width, height } = useWindowDimensions();
-
+    const [errorMessage, setErrorMessage] = useState('');
     const route = useRoute();
     const { selectedSeats } = route.params as { selectedSeats: string[] }; 
     
@@ -29,7 +31,7 @@ const FlightDetailScreen = () => {
     const [totalPrice, setTotalPrice] = useState("");
     const [nationality, setNationality] = useState("");
     const [date, setdate] = useState('');
-
+    const [discount, setDiscount] = useState('');
     const hideDatePicker = () => {
       setDatePickerVisibility(false);
   };
@@ -106,37 +108,74 @@ const seatsArray = selectedSeatsString.split(",");
       fetchFlightDetails(); // 调用获取航班详情的函数
   }, [flightId]); // 依赖于 flightId，确保在其变化时重新请求
 
-    const handleSubmit = async () => {
+  const handleSubmit = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      const userData = {
+        userId: userId,
+        fullName: fullName,
+        dateBirth: dateBirth,
+        mobile: mobile,
+        passport: passport,
+        nationality: nationality,
+        flightNumber: flightDetails.flightNumber,
+        ticketType: flightDetails.ticketType,
+        date: flightDetails.date,
+        departureLocation: flightDetails.departureLocation,
+        arrivalLocation: flightDetails.arrivalLocation,
+        cabinClass: flightDetails.cabinClass,
+        departureTime: flightDetails.departureTime,
+        arrivalTime: flightDetails.arrivalTime,
+        totalPrice: totalPrice,
+        ticketPrice: flightDetails.ticketPrice,
+        seat: selectedSeats,
+        discountValue: discount, // 替换为实际的 code 值
+        isUsed: true // 默认设置为 true
+      };
+      
+      console.log('Flight Details:', flightDetails);
+      const response = await axios.post(`${API_URL}/createFlightbook`, userData);
+      console.log('Flight Details:', flightDetails);
+      console.log(response.data); // 处理返回的数据
+      router.push("/bookconfirm");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+    
+
+    const handleCheckDiscountCode = async () => {
       try {
-        const userId = await AsyncStorage.getItem('userId');
-        const userData = {
-          userId:userId,
-          fullName: fullName,
-          dateBirth: dateBirth,
-          mobile: mobile,
-          passport: passport,
-          nationality: nationality,
-          flightNumber: flightDetails.flightNumber,
-          ticketType: flightDetails.ticketType,
-          date: flightDetails.date,
-          departureLocation: flightDetails.departureLocation,
-          arrivalLocation: flightDetails.arrivalLocation,
-          cabinClass: flightDetails.cabinClass,
-          departureTime: flightDetails.departureTime,
-          arrivalTime: flightDetails.arrivalTime,
-          totalPrice: totalPrice,
-          ticketPrice: flightDetails.ticketPrice,
-          seat:selectedSeats
-        };
-        console.log('Flight Details:', flightDetails);
-        const response = await axios.post(`${API_URL}/createFlightbook`, userData);
-        console.log('Flight Details:', flightDetails);
-        console.log(response.data); // 处理返回的数据
-        router.push("/bookconfirm");
+        // 将 totalPrice 转换为数字
+        const numericTotalPrice = parseFloat(totalPrice);
+    
+        const response = await fetch(`${API_URL}/applyDiscountCode`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            discountValue: discount,
+            originalPrice: numericTotalPrice, // 发送数字类型的价格
+          }),
+        });
+    
+        const data = await response.json();
+    
+        if (response.ok) {
+          // 更新总价格，确保将 discountedPrice 转换为字符串
+          setTotalPrice(data.discountedPrice.toString());
+          setErrorMessage(''); // 清除错误信息
+        } else {
+          setErrorMessage(data.error); // 显示错误信息
+        }
       } catch (error) {
-        console.error(error);
+        console.error('Error checking discount code', error);
+        setErrorMessage('Internal server error');
       }
     };
+    
 
   return (
     <View style={{flex:1,width:'100%', backgroundColor:'#EAEAEA'}}>
@@ -229,12 +268,11 @@ const seatsArray = selectedSeatsString.split(",");
                 <View style={{backgroundColor:'#fff',padding:20, borderRadius:10,marginBottom:20}}>
                         <View style={{flexDirection:'row',alignItems:'center',paddingBottom:10}}>
                             <FontAwesome name="user" size={24} color={'black'}/>
-                            <Text style={{fontWeight:'bold',paddingLeft:10,fontSize:16}}>Passenger Information</Text>
+                            <Text style={{fontWeight:'bold',paddingLeft:10,fontSize:16}}>Have Any Discount？</Text>
             </View>
             {/* <TextInput value={fullName}
               onChangeText={setFullName} placeholderTextColor={'gray'} placeholder='Full Name' style={{ height: 50, width: '100%', backgroundColor: '#fff', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} /> */}
-             <TextInput value={dateBirth}
-              onChangeText={setDateBirth} placeholderTextColor={'gray'} placeholder='DateBirth' style={{ height: 50, width: '100%', backgroundColor: '#fff', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} />
+            
 {/*   
             <View>
               <TouchableOpacity onPress={showDatePicker} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -249,9 +287,29 @@ const seatsArray = selectedSeatsString.split(",");
               />
             </View> */}
 
-            <TextInput value={nationality} onChangeText={setNationality} placeholderTextColor={'gray'} placeholder='Nationality' style={{ height: 50, width: '100%', backgroundColor: '#FFF', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} />
-            <TextInput value={passport} onChangeText={setPassport} placeholderTextColor={'gray'} placeholder='Passsport or ID Number' style={{ height: 50, width: '100%', backgroundColor: '#FFF', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} />
-            <TextInput value={mobile} onChangeText={setMobile} placeholderTextColor={'gray'} placeholder='Contact Information' style={{ height: 50, width: '100%', backgroundColor: '#FFF', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} />
+<View style={styles.container}>
+      <TextInput
+        value={discount}
+        onChangeText={setDiscount}
+        placeholderTextColor={'gray'}
+        placeholder='Enter discount code'
+        style={styles.input}
+      />
+      <TouchableOpacity onPress={handleCheckDiscountCode} style={styles.button}>
+        <Text style={styles.buttonText}>Check Discount Code</Text>
+      </TouchableOpacity>
+      {errorMessage ? (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      ) : (
+        
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginTop: 15 }}>
+        <MaterialIcons name="view-list" size={30} color="#f0a008" />
+        <Text style={{ fontSize: 15, fontWeight: 'bold', color: 'black' }}>  Total Price: ${parseFloat(totalPrice).toFixed(2)}</Text>
+    </View>
+    
+      )}
+    </View>
+            
             </View>
 
                 {/* Flight Details (Chi tiết chuyến bay):: */}
@@ -286,7 +344,7 @@ const seatsArray = selectedSeatsString.split(",");
                 </View> */}
 
                 <View>
-                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:10}}>
+                {/*  <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:10}}>
                  
                  <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center',gap:5}}>
                   
@@ -294,11 +352,11 @@ const seatsArray = selectedSeatsString.split(",");
                     <Text style={{fontSize:12,fontWeight:500, color:'black'}}>Total price</Text>
                 </View>
                  <Text style={{fontSize:18,fontWeight:500,color:'#fa5e3e'}}>${totalPrice}</Text>
-            </View>
+            </View>*/}
                      <TouchableOpacity onPress={() => handleSubmit()}>
                           <View style={{backgroundColor:'orange',padding:20, borderRadius:10,marginBottom:20, flexDirection:'row',alignItems:'center',justifyContent:'center',gap:10}}>
                               <MaterialIcons name="next-plan" size={30} color="white" />
-                              <Text style={{fontWeight:'bold',fontSize:20, color:'#fff', textAlign:'center'}}>Continue</Text>
+                              <Text style={{fontWeight:'bold',fontSize:20, color:'#fff', textAlign:'center'}}>Finished</Text>
                           </View>
                      </TouchableOpacity>
                 </View>
@@ -307,5 +365,41 @@ const seatsArray = selectedSeatsString.split(",");
     </View>
   )
 }
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+  },
+  input: {
+    height: 50,
+    width: '100%',
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#EAEAEA',
+  },
+  button: {
+    backgroundColor: '#fa5e3e',
+    borderRadius: 10,
+    padding: 10,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+  },
+  priceText: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#fa5e3e',
+    marginTop: 20,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+  },
+});
 
 export default FlightDetailScreen

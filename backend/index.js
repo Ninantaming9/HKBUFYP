@@ -309,8 +309,9 @@ app.post('/createFlightbook', async (req, res) => {
   try {
     const db = await connectToDB();
     const flightbookCollection = db.collection('flightbook'); 
+    const discountCollection = db.collection('discount');
 
-    const { fullName, dateBirth, nationality, passport, mobile, ticketType, flightNumber, date, departureTime, arrivalTime, departureLocation, arrivalLocation, cabinClass, ticketPrice, seat, totalPrice, userId, email } = req.body;
+    const { fullName, dateBirth, nationality, passport, mobile, ticketType, flightNumber, date, departureTime, arrivalTime, departureLocation, arrivalLocation, cabinClass, ticketPrice, seat, totalPrice, userId, email,discountValue,isUsed } = req.body;
      
     const flightbookData = {
       userId,
@@ -329,10 +330,13 @@ app.post('/createFlightbook', async (req, res) => {
       cabinClass,
       ticketPrice,
       seat,
-      totalPrice
+      totalPrice,
+      discountValue,
+      isUsed
     };
     console.log('Flightbook data:', flightbookData);
     await flightbookCollection.insertOne(flightbookData);
+    await discountCollection.updateOne({ code: discountValue }, { $set: { isUsed: true } });
 
 
 // 创建邮件发送器
@@ -622,4 +626,72 @@ app.post('/resetPassword', async (req, res) => {
     res.status(400).json({ error: 'Invalid confirmation code.' });
   }
 });
+
+app.post('/applyDiscountCode', async (req, res) => {
+  try {
+    const { discountValue, originalPrice } = req.body;
+
+    const db = await connectToDB();
+    const discountCollection = db.collection('discount');
+
+    // 查找折扣码
+    const discount = await discountCollection.findOne({ code: discountValue }); // 使用 code 查找
+
+    // 检查折扣码是否存在
+    if (!discount) {
+      return res.status(400).json({ error: 'Invalid discount code' });
+    }
+
+    // 检查折扣码是否已被使用
+    if (discount.isUsed) {
+      return res.status(400).json({ error: 'This discount code has already been used' });
+    }
+
+    // 获取折扣值并转换为数字
+    const discountPercentage = parseFloat(discount.discountValue); // 将 "10%" 转换为 10
+    const discountAmount = (discountPercentage / 100) * originalPrice; // 计算折扣金额
+
+    // 计算折扣后的价格
+    const discountedPrice = originalPrice - discountAmount;
+
+    // 更新折扣码为已使用
+   // await discountCollection.updateOne({ code: discountValue }, { $set: { isUsed: true } });
+
+    // 返回折扣后的价格
+    res.status(200).json({ discountedPrice });
+  } catch (error) {
+    console.log('Error applying discount code', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+app.post('/addDiscountCode', async (req, res) => {
+  const db = await connectToDB();
+  const discountCodesCollection = db.collection('discount'); // 存储折扣码的集合
+
+  const { code, discountValue, isUsed } = req.body; // 从请求体中提取折扣码信息
+
+  try {
+    // 检查折扣码信息是否完整
+    if (!code || discountValue === undefined || isUsed === undefined) {
+      return res.status(400).json({ error: 'Code, discount value, and usage status are required.' });
+    }
+
+    // 将折扣码存储到 discountCodes 集合中
+    await discountCodesCollection.insertOne({
+      code,            // 折扣码
+      discountValue,  // 折扣优惠价
+      isUsed,         // 是否使用过
+      createdAt: new Date() // 可选：记录创建时间
+    });
+
+    res.status(200).json({ message: 'Discount code added successfully.' });
+  } catch (error) {
+    console.error('Error adding discount code:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 
