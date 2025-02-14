@@ -8,6 +8,8 @@ import {
     TouchableOpacity,
     ScrollView,
     Image,
+    Modal,
+    Button,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
@@ -60,41 +62,96 @@ const FlightScreen = () => {
     const [photoPath, setPhotoPath] = useState<string | null>(null);
     const [userRole, setUserRole] = useState(null);
     // const router = useRouter(); // 使用 useRouter 获取 router 实例
-  
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
     const route = useRoute();
 
     const [isDescending, setIsDescending] = useState(false);
+
+
+    const handleFilter = () => {
+        setModalVisible(true);
+    };
+
+    // 'Sort by Earliest', 'Sort by Latest', 'Low Price', 'High Price'
+    const applyFilter = () => {
+        console.log('Selected Filter:', selectedFilter);
+        setModalVisible(false);
+
+        let sortedResults: Flight[] = [];
+
+        const convertToHours = (timeString: string) => {
+            const [hours] = timeString.split('.').map(Number); // 只获取小时部分
+            return hours; // 返回小时作为数值
+        };
+
+        if (selectedFilter === 'Sort by Earliest') {
+            // 从早到晚排序
+            sortedResults = [...searchResults].sort((a, b) => {
+                const timeStringA = a.departureTime as string; // 假设 a.departureTime 是 "1:00"
+                const timeStringB = b.departureTime as string; // 假设 b.departureTime 是 "2:30"
+                const hoursA = parseFloat(timeStringA.split(':')[0]) || 0; // 获取小时部分并转换为数字
+                const hoursB = parseFloat(timeStringB.split(':')[0]) || 0; // 获取小时部分并转换为数字
+                return hoursA - hoursB; // 使用小时进行比较
+            });
+        } else if (selectedFilter === 'Sort by Latest') {
+            // 从晚到早排序
+            sortedResults = [...searchResults].sort((a, b) => {
+                const timeStringA = a.departureTime as string; // 假设 a.departureTime 是 "1:00"
+                const timeStringB = b.departureTime as string; // 假设 b.departureTime 是 "2:30"
+                const hoursA = parseFloat(timeStringA.split(':')[0]) || 0; // 获取小时部分并转换为数字
+                const hoursB = parseFloat(timeStringB.split(':')[0]) || 0; // 获取小时部分并转换为数字
+                return hoursB - hoursA; // 使用小时进行比较
+            });
+        } else if (selectedFilter === 'Low Price') {
+            // 低价到高价排序
+            sortedResults = [...searchResults].sort((a, b) => {
+                const priceA = parseFloat(a.ticketPrice) || 0; // Convert to number
+                const priceB = parseFloat(b.ticketPrice) || 0; // Convert to number
+                return priceA - priceB; // Sort based on price
+            });
+        } else if (selectedFilter === 'High Price') {
+            // 高价到低价排序
+            sortedResults = [...searchResults].sort((a, b) => {
+                const priceA = parseFloat(a.ticketPrice) || 0; // Convert to number
+                const priceB = parseFloat(b.ticketPrice) || 0; // Convert to number
+                return priceB - priceA; // Sort based on price
+            });
+        }
+
+        setSearchResults(sortedResults); // 更新排序后的结果
+    };
+
+    // Effect to set initial sorted results
+    /*
+     const handleFilter = () => {
+        Alert.alert(
+            "Filter",
+            "Filter applied successfully!",
+            [
+                {
+                    text: "OK",
+                    onPress: () => {
+                        const newDescending = !isDescending;
+                        setIsDescending(newDescending);
     
- // Effect to set initial sorted results
-
- const handleFilter = () => {
-    Alert.alert(
-        "Filter",
-        "Filter applied successfully!",
-        [
-            {
-                text: "OK",
-                onPress: () => {
-                    const newDescending = !isDescending;
-                    setIsDescending(newDescending);
-
-                    const sorted = [...searchResults].sort((a, b) => {
-                        const priceA = parseFloat(a.ticketPrice) || 0; // Convert to number
-                        const priceB = parseFloat(b.ticketPrice) || 0; // Convert to number
-
-                        return newDescending ? priceB - priceA : priceA - priceB; // Sort based on the new order
-                    });
-
-                    setSearchResults(sorted); // Make sure to set sorted results
+                        const sorted = [...searchResults].sort((a, b) => {
+                            const priceA = parseFloat(a.ticketPrice) || 0; // Convert to number
+                            const priceB = parseFloat(b.ticketPrice) || 0; // Convert to number
+    
+                            return newDescending ? priceB - priceA : priceA - priceB; // Sort based on the new order
+                        });
+    
+                        setSearchResults(sorted); // Make sure to set sorted results
+                    }
                 }
-            }
-        ],
-        { cancelable: false }
-    );
-};
-
-
-
+            ],
+            { cancelable: false }
+        );
+    };
+    
+    
+    */
     const locations = [
         { label: 'Beijing', value: 'Beijing' },
         { label: 'Shanghai', value: 'Shanghai' },
@@ -166,14 +223,14 @@ const FlightScreen = () => {
                     const storedUserId = await AsyncStorage.getItem('userId'); // 从 AsyncStorage 获取用户 ID
                     const storedFullName = await AsyncStorage.getItem('user'); // 从 AsyncStorage 获取用户全名
                     const storedUserRole = await AsyncStorage.getItem('userRole'); // 从 AsyncStorage 获取用户全名
-       
+
                     // 如果存在用户 ID，调用获取照片的 API
                     if (storedUserId) {
                         fetchUserPhoto(storedUserId);
                         setUserId(storedUserId); // 更新用户 ID 状态
                     }
                     if (storedUserRole) {
-            
+
                         setUserRole(JSON.parse(storedUserRole)); // 
                     }
 
@@ -213,12 +270,12 @@ const FlightScreen = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                
+
                 body: JSON.stringify(searchData)
             });
 
 
-            console.log("adsadsads"+priceRange);
+            console.log("adsadsads" + priceRange);
             if (!date) {
                 Alert.alert(
                     'Information',
@@ -241,11 +298,11 @@ const FlightScreen = () => {
                 if (flightData.flights && flightData.flights.length > 0) {
                     // Access the cabinClass of the first flight (or any specific flight)
                     const cabinClass = flightData.flights[0].cabinClass; // Change the index as needed
-            
+
                     // Check if cabinClass is defined before storing
                     if (cabinClass !== undefined) {
                         await AsyncStorage.setItem('cabinClass', JSON.stringify(cabinClass));
-                 
+
                     } else {
                         console.warn('cabinClass is undefined, not storing in AsyncStorage');
                     }
@@ -482,37 +539,37 @@ const FlightScreen = () => {
         } else if (userRole === 'admin') {
             return (
                 <View className='w-full flex-row justify-between items-center h-14'>
-                <TouchableOpacity
-                    onPress={() => router.push("/flightCreat")}
-                    className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
-                >
-                    <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
-                        <Text className='text-white font-semibold'>📖</Text>
-                    </View>
-                    
-                </TouchableOpacity>
-            
-                <TouchableOpacity 
-                    onPress={() => router.push("/flightCreat")}  
-                    className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
-                >
-                    <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
-                        <Text className='text-white font-semibold'>✈️</Text>
-                    </View>
-                    
-                    <View className='justify-start items-start gap-1'>
-                        <Text className='text-black font-bold text-lg'>Create</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-            
+                    <TouchableOpacity
+                        onPress={() => router.push("/flightCreat")}
+                        className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
+                    >
+                        <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
+                            <Text className='text-white font-semibold'>📖</Text>
+                        </View>
+
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => router.push("/flightCreat")}
+                        className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
+                    >
+                        <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
+                            <Text className='text-white font-semibold'>✈️</Text>
+                        </View>
+
+                        <View className='justify-start items-start gap-1'>
+                            <Text className='text-black font-bold text-lg'>Create</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+
             );
         } else {
             return null; // 处理其他角色或情况
         }
     };
-    
-   
+
+
 
 
     return (
@@ -668,25 +725,25 @@ const FlightScreen = () => {
 
 
                         <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
-    <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 30, position: 'relative' }}>
-        
-        <View style={{ width: '100%', borderWidth: 1, borderColor: '#EAEAEA', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#333', paddingVertical: 10 }}>Price Range</Text>
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-                <MaterialIcons name="attach-money" size={20} color="gray" />
-                <Picker
-                    selectedValue={priceRange}
-                    style={{ height: 50, width: '100%' }}
-                    onValueChange={(itemValue) => setPriceRange(itemValue)}
-                >
-                    <Picker.Item label="100 - 500" value="100-500" />
-                    <Picker.Item label="500 - 1000" value="500-1000" />
-                    <Picker.Item label="1000 - 1500" value="1000-1500" />
-                </Picker>
-            </View>
-        </View>
-    </View>
-</View>
+                            <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 30, position: 'relative' }}>
+
+                                <View style={{ width: '100%', borderWidth: 1, borderColor: '#EAEAEA', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10 }}>
+                                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#333', paddingVertical: 10 }}>Price Range</Text>
+                                    <View style={{ flexDirection: 'row', gap: 10 }}>
+                                        <MaterialIcons name="attach-money" size={20} color="gray" />
+                                        <Picker
+                                            selectedValue={priceRange}
+                                            style={{ height: 50, width: '100%' }}
+                                            onValueChange={(itemValue) => setPriceRange(itemValue)}
+                                        >
+                                            <Picker.Item label="100 - 500" value="100-500" />
+                                            <Picker.Item label="500 - 1000" value="500-1000" />
+                                            <Picker.Item label="1000 - 1500" value="1000-1500" />
+                                        </Picker>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
 
 
 
@@ -708,15 +765,54 @@ const FlightScreen = () => {
 
                     {/* show content search */}
                     <View style={{ paddingHorizontal: 20, paddingBottom: 100 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Search result : {flightCount}</Text>
-                <TouchableOpacity onPress={handleFilter}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 16, paddingRight: 10, fontWeight: '500' }}>Filter</Text>
-                        <MaterialIcons name="filter-list-alt" size={24} color="black" />
-                    </View>
-                </TouchableOpacity>
-            </View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Text style={{ fontSize: 16, fontWeight: '500' }}>Search result : {flightCount}</Text>
+
+
+
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                                <View>
+                                    <TouchableOpacity onPress={handleFilter}>
+                                        <View className="flex-row justify-center items-center">
+                                            <Text className="text-lg pr-2 font-medium">Filter</Text>
+                                            <MaterialIcons name="filter-list-alt" size={24} color="black" />
+                                        </View>
+                                    </TouchableOpacity>
+
+                                    <Modal
+                                        animationType="slide"
+                                        transparent={true}
+                                        visible={modalVisible}
+                                        onRequestClose={() => setModalVisible(false)}
+                                    >
+                                        <View className="flex-1 justify-center items-center bg-transparent">
+                                            <View className="bg-white rounded-3xl pt-2 pb-4 shadow-md shadow-slate-300 w-72">
+                                                <Text className="text-lg font-bold mb-4">Select Filter</Text>
+                                                {['Sort by Earliest', 'Sort by Latest', 'Low Price', 'High Price'].map((filter) => (
+                                                    <TouchableOpacity
+                                                        key={filter}
+                                                        onPress={() => setSelectedFilter(filter)}
+                                                        className="flex-row items-center mb-2"
+                                                    >
+                                                        <View className="mr-2">
+                                                            <View className={`w-5 h-5 border border-gray-400 rounded-full justify-center items-center ${selectedFilter === filter ? 'bg-blue-500' : 'bg-white'}`}>
+                                                                {selectedFilter === filter && (
+                                                                    <View className="w-3 h-3 bg-white rounded-full" />
+                                                                )}
+                                                            </View>
+                                                        </View>
+                                                        <Text className="text-lg">{filter}</Text>
+                                                    </TouchableOpacity>
+                                                ))}
+                                                <Button title="确定" onPress={applyFilter} />
+                                                <Button title="取消" onPress={() => setModalVisible(false)} />
+                                            </View>
+                                        </View>
+                                    </Modal>
+                                </View>
+                            </View>
+                        </View>
 
                         {/* show content card */}
 

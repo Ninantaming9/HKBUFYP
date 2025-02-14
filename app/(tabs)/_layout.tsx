@@ -36,6 +36,7 @@ export default function TabLayout() {
             screenOptions={{
                 tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
                 headerShown: false,
+                tabBarStyle: { display: 'flex' }, // 显示标签栏
             }}>
             <Tabs.Screen
                 name="search"
@@ -82,6 +83,22 @@ export default function TabLayout() {
                     },
                 }}
             />
+                  <Tabs.Screen
+                name="manage"
+                options={{
+                    title: 'manage',
+                    tabBarIcon: ({ color, focused }) => (
+                        <TabBarIcon name={focused ? 'ticket' : 'ticket-outline'} color={color} />
+                    ),
+                }}
+                key={refreshKey}
+                listeners={{
+                    tabPress: (e) => {
+                        handleTabPress();
+                    },
+                }}
+            />
+           
            
             
         </Tabs>
