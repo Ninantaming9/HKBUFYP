@@ -695,3 +695,80 @@ app.post('/addDiscountCode', async (req, res) => {
 });
 
 
+app.post('/validateTicketQRCode', async (req, res) => {
+  const db = await connectToDB();
+  const ticketsCollection = db.collection('tickets'); // 存储机票信息的集合
+
+  const { qrCode } = req.body; // 从请求体中提取二维码信息
+
+  try {
+    // 检查二维码是否提供
+    if (!qrCode) {
+      return res.status(400).json({ error: 'QR code is required.' });
+    }
+
+    // 查询数据库中是否存在该二维码对应的机票信息
+    const ticket = await ticketsCollection.findOne({ qrCode });
+
+    // 如果找到机票信息，返回 true；否则返回 false
+    if (ticket) {
+      return res.status(200).json({ valid: true });
+    } else {
+      return res.status(200).json({ valid: false });
+    }
+  } catch (error) {
+    console.error('Error validating ticket QR code:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+
+app.post('/searchBookbyadmin', async (req, res) => {
+  try {
+    const db = await connectToDB();
+    const flightCollection = db.collection('flightbook');
+
+    // 从请求体中提取查询条件并转换为字符串
+    const fullName = req.body.fullName ? req.body.fullName.toString() : '';
+    const email = req.body.email ? req.body.email.toString() : '';
+    const mobile = req.body.mobile ? req.body.mobile.toString() : '';
+
+    // 构建查询条件
+    const query = {
+      $or: [] // 使用 $or 运算符
+    };
+
+    // 检查并添加查询条件
+    if (fullName.trim() !== '') {
+      query.$or.push({ fullName: { $regex: fullName, $options: 'i' } });
+    }
+    if (email.trim() !== '') {
+      query.$or.push({ email: { $regex: email, $options: 'i' } });
+    }
+    if (mobile.trim() !== '') {
+      query.$or.push({ mobile: { $regex: mobile, $options: 'i' } });
+    }
+    console.log('Query:', JSON.stringify(query, null, 2));
+    // 如果没有提供任何查询条件，返回 400 错误
+    if (query.$or.length === 0) {
+      return res.status(400).json({ message: 'At least one search parameter is required.' });
+    }
+
+    // 打印查询条件以进行调试
+    console.log('Query:', JSON.stringify(query, null, 2));
+
+    // 查询数据库
+    const flights = await flightCollection.find(query).toArray();
+
+    if (flights.length > 0) {
+      res.status(200).json(flights);
+    } else {
+      res.status(404).json({ message: 'No flight bookings found.' });
+    }
+  } catch (error) {
+    console.log('Error finding flight bookings', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
