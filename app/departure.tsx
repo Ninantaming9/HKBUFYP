@@ -8,7 +8,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Departure() {
   const [searchInput, setSearchInput] = useState("");
-
   const [autoCompleteResults, setAutoCompleteResults] = useState<
     { id: string; name: string; iataCode: string }[]
   >([]);

@@ -805,8 +805,20 @@ const FlightScreen = () => {
                                                         <Text className="text-lg">{filter}</Text>
                                                     </TouchableOpacity>
                                                 ))}
-                                                <Button title="确定" onPress={applyFilter} />
-                                                <Button title="取消" onPress={() => setModalVisible(false)} />
+                                                <View className="flex-row items-center justify-between">
+                                                    <TouchableOpacity
+                                                        className="bg-green-500 p-2 rounded w-40" // 确认按钮样式
+                                                        onPress={applyFilter}
+                                                    >
+                                                        <Text className="text-white text-center">Confirm</Text>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity
+                                                        className="bg-red-500 p-2 rounded w-40" // 取消按钮样式
+                                                        onPress={() => setModalVisible(false)}
+                                                    >
+                                                        <Text className="text-white text-center">Cancel</Text>
+                                                    </TouchableOpacity>
+                                                </View>
                                             </View>
                                         </View>
                                     </Modal>

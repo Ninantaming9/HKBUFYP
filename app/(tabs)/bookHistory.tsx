@@ -20,7 +20,9 @@ export default function searchresult() {
 
   const [refreshKey, setRefreshKey] = useState(0);
   const [fullName, setFullName] = useState(null);
-
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [scannedResult, setScannedResult] = useState(null);
+  const [qrCode, setQrCode] = useState('TICKET123456'); // 你要生成的二维码内容
 
   interface Flightbook {
     _id: string;
@@ -149,10 +151,35 @@ export default function searchresult() {
     }
   };
 
-  const handleViewQRCode = (flightId: string) => {
-    router.push("/login");
-    console.log(`Viewing QR Code for flight ID: ${flightId}`);
+  const handleViewQRCode = () => {
+    setShowQRCode(true);
   };
+
+  const handleScan = (data: any) => {
+    if (data) {
+      // 发送请求到后端验证二维码
+      fetch('http://10.241.237.131/validateTicketQRCode', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ qrCode: data }),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          setScannedResult(result.valid);
+          alert(result.valid ? 'QR Code is valid!' : 'QR Code is invalid!');
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    }
+  };
+
+  const handleError = (err: any) => {
+    console.error(err);
+  };
+
 
 
   return (
@@ -184,6 +211,7 @@ export default function searchresult() {
                   Book History
                 </Text>
               </View>
+              
 
               <View>
                 <View>
@@ -293,11 +321,14 @@ export default function searchresult() {
       </View>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
-        <TouchableOpacity onPress={() => handleViewQRCode(flight._id)}>
+  
+        <TouchableOpacity onPress={() => handleViewQRCode()}>
           <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
             <AntDesign name="qrcode" size={16} color="#66b3f8" />
             <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>View QR Code</Text>
           </View>
+
+          
         </TouchableOpacity>
 
         <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
