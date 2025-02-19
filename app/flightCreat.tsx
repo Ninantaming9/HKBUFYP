@@ -1,311 +1,489 @@
-import { View, Text, useWindowDimensions,TextInput, ScrollView, TouchableOpacity , Image} from 'react-native'
-import React, { useEffect, useState } from 'react'
-import Constants from "expo-constants";
-import Svg, { Defs, Path , LinearGradient,Stop} from "react-native-svg";
-import { AntDesign, FontAwesome, Fontisto, Ionicons } from '@expo/vector-icons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { router, useRouter } from "expo-router";
-import { useRoute } from '@react-navigation/native';
-import axios from 'axios';
-import { API_URL } from '../backend/address';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-const flightCreat = () => {
-    const { width, height } = useWindowDimensions();
+    import { View, Text, useWindowDimensions, TextInput, ScrollView, TouchableOpacity, Image, StatusBar, Modal, ActivityIndicator, Pressable } from 'react-native'
+    import React, { useEffect, useState } from 'react'
+    import Constants from "expo-constants";
+    import Svg, { Defs, Path, LinearGradient, Stop } from "react-native-svg";
+    import { AntDesign, FontAwesome, Fontisto, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+    import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+    import { router, useRouter } from "expo-router";
+    import { useRoute } from '@react-navigation/native';
+    import axios from 'axios';
+    import { API_URL } from '../backend/address';
+    import DateTimePickerModal from 'react-native-modal-datetime-picker';
+    import AsyncStorage from '@react-native-async-storage/async-storage';
+    import { Picker } from '@react-native-picker/picker';
+    import { ArrowPathRoundedSquareIcon, ChevronDoubleRightIcon } from 'react-native-heroicons/outline';
+    const flightCreat = () => {
+        const { width, height } = useWindowDimensions();
+        const [ticketType, setticketType] = useState("One Way");
+        const [departureLocation, setdepartureLocation] = useState('Beijing');
+        const [arrivalLocation, setarrivalLocation] = useState('Shanghai');
+        const [cabinClass, setcabinClass] = useState('Economy Class');
+        const [priceRange, setPriceRange] = useState('');
+        const [departureTime, setDepartureTime] = useState("");
+        const [arrivalTime, setArrivalTime] = useState("");
+        const [ticketPrice, setTicketPrice] = useState("");
 
-//     const route = useRoute();
-//     const { selectedSeats } = route.params as { selectedSeats: string[] }; 
-    
+        const [flightCount, setFlightCount] = useState(0);
+        const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+        const [flightNumber, setFlightNumber] = useState("");
+        const [flightData, setFlightData] = useState(null);
+        const [fullName, setFullName] = useState(null);
+        const [date, setdate] = useState('');
+        const [photoPath, setPhotoPath] = useState<string | null>(null);
+        const [userRole, setUserRole] = useState(null);
+        // const router = useRouter(); // 使用 useRouter 获取 router 实例
+        const [modalVisible, setModalVisible] = useState(false);
+        const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+        const route = useRoute();
 
-//     const [flightDetails, setFlightDetails] = useState<any>(null);
-//     const { flightId } = route.params as { flightId: string }; // 接收航班 ID
-  
-//     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+        const [isDescending, setIsDescending] = useState(false);
 
-    const [fullName, setFullName] = useState("");
-    const [dateBirth, setDateBirth] = useState("");
-    const [mobile, setMobile] = useState("");
-    const [passport, setPassport] = useState("");
-    const [totalPrice, setTotalPrice] = useState("");
-    const [nationality, setNationality] = useState("");
-    const [date, setdate] = useState('');
-
-//     const hideDatePicker = () => {
-//       setDatePickerVisibility(false);
-//   };
-
-//     const showDatePicker = () => {
-//       setDatePickerVisibility(true);
-//   };
-
-//   const handleConfirm = (date: { getFullYear: () => any; getMonth: () => number; getDate: () => any; }) => {
-//     setDateBirth(formatDate(date));
-//     hideDatePicker();
-// };
-
-// const formatDate = (date: { getFullYear: () => any; getMonth: () => number; getDate: () => any; }) => {
-//   const year = date.getFullYear();
-//   const month = String(date.getMonth() + 1).padStart(2, '0');
-//   const day = String(date.getDate()).padStart(2, '0');
-//   return `${year}-${month}-${day}`;
-// };
-
-//     const selectedSeatsString = selectedSeats.toString(); // 将数组转换为字符串
-// const seatsArray = selectedSeatsString.split(",");
-//     const numberOfSeats = seatsArray.reduce((count, seat) => {
-//       const seatFormat = /^\d+[A-Z]$/;
-//       if (seatFormat.test(seat.trim())) {
-//           return count + 1;
-//       }
-//       return count;
-//   }, 0);
-  
-
-//   useEffect(() => {
-//     const fetchUserData = async () => {
-//         try {
-//             // 从 AsyncStorage 中获取用户全名
-//             const storedFullName = await AsyncStorage.getItem('user');
-//             // 如果存在，更新状态
-//             if (storedFullName) {
-//                 setFullName(JSON.parse(storedFullName)); // 解析 JSON 字符串
-//             }
-     
-//         } catch (error) {
-//             console.error('Error fetching user data', error);
-//         }
-//     };
-
-//     fetchUserData();
-// }, []);
-
-//     useEffect(() => {
-//       const fetchFlightDetails = async () => {
-//         try {
-//               const response = await fetch(`${API_URL}/findFlightId`, {
-//                   method: 'POST',
-//                   headers: {
-//                       'Content-Type': 'application/json',
-//                   },
-//                   body: JSON.stringify({ flightId }), // 发送 flightId
-//               });
-
-//               if (response.ok) {
-//                   const data = await response.json();
-//                   setFlightDetails(data); // 设置航班详情
-//                   const totalPrice = numberOfSeats * data.ticketPrice;
-//                   setTotalPrice(totalPrice.toString());
-//                   console.log("Flight Details: " + JSON.stringify(data, null, 2)); // 使用 JSON.stringify 打印对象
-//               } else {
-//                   console.log('Error fetching flight details');
-//               }
-//           } catch (error) {
-//               console.error('Error:', error);
-//           } 
-//       };
-//       fetchFlightDetails(); // 调用获取航班详情的函数
-//   }, [flightId]); // 依赖于 flightId，确保在其变化时重新请求
-
-//     const handleSubmit = async () => {
-//       try {
-//         const userId = await AsyncStorage.getItem('userId');
-//         const userData = {
-//           userId:userId,
-//           fullName: fullName,
-//           dateBirth: dateBirth,
-//           mobile: mobile,
-//           passport: passport,
-//           nationality: nationality,
-//           flightNumber: flightDetails.flightNumber,
-//           ticketType: flightDetails.ticketType,
-//           date: flightDetails.date,
-//           departureLocation: flightDetails.departureLocation,
-//           arrivalLocation: flightDetails.arrivalLocation,
-//           cabinClass: flightDetails.cabinClass,
-//           departureTime: flightDetails.departureTime,
-//           arrivalTime: flightDetails.arrivalTime,
-//           totalPrice: totalPrice,
-//           ticketPrice: flightDetails.ticketPrice,
-//           seat:selectedSeats
-//         };
-//         console.log('Flight Details:', flightDetails);
-//         const response = await axios.post(`${API_URL}createFlightbook`, userData);
-//         console.log('Flight Details:', flightDetails);
-//         console.log(response.data); // 处理返回的数据
-//         router.push("/bookconfirm");
-//       } catch (error) {
-//         console.error(error);
-//       }
-//     };
-
-  return (
-    <View style={{flex:1,width:'100%', backgroundColor:'#EAEAEA'}}>
+        const locations = [
+            { label: 'Beijing', value: 'Beijing' },
+            { label: 'Shanghai', value: 'Shanghai' },
+            { label: 'Wuhan', value: 'Wuhan' },
+            { label: 'Guangzhou', value: 'Guangzhou' }
+        ];
 
 
-       {/* fix header top */}
-       <View style={{position:'relative'}}>
-          <View style={{position:'absolute',top:0, zIndex:1}}>
-            <Svg width={`${width}`} height={200} fill="none">
-              <Path
-                d="M 0 0 L 0 200 C 50 200 0 150 60  120 S 70 70 80 50 S 100 50 120 0"
-                fill="#EAEAEA"
-                stroke={"transparent"}
-                strokeWidth={0}
-              />
-            </Svg>
-          </View>
-          <View style={{position:'absolute',top:-10,left:-10, zIndex:2}}>
-            <Svg width={`${width}`} height={200} fill="none">
-                <Defs>
-                  <LinearGradient id="grad1" x1="0%" x2="100%" y1="0%" y2="0%">
-                    <Stop offset="0%" stopColor="green" />
-                    <Stop offset="100%" stopColor="#03D12E" />
-                  </LinearGradient>
-                </Defs>
-              <Path
-                d="M 0 0 L 0 200 C 50 200 0 150 60  120 S 70 70 80 50 S 100 50 120 0"
-                fill="url(#grad1)"
-                stroke={"transparent"}
-                strokeWidth={0}
-              />
-            </Svg>
-          </View>
-        </View>
 
-        
-        {/* fix footer bottom */}
-        <View style={{position:'absolute',bottom:0, zIndex:1,right:0,height:200,transform:[{rotate:'180deg'}]}}>
-          <View style={{position:'absolute',top:0, zIndex:1}}>
-            <Svg width={`${width}`} height={200} fill="none">
-              <Path
-                d="M 0 0 L 0 200 C 50 200 0 150 60  120 S 70 70 80 50 S 100 50 120 0"
-                fill="#EAEAEA"
-                stroke={"transparent"}
-                strokeWidth={0}
-              />
-            </Svg>
-          </View>
-          <View style={{position:'absolute',top:-10,left:-10, zIndex:2}}>
-            <Svg width={`${width}`} height={200} fill="none">
-                <Defs>
-                  <LinearGradient id="grad1" x1="0%" x2="100%" y1="0%" y2="0%">
-                    <Stop offset="0%" stopColor="green" />
-                    <Stop offset="100%" stopColor="#03D12E" />
-                  </LinearGradient>
-                </Defs>
-              <Path
-                d="M 0 0 L 0 200 C 50 200 0 150 60  120 S 70 70 80 50 S 100 50 120 0"
-                fill="url(#grad1)"
-                stroke={"transparent"}
-                strokeWidth={0}
-              />
-            </Svg>
-          </View>
-          
-        </View>
+        const showDatePicker = () => {
+            setDatePickerVisibility(true);
+        };
+
+        const hideDatePicker = () => {
+            setDatePickerVisibility(false);
+        };
 
 
-        <ScrollView style={{width:'100%',height:'100%',position:'relative',zIndex:100, paddingBottom:50}}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, alignItems: 'center', marginTop: 30 }}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <View style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#696969', justifyContent: 'center', alignItems: 'center' }}>
-              <Ionicons name='chevron-back' size={20} color={'black'} />
+
+
+        const handleOptionChange = (option: React.SetStateAction<string>) => {
+            setticketType(option);
+        };
+
+
+        const handleConfirm = (date: { getFullYear: () => any; getMonth: () => number; getDate: () => any; }) => {
+            setdate(formatDate(date));
+            hideDatePicker();
+        };
+
+        const formatDate = (date: { getFullYear: () => any; getMonth: () => number; getDate: () => any; }) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+
+
+        // 获取用户照片的函数
+        const fetchUserPhoto = async (userId: string) => {
+            const response = await axios.get(`${API_URL}/getPhoto/${userId}`);
+
+            setPhotoPath(response.data.photoPath); // 更新状态
+
+        };
+
+
+        // Search Flight Form
+        interface SearchFlightData {
+            originCity: string;
+            destinationCity: string;
+            departureDate: string;
+            seat: number | string;
+        }
+
+        // Flight Offer Data
+        interface FlightOfferData {
+            originLocationCode: string;
+            destinationLocationCode: string;
+            departureDate: Date;
+            returnDate: Date;
+            adults: number;
+            maxResults: number;
+        }
+
+        // Trip Option Components
+        interface TripOptionProps {
+            ticketType: string;
+            handleNavigationChange: (type: string) => void;
+        }
+        const TripOption = ({
+            ticketType,
+            handleNavigationChange,
+        }: TripOptionProps) => (
+            <View className="flex-row justify-between w-full px-4 py-2">
+                <Pressable
+
+                    className="flex-row w-1/2"
+                    onPress={() => handleNavigationChange("One Way")}
+                >
+                    <View
+                        className={`w-full justify-center items-center flex-row space-x-2 pb-2 ${ticketType === "One Way"
+                            ? "border-b-4 border-[#12B3A8]"
+                            : "border-t-transparent"
+                            }`}
+                    >
+                        <ChevronDoubleRightIcon
+                            size={20}
+                            strokeWidth={ticketType === "One Way" ? 3 : 2}
+                            color={ticketType === "Round Way" ? "#12B3A8" : "gray"}
+                        />
+                        <Text
+                            className={`text-xl pl-2 ${ticketType === "One Way" ? "text-[#12B3A8]" : "text-gray-500"
+                                }`}
+                            style={{
+                                fontWeight: ticketType === "One Way" ? "700" : "500",
+                            }}
+                        >
+                            One Trip
+                        </Text>
+                    </View>
+                </Pressable>
+
+
+
+                <Pressable
+
+                    className="flex-row w-1/2"
+                    onPress={() => handleNavigationChange("Round Way")}
+                >
+                    <View
+                        className={`w-full justify-center items-center flex-row space-x-2 pb-2 ${ticketType === "Round Way"
+                            ? "border-b-4 border-[#12B3A8]"
+                            : "border-t-transparent"
+                            }`}
+                    >
+                        <ArrowPathRoundedSquareIcon
+                            size={20}
+                            strokeWidth={ticketType === "Round Way" ? 3 : 2}
+                            color={ticketType === "One Way" ? "#12B3A8" : "gray"}
+                        />
+                        <Text
+                            className={`text-xl pl-2 ${ticketType === "Round Way" ? "text-[#12B3A8]" : "text-gray-500"
+                                }`}
+                            style={{
+                                fontWeight: ticketType === "Round Way" ? "700" : "500",
+                            }}
+                        >
+                            Round Trip
+                        </Text>
+                    </View>
+                </Pressable>
             </View>
-          </TouchableOpacity>
+        );
+        // Location Components
+        interface LocationInputProps {
+            placeholder: string;
+            icon: React.ReactNode;
+            value: string;
+            onPress: () => void;
+        }
 
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+        const LocationInput = ({
+            placeholder,
+            icon,
+            value,
+            onPress,
+        }: LocationInputProps) => (
+            <View className="border-2 border-gray-300 mx-4 mb-4 rounded-2xl justify-center">
+                <Pressable onPress={onPress}>
+                    <View className="px-4 flex-row justify-between items-center">
+                        <View className="w-[15%] border-r-2 border-gray-300">{icon}</View>
 
-            <TouchableOpacity>
-              <View style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
-                <AntDesign name="sharealt" size={20} color="black" />
-              </View>
-            </TouchableOpacity>
-
-          </View>
-        </View>
-          
-            <View style={{paddingTop:Constants.statusBarHeight+10,paddingHorizontal:20}}>
-                {/* Passenger Information (Thông tin hành khách): */}
-                <View style={{backgroundColor:'#fff',padding:20, borderRadius:10,marginBottom:20}}>
-                        <View style={{flexDirection:'row',alignItems:'center',paddingBottom:10}}>
-                            <FontAwesome name="user" size={24} color={'black'}/>
-                            <Text style={{fontWeight:'bold',paddingLeft:10,fontSize:16}}>Passenger Information</Text>
+                        <View className="w-[80%] py-3">
+                            {value ? (
+                                <Text className="bg-transparent text-gray-600 font-bold">
+                                    {value}
+                                </Text>
+                            ) : (
+                                <Text className="bg-transparent text-lg text-gray-600 font-semibold">
+                                    {placeholder}
+                                </Text>
+                            )}
+                        </View>
+                    </View>
+                </Pressable>
             </View>
-            {/* <TextInput value={fullName}
-              onChangeText={setFullName} placeholderTextColor={'gray'} placeholder='Full Name' style={{ height: 50, width: '100%', backgroundColor: '#fff', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} /> */}
-             <TextInput value={dateBirth}
-              onChangeText={setDateBirth} placeholderTextColor={'gray'} placeholder='DateBirth' style={{ height: 50, width: '100%', backgroundColor: '#fff', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} />
-{/*   
-            <View>
-              <TouchableOpacity onPress={showDatePicker} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <Fontisto name="date" size={20} color="gray" />
-                <Text>{dateBirth || 'Select Date'}</Text>
-              </TouchableOpacity>
-              <DateTimePickerModal
-                isVisible={isDatePickerVisible}
-                mode="date"
-                onConfirm={handleConfirm}
-                onCancel={hideDatePicker}
-              />
-            </View> */}
+        );
 
-            <TextInput value={"nationality"} onChangeText={setNationality} placeholderTextColor={'gray'} placeholder='Nationality' style={{ height: 50, width: '100%', backgroundColor: '#FFF', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} />
-            <TextInput value={"nationality"} onChangeText={setPassport} placeholderTextColor={'gray'} placeholder='Passsport or ID Number' style={{ height: 50, width: '100%', backgroundColor: '#FFF', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} />
-            <TextInput value={"nationality"} onChangeText={setMobile} placeholderTextColor={'gray'} placeholder='Contact Information' style={{ height: 50, width: '100%', backgroundColor: '#FFF', borderRadius: 10, marginTop: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#EAEAEA' }} />
-            </View>
+        // Departure Date Components
+        interface DepartureDateInputProps {
+            placeholder: string;
+            icon: React.ReactNode;
+            value: string;
+            onPress: () => void;
+        }
 
-                {/* Flight Details (Chi tiết chuyến bay):: */}
-            
-                        {/* <View style={{flexDirection:'row',alignItems:'center',paddingBottom:10}}>
-                            <FontAwesome name="plane" size={24} color={'black'}/>
-                            <Text style={{fontWeight:'bold',paddingLeft:10,fontSize:16}}>Flight Details</Text>
-                        </View> */}
-                        {/* <TextInput  onPress={() => router.push("/seat")} placeholderTextColor={'gray'} placeholder='Select Seat' style={{height:50, width:'100%', backgroundColor:'#FFF', borderRadius:10, marginTop:10, paddingHorizontal:10,borderWidth:1, borderColor:'#EAEAEA'}}/> */}
- {/* <TextInput placeholderTextColor={'gray'} placeholder='Date and Time Of Flight' style={{height:50, width:'100%', backgroundColor:'#FFF', borderRadius:10, marginTop:10, paddingHorizontal:10,borderWidth:1, borderColor:'#EAEAEA'}}/>
-                        <TextInput placeholderTextColor={'gray'} placeholder='Departure and Arrival Locations' style={{height:50, width:'100%', backgroundColor:'#FFF', borderRadius:10, marginTop:10, paddingHorizontal:10,borderWidth:1, borderColor:'#EAEAEA'}}                       /> */}
+        const DepartureDate = ({
+            placeholder,
+            icon,
+            value,
+            onPress,
+        }: DepartureDateInputProps) => (
+            <Pressable
+                onPress={onPress}
+                className="border-2 border-gray-300 mx-4 mb-4 rounded-2xl justify-center py-4 flex-row items-center pl-4 "
+            >
+                <View className="w-[15%] border-r-2 border-gray-300">{icon}</View>
+                <View className="w-[85%] px-4 items-start justify-start">
+                    <Text className="bg-transparent text-gray-600 font-bold">
+                        {value || placeholder}
+                    </Text>
+                </View>
+            </Pressable>
+        );
+
+
+        const [isPending, setIsPending] = useState(false);
+        const [refreshData, setRefreshData] = useState(false);
+        const [session, setSession] = useState<any>(null);
+
+
+
+        const [flightOffferData, setFlightOfferData] = useState<FlightOfferData>({
+            originLocationCode: "",
+            destinationLocationCode: "",
+            departureDate: new Date(),
+            returnDate: new Date(),
+            adults: 1,
+            maxResults: 10,
+        });
+        const [searchFlightData, setSearchFlightData] = useState<SearchFlightData>({
+            originCity: "",
+            destinationCity: "",
+            departureDate: "",
+            seat: 1,
+        });
+        const [selectedDate, setSelectedDate] = useState<any>(new Date());
+
+        const handleNavigationChange = (type: string) => setticketType(type);
+
+
+        const renderContent = () => {
+            if (userRole === 'user') {
+                return (
+                    <View className='w-full flex-row space-x-4 justify-end items-center h-14'>
+                        {/* 用户角色的内容 */}
+                    </View>
+                );
+            } else if (userRole === 'admin') {
+                return (
+                    <View className='w-full flex-row justify-between items-center h-14'>
+                        <TouchableOpacity
+                            onPress={() => router.push("/flightCreat")}
+                            className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
+                        >
+                            <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
+                                <Text className='text-white font-semibold'>📖</Text>
+                            </View>
+
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => router.push("/flightCreat")}
+                            className='bg-blue-600 w-fit rounded-full px-4 justify-center h-full flex-row items-center gap-4 transition-transform transform hover:scale-105'
+                        >
+                            <View className='bg-blue-500 rounded-full w-8 h-8 justify-center items-center'>
+                                <Text className='text-white font-semibold'>✈️</Text>
+                            </View>
+
+                            <View className='justify-start items-start gap-1'>
+                                <Text className='text-black font-bold text-lg'>Create</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+
+                );
+            } else {
+                return null; // 处理其他角色或情况
+            }
+        };
+        return (
+            <View style={{ flex: 1, width: '100%', backgroundColor: '#EAEAEA' }}>
+
+                <ScrollView>
+                    <View className="flex-1 items-center bg-[#F5F7FA] relative">
+                        {/* <StatusBar style="light" /> */}
+
+                        {/* Header */}
+
+                        <View
+
+                            className="h-64 mb-4 justify-start border-orange-600 w-full bg-[#192031] relative pt-16"
+                            style={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}
+
+                        >
+                            <Pressable
+                                onPress={() => router.push("/search")}
+                                className="flex-row justify-center items-center h-14 w-[20%]"
+                            >
+                                <View className="rounded-full items-center justify-center bg-gray-500 h-10 w-10">
+                                    <MaterialIcons
+                                        name="keyboard-arrow-left"
+                                        size={30}
+                                        color={"#fff"}
+                                    />
+                                </View>
+                            </Pressable>
+                       
                
-
-                    {/* Payment Information (Thông tin thanh toán):: */}
-                    {/* <View style={{backgroundColor:'#fff',padding:20, borderRadius:10,marginBottom:20}}>
-                        <View style={{flexDirection:'row',alignItems:'center',paddingBottom:10}}>
-                            <FontAwesome name="credit-card" size={24} color={'black'}/>
-                            <Text style={{fontWeight:'bold',paddingLeft:10,fontSize:16}}>Payment Information</Text>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ marginTop: -170 }} className="text-white font-extrabold text-lg">
+                                    Create flight
+                                </Text>
+                            </View>
+                      
+                          
                         </View>
-                       <View style={{marginTop:10}}>                 
-                       </View>
-                    </View> */}
 
-                     {/* Baggage Information (Thông tin hành lý): */}
-                {/* <View style={{backgroundColor:'#fff',padding:20, borderRadius:10,marginBottom:20}}>
-                        <View style={{flexDirection:'row',alignItems:'center',paddingBottom:10}}>
-                            <FontAwesome name="suitcase" size={24} color={'black'}/>
-                            <Text style={{fontWeight:'bold',paddingLeft:10,fontSize:16}}>Baggage Information</Text>
+                        {/* Form Area */}
+                        <View className="w-full px-4 -mt-32 mx-4">
+                            <View className="bg-white rounded-3xl pt-2 pb-4 shadow-md shadow-slate-300">
+                                <View className="flex-row justify-between w-full px-4 py-2">
+                                    <TripOption
+                                        ticketType={ticketType}
+                                        handleNavigationChange={handleNavigationChange}
+                                    />
+                                </View>
+
+
+                                {/* Origin City */}
+
+                                <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
+                                    <View style={{ flexDirection: 'column', alignItems: 'center', }}>
+                                        <View style={{ width: '100%', borderWidth: 1, borderColor: '#EAEAEA', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10, flexDirection: 'row', alignItems: 'center', }}>
+                                            <MaterialIcons name="flight-takeoff" size={20} color="gray" style={{ marginRight: 10 }} />
+                                            <View style={{ flex: 1 }}>
+                                                <Text style={{ fontWeight: 'bold', paddingVertical: 10 }}>Departure</Text>
+                                                <Picker
+                                                    selectedValue={departureLocation}
+                                                    onValueChange={(itemValue) => setdepartureLocation(itemValue)}
+                                                    style={{ backgroundColor: 'white', borderWidth: 1, borderColor: '#CCCCCC', borderRadius: 5 }}
+                                                >
+                                                    {locations.map((location, index) => (
+                                                        <Picker.Item label={location.label} value={location.value} key={index} />
+                                                    ))}
+                                                </Picker>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+
+                                {/* Destination City */}
+                                <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
+                                    <View style={{ flexDirection: 'column', alignItems: 'center', }}>
+                                        <View style={{ width: '100%', borderWidth: 1, borderColor: '#EAEAEA', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10, flexDirection: 'row', alignItems: 'center', }}>
+                                            <MaterialIcons name="flight-land" size={20} color="gray" style={{ marginRight: 10 }} />
+                                            <View style={{ flex: 1 }}>
+                                                <Text style={{ fontWeight: 'bold', paddingVertical: 10 }}>Destination</Text>
+                                                <Picker
+                                                    selectedValue={arrivalLocation}
+                                                    onValueChange={(itemValue) => setArrivalTime(itemValue)}
+                                                    style={{ backgroundColor: 'white', borderWidth: 1, borderColor: '#CCCCCC', borderRadius: 5 }}
+                                                >
+                                                    {locations.map((location, index) => (
+                                                        <Picker.Item label={location.label} value={location.value} key={index} />
+                                                    ))}
+                                                </Picker>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+
+
+                                {/* Departure Date */}
+                                <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
+                                    <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 30, position: 'relative' }}>
+                                        <View style={{ width: '100%', borderWidth: 1, borderColor: '#EAEAEA', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10 }}>
+                                            <Text style={{ fontWeight: '500', paddingVertical: 10 }}>Depart</Text>
+                                            <TouchableOpacity onPress={showDatePicker} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                                <Fontisto name="date" size={20} color="gray" />
+                                                <Text>{date || 'Select Date'}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+
+                                    <DateTimePickerModal
+                                        isVisible={isDatePickerVisible}
+                                        mode="date"
+                                        onConfirm={handleConfirm}
+                                        onCancel={hideDatePicker}
+                                    // minimumDate={new Date()} // 设置最小日期为今天
+                                    />
+                                </View>
+                                {/* Seat */}
+                                <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
+
+                                    <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 30, position: 'relative' }}>
+
+
+                                        <View style={{ width: '100%', borderWidth: 1, borderColor: '#EAEAEA', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10 }}>
+                                            <Text style={{ fontWeight: 500, paddingVertical: 10 }}>Class</Text>
+                                            <View style={{ flexDirection: 'row', gap: 10 }}>
+                                                <MaterialIcons name="flight-class" size={20} color="gray" />
+                                                <Picker
+                                                    selectedValue={cabinClass}
+                                                    style={{ height: 50, width: '100%' }}
+                                                    onValueChange={(itemValue: string) => setcabinClass(itemValue)}
+                                                >
+                                                    <Picker.Item label="Economy Class" value="Economy Class" />
+                                                    <Picker.Item label="Business Class" value="Business Class" />
+                                                </Picker>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+
+
+                                <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
+                                    <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 30, position: 'relative' }}>
+                                        <View style={{ width: '100%', borderWidth: 1, borderColor: '#EAEAEA', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10 }}>
+                                            <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#333', paddingVertical: 10 }}>Price Range</Text>
+                                            <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+                                                <MaterialIcons name="attach-money" size={20} color="gray" />
+                                                <TextInput
+                                                    style={{
+                                                        borderWidth: 1,
+                                                        borderColor: '#EAEAEA',
+                                                        borderRadius: 5,
+                                                        padding: 10,
+                                                        flex: 1,
+                                                        marginLeft: 10
+                                                    }}
+                                                    placeholder="Enter price"
+                                                    keyboardType="numeric"
+                                                    value={priceRange}
+                                                    onChangeText={setPriceRange}
+                                                />
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+
+
+
+                                {/* Search Button */}
+                                <TouchableOpacity style={{ paddingHorizontal: 10, marginTop: 20 }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, backgroundColor: 'green', paddingVertical: 15, borderRadius: 10 }}>
+                                        <MaterialCommunityIcons name="airplane-search" size={25} color="white" />
+                                        <Text style={{ color: 'white', fontWeight: 500, fontSize: 18 }}>Create</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+
+
+
+
+
+                            </View>
                         </View>
-                        <TextInput placeholderTextColor={'gray'} placeholder='Number of Checked and Carry-on Bags' style={{height:50, width:'100%', backgroundColor:'#FFF', borderRadius:10, marginTop:10, paddingHorizontal:10,borderWidth:1, borderColor:'#EAEAEA'}}/>
-                        
-                </View> */}
 
-                <View>
-                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:10}}>
-                 
-                 <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center',gap:5}}>
-                  
-                    <MaterialIcons name="view-list" size={24} color="#f0a008" />
-                    <Text style={{fontSize:12,fontWeight:500, color:'black'}}>Total price</Text>
-                </View>
-                 {/* <Text style={{fontSize:18,fontWeight:500,color:'#fa5e3e'}}>${totalPrice}</Text> */}
+                    </View>
+                </ScrollView>
             </View>
-                     <TouchableOpacity >
-                          <View style={{backgroundColor:'orange',padding:20, borderRadius:10,marginBottom:20, flexDirection:'row',alignItems:'center',justifyContent:'center',gap:10}}>
-                              <MaterialIcons name="next-plan" size={30} color="white" />
-                              <Text style={{fontWeight:'bold',fontSize:20, color:'#fff', textAlign:'center'}}>Continue</Text>
-                          </View>
-                     </TouchableOpacity>
-                </View>
-            </View>
-         </ScrollView>
-    </View>
-  )
-}
+        )
+    }
 
-export default flightCreat
+    export default flightCreat

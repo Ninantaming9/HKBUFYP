@@ -728,7 +728,7 @@ const FlightScreen = () => {
                             <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 30, position: 'relative' }}>
 
                                 <View style={{ width: '100%', borderWidth: 1, borderColor: '#EAEAEA', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 10 }}>
-                                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#333', paddingVertical: 10 }}>Price Range</Text>
+                                    <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#333', paddingVertical: 10 }}>Price Range</Text>
                                     <View style={{ flexDirection: 'row', gap: 10 }}>
                                         <MaterialIcons name="attach-money" size={20} color="gray" />
                                         <Picker
