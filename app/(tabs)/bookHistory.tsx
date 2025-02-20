@@ -1,4 +1,4 @@
-import { View, Text, Pressable, TextInput, FlatList, ScrollView, TouchableOpacity, Alert, Modal, Button } from "react-native";
+import { View, Text, Pressable, TextInput, FlatList, ScrollView, TouchableOpacity, Alert, Modal } from "react-native";
 import React, { useEffect, useState } from "react";
 
 import axios from "axios";
@@ -17,15 +17,13 @@ export default function searchresult() {
   const [bookHistory, setBookHistory] = useState<Flightbook[]>([]);
   const [loading, setLoading] = useState(true);
   const [flightCount, setFlightCount] = useState(0);
-
+  const [email, setEmail] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const [fullName, setFullName] = useState(null);
-  const [showQRCode, setShowQRCode] = useState(false);
-  const [scannedResult, setScannedResult] = useState(null);
-  const [qrCode, setQrCode] = useState('TICKET123456'); // 你要生成的二维码内容
   const [userRole, setUserRole] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
   interface Flightbook {
     _id: string;
     flightNumber: string;
@@ -50,7 +48,8 @@ export default function searchresult() {
       try {
         // 从 AsyncStorage 中获取用户全名
         const storedFullName = await AsyncStorage.getItem('user');
-        const storedUserRole = await AsyncStorage.getItem('userRole'); // 从 AsyncStorage 获取用户全名
+        const storedUserRole = await AsyncStorage.getItem('userRole');
+        // 从 AsyncStorage 中获取用户 ID
         // 如果存在，更新状态
         if (storedFullName) {
           setFullName(JSON.parse(storedFullName)); // 解析 JSON 字符串
@@ -59,7 +58,7 @@ export default function searchresult() {
         if (storedUserRole) {
           setUserRole(JSON.parse(storedUserRole)); // 
         }
-        // 从 AsyncStorage 中获取用户 ID
+       
         const userId = await AsyncStorage.getItem('userId');
         // 获取航班预订信息
         const response = await axios.get(`${API_URL}/getAllFlightBookings`, {
@@ -99,6 +98,37 @@ export default function searchresult() {
       );
     });
   };
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(`${API_URL}/searchBookbyadmin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // 设置请求头
+        },
+        body: JSON.stringify({
+          email: email.trim(), // 只传递 email
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const errorMessage = errorData.message || 'An error occurred while searching.';
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json(); // 解析响应数据
+      console.log("dasdasdadas");
+      setBookHistory(data); // 设置返回的航班数据
+
+      // 成功后关闭模态框
+      setModalVisible(false); // 关闭模态框
+    } catch (err) {
+      console.error(err); // 打印错误信息
+    }
+  };
+
+
 
   const handleDeleteFlight = async (flightId: any, flightNumber: any, fullName: any) => {
     const isConfirmed = await showDeleteConfirmation();
@@ -157,46 +187,10 @@ export default function searchresult() {
     }
   };
 
-  const handleViewQRCode = () => {
-    setShowQRCode(true);
+  const handleViewQRCode = (flightId: string) => {
+    router.push("/login");
+    console.log(`Viewing QR Code for flight ID: ${flightId}`);
   };
-
-  const handleSearch = () => {
-    // 在这里执行搜索功能
-    console.log('Searching for:', searchQuery);
-    // 关闭搜索框
-    setModalVisible(false);
-    // 清空搜索框
-    setSearchQuery('');
-  };
-
-
-
-  const handleScan = (data: any) => {
-    if (data) {
-      // 发送请求到后端验证二维码
-      fetch('http://10.241.237.131/validateTicketQRCode', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ qrCode: data }),
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          setScannedResult(result.valid);
-          alert(result.valid ? 'QR Code is valid!' : 'QR Code is invalid!');
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
-    }
-  };
-
-  const handleError = (err: any) => {
-    console.error(err);
-  };
-
 
 
   return (
@@ -262,8 +256,8 @@ export default function searchresult() {
                             <TextInput
                               className="border border-gray-300 rounded-md p-3 flex-1"
                               placeholder="Search by email or Fullname"
-                              value={searchQuery}
-                              onChangeText={setSearchQuery}
+                              value={email}
+                              onChangeText={setEmail}
                             />
                             <TouchableOpacity
                               onPress={handleSearch}
@@ -286,11 +280,8 @@ export default function searchresult() {
               </View>
             </View>
           </View>
-
-
-
-
-
+          
+           
           <View>
             {/* <View className="flex-row justify-center items-center px-2 w-full">
                 <View className="w-[70%] justify-between items-center flex-row pb-2">
@@ -382,30 +373,27 @@ export default function searchresult() {
                     </View>
                   </View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, paddingTop: 15, borderTopColor: '#EAEAEA', borderTopWidth: 1 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
-                      <Text>Total Price</Text>
-                      <Text style={{ fontSize: 16, fontWeight: '500', marginLeft: 5 }}>${flight.totalPrice}</Text>
-                    </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
+        <Text>Total Price</Text>
+        <Text style={{ fontSize: 16, fontWeight: '500', marginLeft: 5 }}>${flight.totalPrice}</Text>
+      </View>
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
+        <TouchableOpacity onPress={() => handleViewQRCode(flight._id)}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
+            <AntDesign name="qrcode" size={16} color="#66b3f8" />
+            <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>View QR Code</Text>
+          </View>
+        </TouchableOpacity>
 
-                      <TouchableOpacity onPress={() => handleViewQRCode()}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
-                          <AntDesign name="qrcode" size={16} color="#66b3f8" />
-                          <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>View QR Code</Text>
-                        </View>
-
-
-                      </TouchableOpacity>
-
-                      <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#f87f66', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5 }}>
-                          <AntDesign name="delete" size={16} color="#f87f66" />
-                          <Text style={{ color: '#f87f66', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>Delete</Text>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+        <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#f87f66', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5 }}>
+            <AntDesign name="delete" size={16} color="#f87f66" />
+            <Text style={{ color: '#f87f66', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>Delete</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </View>
                 </TouchableOpacity>
               ))}
 
