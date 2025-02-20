@@ -210,15 +210,36 @@ app.put('/changePassword', async (req, res) => {
 });
 
 
+function generateFlightNumber() {
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numbers = '0123456789';
+
+  // 生成前三位大写字母
+  let flightNumber = '';
+  for (let i = 0; i < 3; i++) {
+    flightNumber += letters.charAt(Math.floor(Math.random() * letters.length));
+  }
+
+  // 生成后三位数字
+  for (let i = 0; i < 3; i++) {
+    flightNumber += numbers.charAt(Math.floor(Math.random() * numbers.length));
+  }
+
+  return flightNumber;
+}
 
 app.post('/createFlight', async (req, res) => {
   try {
     const db = await connectToDB();
     const flightCollection = db.collection('flight'); 
 
-    const { ticketType, flightNumber, date, departureTime, arrivalTime, departureLocation, arrivalLocation, cabinClass, ticketPrice } = req.body;
+    const { ticketType, date, departureTime, arrivalTime, departureLocation, arrivalLocation, economyClassPrice, businessClassPrice } = req.body;
 
-    const flightData = {
+    // 生成航班号
+    const flightNumber = generateFlightNumber();
+
+    // Create economy class flight data
+    const economyFlightData = {
       ticketType,
       flightNumber,
       date,
@@ -226,18 +247,39 @@ app.post('/createFlight', async (req, res) => {
       arrivalTime,
       departureLocation,
       arrivalLocation,
-      cabinClass,
-      ticketPrice
+      cabinClass: 'Economy Class',
+      ticketPrice: economyClassPrice
     };
 
-    await flightCollection.insertOne(flightData);
+    // Create business class flight data
+    const businessFlightData = {
+      ticketType,
+      flightNumber,
+      date,
+      departureTime,
+      arrivalTime,
+      departureLocation,
+      arrivalLocation,
+      cabinClass: 'Business Class',
+      ticketPrice: businessClassPrice
+    };
 
-    res.status(200).json({ message: 'Flight information created successfully' });
+    // Insert economy class flight data
+    await flightCollection.insertOne(economyFlightData);
+    // Insert business class flight data
+    await flightCollection.insertOne(businessFlightData);
+
+    res.status(200).json({ message: 'Flight information created successfully for both classes' });
   } catch (error) {
     console.log('Error creating flight information', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+
+
+
 app.post('/searchFlight', async (req, res) => {
   try {
     const db = await connectToDB();
