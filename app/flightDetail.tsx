@@ -17,7 +17,7 @@ const FlightDetailScreen = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const route = useRoute();
     const { selectedSeats } = route.params as { selectedSeats: string[] }; 
-    
+      const [email, setEmail] = useState('');
 
     const [flightDetails, setFlightDetails] = useState<any>(null);
     const { flightId } = route.params as { flightId: string }; // 接收航班 ID
@@ -68,11 +68,18 @@ const seatsArray = selectedSeatsString.split(",");
         try {
             // 从 AsyncStorage 中获取用户全名
             const storedFullName = await AsyncStorage.getItem('user');
+            const storedUserEmail = await AsyncStorage.getItem('userEmail'); // 从 AsyncStorage 获取用户全名
             // 如果存在，更新状态
             if (storedFullName) {
                 setFullName(JSON.parse(storedFullName)); // 解析 JSON 字符串
             }
      
+            if (storedUserEmail) {
+              setEmail(JSON.parse(storedUserEmail)); // 解析 JSON 字符串
+          }
+   
+            
+
         } catch (error) {
             console.error('Error fetching user data', error);
         }
@@ -113,6 +120,7 @@ const seatsArray = selectedSeatsString.split(",");
       const userId = await AsyncStorage.getItem('userId');
       const userData = {
         userId: userId,
+        email: email,
         fullName: fullName,
         dateBirth: dateBirth,
         mobile: mobile,

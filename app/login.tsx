@@ -18,8 +18,8 @@ import { API_URL } from '../backend/address';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 export default function Login() {
 
-  const [email, setEmail] = useState('admin@gmail.com');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); // 新增状态变量
   const handleSubmit = async () => {
     try {
@@ -42,6 +42,8 @@ export default function Login() {
               await AsyncStorage.setItem('userId', response.data.userId);
               await AsyncStorage.setItem('user', JSON.stringify(response.data.fullname));
               await AsyncStorage.setItem('userRole', JSON.stringify(response.data.role));
+              await AsyncStorage.setItem('userEmail', JSON.stringify(response.data.email));
+              console.log(response);
               // 根据用户角色跳转到不同页面
               const userRole = response.data.role; // 假设角色信息在 response.data.role 中
 
