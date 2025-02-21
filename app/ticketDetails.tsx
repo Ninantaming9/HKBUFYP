@@ -1,6 +1,6 @@
 import { View, Text, useWindowDimensions,TextInput, ScrollView, TouchableOpacity , Image} from 'react-native'
 import React, { useEffect, useState } from 'react'
-// 📗 khai báo thư viện mà expo hổ trỡ để lấy giá trị chiều cao  statusBar
+
 import Constants from "expo-constants";
 import Svg, { Defs, Path , LinearGradient,Stop} from "react-native-svg";
 import { FontAwesome } from '@expo/vector-icons';
@@ -14,8 +14,8 @@ const FlightDetailScreen = () => {
   const route = useRoute();
     const { width, height } = useWindowDimensions();
     const [flightBookDetails, setFlightBookDetails] = useState<any>(null);
-    const { flightId } = route.params as { flightId: string }; // 接收航班 ID
-    const [bookHistory, setBookHistory] = useState<Flightbook | null>(null); // 初始为 null
+    const { flightId } = route.params as { flightId: string }; 
+    const [bookHistory, setBookHistory] = useState<Flightbook | null>(null); 
  
     interface Flightbook {
       _id: string;
@@ -45,13 +45,13 @@ const FlightDetailScreen = () => {
                   headers: {
                       'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify({ flightId }), // 发送 flightId
+                  body: JSON.stringify({ flightId }), 
               });
 
               if (response.ok) {
                   const data = await response.json();
-                  setBookHistory(data); // 设置航班详情
-                  console.log("Flight Details: " + JSON.stringify(data, null, 2)); // 使用 JSON.stringify 打印对象
+                  setBookHistory(data); 
+                  console.log("Flight Details: " + JSON.stringify(data, null, 2)); 
               } else {
                   console.log('Error fetching flight details');
               }
@@ -60,8 +60,8 @@ const FlightDetailScreen = () => {
           } 
       };
 
-      fetchFlightDetails(); // 调用获取航班详情的函数
-  }, [flightId]); // 依赖于 flightId，确保在其变化时重新请求
+      fetchFlightDetails();
+  }, [flightId]); 
 
   
   return (
@@ -135,35 +135,35 @@ const FlightDetailScreen = () => {
                         </View>
                         <View style={styles.container}>
       <TextInput 
-         value={`FullName: ${bookHistory?.fullName || ''}`} // 在前面添加 "Name: "
+         value={`FullName: ${bookHistory?.fullName || ''}`} 
         placeholderTextColor={'gray'}
         placeholder='Full Name'
         style={styles.input}
         editable={false}
       />
       <TextInput
-           value={`DateBirth: ${bookHistory?.dateBirth || ''}`} // 在前面添加 "Name: "
+           value={`DateBirth: ${bookHistory?.dateBirth || ''}`} 
         placeholderTextColor={'gray'}
         placeholder='Date of Birth'
         style={styles.input}
         editable={false}
       />
       <TextInput
-         value={`Nationality: ${bookHistory?.nationality || ''}`} // 在前面添加 "Name: "
+         value={`Nationality: ${bookHistory?.nationality || ''}`} 
         placeholderTextColor={'gray'}
         placeholder='Nationality'
         style={styles.input}
         editable={false}
       />
       <TextInput
-        value={`Passport: ${bookHistory?.passport || ''}`} // 在前面添加 "Name: "
+        value={`Passport: ${bookHistory?.passport || ''}`} 
         placeholderTextColor={'gray'}
         placeholder='Passport or ID Number'
         style={styles.input}
         editable={false}
       />
       <TextInput
-          value={`Mobile: ${bookHistory?.mobile || ''}`} // 在前面添加 "Name: "
+          value={`Mobile: ${bookHistory?.mobile || ''}`} 
         placeholderTextColor={'gray'}
         placeholder='Contact Information'
         style={styles.input}

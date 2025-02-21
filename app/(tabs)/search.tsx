@@ -61,7 +61,6 @@ const FlightScreen = () => {
     const [date, setdate] = useState('');
     const [photoPath, setPhotoPath] = useState<string | null>(null);
     const [userRole, setUserRole] = useState(null);
-    // const router = useRouter(); // 使用 useRouter 获取 router 实例
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
     const route = useRoute();
@@ -81,34 +80,34 @@ const FlightScreen = () => {
         let sortedResults: Flight[] = [];
 
         const convertToHours = (timeString: string) => {
-            const [hours] = timeString.split('.').map(Number); // 只获取小时部分
-            return hours; // 返回小时作为数值
+            const [hours] = timeString.split('.').map(Number); 
+            return hours; 
         };
 
         if (selectedFilter === 'Sort by Earliest') {
-            // 从早到晚排序
+            
             sortedResults = [...searchResults].sort((a, b) => {
-                const timeStringA = a.departureTime as string; // 假设 a.departureTime 是 "1:00"
-                const timeStringB = b.departureTime as string; // 假设 b.departureTime 是 "2:30"
-                const hoursA = parseFloat(timeStringA.split(':')[0]) || 0; // 获取小时部分并转换为数字
-                const hoursB = parseFloat(timeStringB.split(':')[0]) || 0; // 获取小时部分并转换为数字
-                return hoursA - hoursB; // 使用小时进行比较
+                const timeStringA = a.departureTime as string; 
+                const timeStringB = b.departureTime as string; 
+                const hoursA = parseFloat(timeStringA.split(':')[0]) || 0; 
+                const hoursB = parseFloat(timeStringB.split(':')[0]) || 0; 
+                return hoursA - hoursB; 
             });
         } else if (selectedFilter === 'Sort by Latest') {
-            // 从晚到早排序
+            
             sortedResults = [...searchResults].sort((a, b) => {
-                const timeStringA = a.departureTime as string; // 假设 a.departureTime 是 "1:00"
-                const timeStringB = b.departureTime as string; // 假设 b.departureTime 是 "2:30"
-                const hoursA = parseFloat(timeStringA.split(':')[0]) || 0; // 获取小时部分并转换为数字
-                const hoursB = parseFloat(timeStringB.split(':')[0]) || 0; // 获取小时部分并转换为数字
-                return hoursB - hoursA; // 使用小时进行比较
+                const timeStringA = a.departureTime as string; 
+                const timeStringB = b.departureTime as string; 
+                const hoursA = parseFloat(timeStringA.split(':')[0]) || 0; 
+                const hoursB = parseFloat(timeStringB.split(':')[0]) || 0; 
+                return hoursB - hoursA; 
             });
         } else if (selectedFilter === 'Low Price') {
-            // 低价到高价排序
+      
             sortedResults = [...searchResults].sort((a, b) => {
-                const priceA = parseFloat(a.ticketPrice) || 0; // Convert to number
-                const priceB = parseFloat(b.ticketPrice) || 0; // Convert to number
-                return priceA - priceB; // Sort based on price
+                const priceA = parseFloat(a.ticketPrice) || 0; 
+                const priceB = parseFloat(b.ticketPrice) || 0; 
+                return priceA - priceB; 
             });
         } else if (selectedFilter === 'High Price') {
             // 高价到低价排序
@@ -119,7 +118,7 @@ const FlightScreen = () => {
             });
         }
 
-        setSearchResults(sortedResults); // 更新排序后的结果
+        setSearchResults(sortedResults); 
     };
 
     // Effect to set initial sorted results
@@ -207,11 +206,11 @@ const FlightScreen = () => {
 
 
 
-    // 获取用户照片的函数
+    
     const fetchUserPhoto = async (userId: string) => {
         const response = await axios.get(`${API_URL}/getPhoto/${userId}`);
 
-        setPhotoPath(response.data.photoPath); // 更新状态
+        setPhotoPath(response.data.photoPath); 
 
     };
 
@@ -219,24 +218,23 @@ const FlightScreen = () => {
         React.useCallback(() => {
             const fetchUserData = async () => {
                 try {
-                    // 从 AsyncStorage 获取用户 ID 和全名
-                    const storedUserId = await AsyncStorage.getItem('userId'); // 从 AsyncStorage 获取用户 ID
-                    const storedFullName = await AsyncStorage.getItem('user'); // 从 AsyncStorage 获取用户全名
-                    const storedUserRole = await AsyncStorage.getItem('userRole'); // 从 AsyncStorage 获取用户全名
 
-                    // 如果存在用户 ID，调用获取照片的 API
+                    const storedUserId = await AsyncStorage.getItem('userId'); 
+                    const storedFullName = await AsyncStorage.getItem('user'); 
+                    const storedUserRole = await AsyncStorage.getItem('userRole'); 
+
+              
                     if (storedUserId) {
                         fetchUserPhoto(storedUserId);
-                        setUserId(storedUserId); // 更新用户 ID 状态
+                        setUserId(storedUserId); 
                     }
                     if (storedUserRole) {
 
                         setUserRole(JSON.parse(storedUserRole)); // 
                     }
 
-                    // 如果存在用户全名，更新状态
                     if (storedFullName) {
-                        setFullName(JSON.parse(storedFullName)); // 解析 JSON 字符串
+                        setFullName(JSON.parse(storedFullName)); 
                     }
                 } catch (error) {
                     console.error('Error fetching user data', error);
@@ -288,7 +286,7 @@ const FlightScreen = () => {
                             },
                         },
                     ],
-                    { cancelable: false } // 不允许用户通过点击背景来关闭警报
+                    { cancelable: false } 
                 );
             }
             else if (response.ok) {
@@ -332,17 +330,17 @@ const FlightScreen = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ flightId }), // 发送 flightId
+                body: JSON.stringify({ flightId }), 
             });
 
             if (response.ok) {
                 const flightDetails = await response.json();
-                console.log('Flight Details:', flightDetails._id); // 打印航班 ID
+                console.log('Flight Details:', flightDetails._id); 
 
-                // 传递航班 ID 到 flightDetail 页面
+              
                 router.push({
                     pathname: "/seat",
-                    params: { flightId: flightDetails._id }, // 传递航班 ID
+                    params: { flightId: flightDetails._id }, 
                 });
 
             } else {
@@ -565,7 +563,7 @@ const FlightScreen = () => {
 
             );
         } else {
-            return null; // 处理其他角色或情况
+            return null; 
         }
     };
 
@@ -697,7 +695,7 @@ const FlightScreen = () => {
                                 mode="date"
                                 onConfirm={handleConfirm}
                                 onCancel={hideDatePicker}
-                            // minimumDate={new Date()} // 设置最小日期为今天
+                       
                             />
                         </View>
                         {/* Seat */}
@@ -787,8 +785,8 @@ const FlightScreen = () => {
                                         onRequestClose={() => setModalVisible(false)}
                                     >
                                         <View className="flex-1 justify-center items-center bg-transparent">
-                                            <View className="bg-white rounded-3xl pt-2 pb-4 shadow-md shadow-slate-300 w-72">
-                                                <Text className="text-lg font-bold mb-4">Select Filter</Text>
+                                            <View className="bg-white rounded-3xl pt-2 pb-4 shadow-md shadow-slate-300 w-100">
+                                                <Text className="text-lg font-bold mb-4 text-center">Select Filter</Text>
                                                 {['Sort by Earliest', 'Sort by Latest', 'Low Price', 'High Price'].map((filter) => (
                                                     <TouchableOpacity
                                                         key={filter}
@@ -807,13 +805,13 @@ const FlightScreen = () => {
                                                 ))}
                                                 <View className="flex-row items-center justify-between">
                                                     <TouchableOpacity
-                                                        className="bg-green-500 p-2 rounded w-40" // 确认按钮样式
+                                                        className="bg-green-500 p-2 rounded w-40" 
                                                         onPress={applyFilter}
                                                     >
                                                         <Text className="text-white text-center">Confirm</Text>
                                                     </TouchableOpacity>
                                                     <TouchableOpacity
-                                                        className="bg-red-500 p-2 rounded w-40" // 取消按钮样式
+                                                        className="bg-red-500 p-2 rounded w-40" 
                                                         onPress={() => setModalVisible(false)}
                                                     >
                                                         <Text className="text-white text-center">Cancel</Text>
@@ -832,7 +830,7 @@ const FlightScreen = () => {
                             <View>
                                 {searchResults.map((flight, index) => (
                                     <TouchableOpacity key={index} onPress={() => {
-                                        // 打印将要传递的 ID
+                              
                                         handleContinue(flight._id);
                                     }} style={{ width: '100%', backgroundColor: 'white', marginTop: 20, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 20 }}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>

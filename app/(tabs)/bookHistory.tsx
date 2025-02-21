@@ -46,23 +46,21 @@ export default function searchresult() {
   useEffect(() => {
     const fetchUserDataAndFlightBookings = async () => {
       try {
-        // 从 AsyncStorage 中获取用户全名
+
         const storedFullName = await AsyncStorage.getItem('user');
         const storedUserRole = await AsyncStorage.getItem('userRole');
-        // 从 AsyncStorage 中获取用户 ID
-        // 如果存在，更新状态
+
         if (storedFullName) {
-          setFullName(JSON.parse(storedFullName)); // 解析 JSON 字符串
+          setFullName(JSON.parse(storedFullName)); 
         }
 
         if (storedUserRole) {
-          setUserRole(JSON.parse(storedUserRole)); // 
+          setUserRole(JSON.parse(storedUserRole)); 
         }
-       
+
         const userId = await AsyncStorage.getItem('userId');
-        // 获取航班预订信息
         const response = await axios.get(`${API_URL}/getAllFlightBookings`, {
-          params: { userId } // 传递 userId 作为查询参数
+          params: { userId }
         });
         setBookHistory(response.data.bookings);
         setFlightCount(response.data.bookings.length);
@@ -104,10 +102,10 @@ export default function searchresult() {
       const response = await fetch(`${API_URL}/searchBookbyadmin`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', // 设置请求头
+          'Content-Type': 'application/json', 
         },
         body: JSON.stringify({
-          email: email.trim(), // 只传递 email
+          email: email.trim(), 
         }),
       });
 
@@ -117,14 +115,13 @@ export default function searchresult() {
         throw new Error(errorMessage);
       }
 
-      const data = await response.json(); // 解析响应数据
-      console.log("dasdasdadas");
-      setBookHistory(data); // 设置返回的航班数据
+      const data = await response.json(); 
 
-      // 成功后关闭模态框
-      setModalVisible(false); // 关闭模态框
+      setBookHistory(data); 
+      setModalVisible(false); 
+      setEmail(''); 
     } catch (err) {
-      console.error(err); // 打印错误信息
+      console.error(err); 
     }
   };
 
@@ -165,17 +162,17 @@ export default function searchresult() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ flightId }), // 发送 flightId
+        body: JSON.stringify({ flightId }), 
       });
 
       if (response.ok) {
         const flightDetails = await response.json();
-        console.log('Flight Details:', flightDetails._id); // 打印航班 ID
+        console.log('Flight Details:', flightDetails._id); 
 
 
         router.push({
           pathname: "/ticketDetails",
-          params: { flightId: flightDetails._id }, // 传递航班 ID
+          params: { flightId: flightDetails._id }, 
         });
 
       } else {
@@ -280,8 +277,8 @@ export default function searchresult() {
               </View>
             </View>
           </View>
-          
-           
+
+
           <View>
             {/* <View className="flex-row justify-center items-center px-2 w-full">
                 <View className="w-[70%] justify-between items-center flex-row pb-2">
@@ -334,7 +331,7 @@ export default function searchresult() {
             <View>
               {bookHistory.map((flight, index) => (
                 <TouchableOpacity key={index} onPress={() => {
-                  // 打印将要传递的 ID
+             
                   handleContinue(flight._id);
                 }} style={{ width: '100%', backgroundColor: 'white', marginTop: 20, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 20 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
@@ -373,27 +370,27 @@ export default function searchresult() {
                     </View>
                   </View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, paddingTop: 15, borderTopColor: '#EAEAEA', borderTopWidth: 1 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
-        <Text>Total Price</Text>
-        <Text style={{ fontSize: 16, fontWeight: '500', marginLeft: 5 }}>${flight.totalPrice}</Text>
-      </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
+                      <Text>Total Price</Text>
+                      <Text style={{ fontSize: 16, fontWeight: '500', marginLeft: 5 }}>${flight.totalPrice}</Text>
+                    </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
-        <TouchableOpacity onPress={() => handleViewQRCode(flight._id)}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
-            <AntDesign name="qrcode" size={16} color="#66b3f8" />
-            <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>View QR Code</Text>
-          </View>
-        </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
+                      <TouchableOpacity onPress={() => handleViewQRCode(flight._id)}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
+                          <AntDesign name="qrcode" size={16} color="#66b3f8" />
+                          <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>View QR Code</Text>
+                        </View>
+                      </TouchableOpacity>
 
-        <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#f87f66', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5 }}>
-            <AntDesign name="delete" size={16} color="#f87f66" />
-            <Text style={{ color: '#f87f66', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>Delete</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
+                      <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#f87f66', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5 }}>
+                          <AntDesign name="delete" size={16} color="#f87f66" />
+                          <Text style={{ color: '#f87f66', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>Delete</Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </TouchableOpacity>
               ))}
 

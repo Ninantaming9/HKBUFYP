@@ -58,8 +58,8 @@ const FlightScreen = () => {
     const [date, setdate] = useState('');
     const [photoPath, setPhotoPath] = useState<string | null>(null);
 
-    // const router = useRouter(); // 使用 useRouter 获取 router 实例
-    const route = useRoute(); // 获取路由信息
+    
+    const route = useRoute(); 
 
 
     const locations = [
@@ -118,31 +118,30 @@ const FlightScreen = () => {
 
 
 
-    // 获取用户照片的函数
+
     const fetchUserPhoto = async (userId: string) => {
         const response = await axios.get(`${API_URL}/getPhoto/${userId}`);
        
-        setPhotoPath(response.data.photoPath); // 更新状态
-
+        setPhotoPath(response.data.photoPath);
     };
 
     useFocusEffect(
         React.useCallback(() => {
             const fetchUserData = async () => {
                 try {
-                    // 从 AsyncStorage 获取用户 ID 和全名
-                    const storedUserId = await AsyncStorage.getItem('userId'); // 从 AsyncStorage 获取用户 ID
-                    const storedFullName = await AsyncStorage.getItem('user'); // 从 AsyncStorage 获取用户全名
+                    
+                    const storedUserId = await AsyncStorage.getItem('userId'); 
+                    const storedFullName = await AsyncStorage.getItem('user'); 
 
-                    // 如果存在用户 ID，调用获取照片的 API
+           
                     if (storedUserId) {
                         fetchUserPhoto(storedUserId);
-                        setUserId(storedUserId); // 更新用户 ID 状态
+                        setUserId(storedUserId); 
                     }
 
-                    // 如果存在用户全名，更新状态
+                
                     if (storedFullName) {
-                        setFullName(JSON.parse(storedFullName)); // 解析 JSON 字符串
+                        setFullName(JSON.parse(storedFullName)); 
                     }
                 } catch (error) {
                     console.error('Error fetching user data', error);
@@ -190,7 +189,7 @@ const FlightScreen = () => {
                             },
                         },
                     ],
-                    { cancelable: false } // 不允许用户通过点击背景来关闭警报
+                    { cancelable: false } 
                 );
             }
             else if (response.ok) {
@@ -218,17 +217,17 @@ const FlightScreen = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ flightId }), // 发送 flightId
+                body: JSON.stringify({ flightId }), 
             });
 
             if (response.ok) {
                 const flightDetails = await response.json();
-                console.log('Flight Details:', flightDetails._id); // 打印航班 ID
+                console.log('Flight Details:', flightDetails._id); 
 
-                // 传递航班 ID 到 flightDetail 页面
+                
                 router.push({
                     pathname: "/seat",
-                    params: { flightId: flightDetails._id }, // 传递航班 ID
+                    params: { flightId: flightDetails._id }, 
                 });
 
             } else {
@@ -240,11 +239,6 @@ const FlightScreen = () => {
         }
     };
 
-
-    const handleCreate = () => {
-        router.push("/flightCreat"); // 跳转到创建航班页面
-        // 或者使用 navigate("/flightCreate"); // 如果您使用的是 React Router
-    };
 
 
     // Search Flight Form
@@ -561,7 +555,7 @@ const FlightScreen = () => {
                                 mode="date"
                                 onConfirm={handleConfirm}
                                 onCancel={hideDatePicker}
-                                minimumDate={new Date()} // 设置最小日期为今天
+                                minimumDate={new Date()} 
                             />
                         </View>
                         {/* Seat */}
@@ -619,7 +613,7 @@ const FlightScreen = () => {
                             <View>
                                 {searchResults.map((flight, index) => (
                                     <TouchableOpacity key={index} onPress={() => {
-                                        // 打印将要传递的 ID
+                              
                                         handleContinue(flight._id);
                                     }} style={{ width: '100%', backgroundColor: 'white', marginTop: 20, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 20 }}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>

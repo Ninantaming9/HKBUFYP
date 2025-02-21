@@ -20,7 +20,7 @@ const FlightDetailScreen = () => {
       const [email, setEmail] = useState('');
 
     const [flightDetails, setFlightDetails] = useState<any>(null);
-    const { flightId } = route.params as { flightId: string }; // 接收航班 ID
+    const { flightId } = route.params as { flightId: string }; 
   
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -52,7 +52,7 @@ const formatDate = (date: { getFullYear: () => any; getMonth: () => number; getD
   return `${year}-${month}-${day}`;
 };
 
-    const selectedSeatsString = selectedSeats.toString(); // 将数组转换为字符串
+    const selectedSeatsString = selectedSeats.toString(); 
 const seatsArray = selectedSeatsString.split(",");
     const numberOfSeats = seatsArray.reduce((count, seat) => {
       const seatFormat = /^\d+[A-Z]$/;
@@ -66,16 +66,16 @@ const seatsArray = selectedSeatsString.split(",");
   useEffect(() => {
     const fetchUserData = async () => {
         try {
-            // 从 AsyncStorage 中获取用户全名
+            
             const storedFullName = await AsyncStorage.getItem('user');
-            const storedUserEmail = await AsyncStorage.getItem('userEmail'); // 从 AsyncStorage 获取用户全名
-            // 如果存在，更新状态
+            const storedUserEmail = await AsyncStorage.getItem('userEmail');
+
             if (storedFullName) {
-                setFullName(JSON.parse(storedFullName)); // 解析 JSON 字符串
+                setFullName(JSON.parse(storedFullName)); 
             }
      
             if (storedUserEmail) {
-              setEmail(JSON.parse(storedUserEmail)); // 解析 JSON 字符串
+              setEmail(JSON.parse(storedUserEmail)); 
           }
    
             
@@ -96,15 +96,15 @@ const seatsArray = selectedSeatsString.split(",");
                   headers: {
                       'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify({ flightId }), // 发送 flightId
+                  body: JSON.stringify({ flightId }), 
               });
 
               if (response.ok) {
                   const data = await response.json();
-                  setFlightDetails(data); // 设置航班详情
+                  setFlightDetails(data); 
                   const totalPrice = numberOfSeats * data.ticketPrice;
                   setTotalPrice(totalPrice.toString());
-                  console.log("Flight Details: " + JSON.stringify(data, null, 2)); // 使用 JSON.stringify 打印对象
+                  console.log("Flight Details: " + JSON.stringify(data, null, 2)); 
               } else {
                   console.log('Error fetching flight details');
               }
@@ -112,8 +112,8 @@ const seatsArray = selectedSeatsString.split(",");
               console.error('Error:', error);
           } 
       };
-      fetchFlightDetails(); // 调用获取航班详情的函数
-  }, [flightId]); // 依赖于 flightId，确保在其变化时重新请求
+      fetchFlightDetails(); 
+  }, [flightId]); 
 
   const handleSubmit = async () => {
     try {
@@ -137,14 +137,14 @@ const seatsArray = selectedSeatsString.split(",");
         totalPrice: totalPrice,
         ticketPrice: flightDetails.ticketPrice,
         seat: selectedSeats,
-        discountValue: discount, // 替换为实际的 code 值
-        isUsed: true // 默认设置为 true
+        discountValue: discount, 
+        isUsed: true 
       };
       
       console.log('Flight Details:', flightDetails);
       const response = await axios.post(`${API_URL}/createFlightbook`, userData);
       console.log('Flight Details:', flightDetails);
-      console.log(response.data); // 处理返回的数据
+      console.log(response.data); 
       router.push("/bookconfirm");
     } catch (error) {
       console.error(error);
@@ -155,7 +155,7 @@ const seatsArray = selectedSeatsString.split(",");
 
     const handleCheckDiscountCode = async () => {
       try {
-        // 将 totalPrice 转换为数字
+        
         const numericTotalPrice = parseFloat(totalPrice);
     
         const response = await fetch(`${API_URL}/applyDiscountCode`, {
@@ -165,18 +165,18 @@ const seatsArray = selectedSeatsString.split(",");
           },
           body: JSON.stringify({
             discountValue: discount,
-            originalPrice: numericTotalPrice, // 发送数字类型的价格
+            originalPrice: numericTotalPrice, 
           }),
         });
     
         const data = await response.json();
     
         if (response.ok) {
-          // 更新总价格，确保将 discountedPrice 转换为字符串
+          
           setTotalPrice(data.discountedPrice.toString());
-          setErrorMessage(''); // 清除错误信息
+          setErrorMessage(''); 
         } else {
-          setErrorMessage(data.error); // 显示错误信息
+          setErrorMessage(data.error); 
         }
       } catch (error) {
         console.error('Error checking discount code', error);

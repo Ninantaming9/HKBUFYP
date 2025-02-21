@@ -18,14 +18,14 @@ export default function TabLayout() {
                 if (storedUserRole) {
                     setUserRole(JSON.parse(storedUserRole));
                 } else {
-                    setUserRole(null); // 如果没有存储的角色，确保设置为 null
+                    setUserRole(null); 
                 }
             } catch (error) {
                 console.error('Error fetching user data', error);
             }
         };
         fetchUserData();
-    }, []); // 只在组件挂载时运行
+    }, []); 
     
     const handleTabPress = () => {
         setRefreshKey(prevKey => prevKey + 1);
@@ -36,7 +36,7 @@ export default function TabLayout() {
             screenOptions={{
                 tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
                 headerShown: false,
-                tabBarStyle: { display: 'flex' }, // 显示标签栏
+                tabBarStyle: { display: 'flex' }, 
             }}>
             <Tabs.Screen
                 name="search"

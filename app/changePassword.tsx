@@ -18,8 +18,8 @@ import { AntDesign, Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 
 export default function Login() {
-  const router = useRouter(); // 使用 useRouter 获取 router 实例
-const route = useRoute(); // 获取路由信息
+  const router = useRouter(); 
+const route = useRoute(); 
   const [showPassword, setShowPassword] = useState(false);
 
 
@@ -27,13 +27,13 @@ const route = useRoute(); // 获取路由信息
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const [userId, setUserId] = useState<string | null>(null); // 明确指定类型
+  const [userId, setUserId] = useState<string | null>(null); 
 
   const getUserId = async () => {
     
       const storedUserId = await AsyncStorage.getItem('userId');
       if (storedUserId !== null) {
-        setUserId(storedUserId); // 这里的 storedUserId 是 string 类型
+        setUserId(storedUserId); 
       }
     
   };

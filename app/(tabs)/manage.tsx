@@ -20,7 +20,7 @@ const MyAccountScreen = () => {
   const [userId, setUserId] = useState('');
   const [photo, setPhoto] = useState(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false); // 添加加载状态
+  const [loading, setLoading] = useState(false); 
   const [showModal, setShowModal] = useState(false);
   const [photoPath, setPhotoPath] = useState<string | null>(null);
 
@@ -32,14 +32,14 @@ const MyAccountScreen = () => {
   const handleChoosePhoto = async () => {
     console.log('photo use');
 
-    // 请求权限
+
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       Alert.alert('error');
       return;
     }
 
-    // 打开图像选择器
+    
     const options = {
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -54,7 +54,7 @@ const MyAccountScreen = () => {
         console.log('photo canceled ');
       } else if (response.assets && response.assets.length > 0) {
         const uri = response.assets[0].uri; // Get the URI from the first asset
-        // 上传选择的照片
+ 
         uploadPhoto(uri);
       } else {
         Alert.alert('error', 'no select any photo');
@@ -75,9 +75,9 @@ const MyAccountScreen = () => {
     formData.append('photo', file as any);
     formData.append('userId', userId);
   
-    setLoading(true); // 开始上传时设置加载状态为 true
+    setLoading(true); 
   
-    // 使用 try...finally 结构
+    
     try {
       const response = await axios.post(`${API_URL}/uploadPhoto`, formData, {
         headers: {
@@ -90,16 +90,16 @@ const MyAccountScreen = () => {
       await AsyncStorage.setItem('photoPath', uri);
       Alert.alert('success upload', response.data.message);
     } finally {
-      setLoading(false); // 上传结束时重置加载状态
+      setLoading(false); 
     }
   };
 
-  // 获取用户照片的函数
+  
   const fetchUserPhoto = async (userId: string) => {
 
     const response = await axios.get(`${API_URL}/getPhoto/${userId}`);
  
-    setPhotoPath(response.data.photoPath); // 更新状态
+    setPhotoPath(response.data.photoPath); 
 
   };
 
@@ -107,19 +107,19 @@ const MyAccountScreen = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // 从 AsyncStorage 获取用户 ID 和全名
-        const userId = await AsyncStorage.getItem('userId'); // 从 AsyncStorage 获取用户 ID
-        const storedFullName = await AsyncStorage.getItem('user'); // 从 AsyncStorage 获取用户全名
+      
+        const userId = await AsyncStorage.getItem('userId'); 
+        const storedFullName = await AsyncStorage.getItem('user'); 
 
-        // 如果存在用户 ID，调用获取照片的 API
+
         if (userId) {
           fetchUserPhoto(userId);
-          setUserId(userId); // 更新用户 ID 状态
+          setUserId(userId); 
         }
 
-        // 如果存在用户全名，更新状态
+        
         if (storedFullName) {
-          setFullName(JSON.parse(storedFullName)); // 解析 JSON 字符串
+          setFullName(JSON.parse(storedFullName)); 
         }
       } catch (error) {
         console.error('Error fetching user data', error);
@@ -149,8 +149,6 @@ const MyAccountScreen = () => {
   };
 
   const handleLogoutConfirmed = () => {
-    // 执行退出操作
-    // 导航到登录页面
     router.push('/login');
   };
 

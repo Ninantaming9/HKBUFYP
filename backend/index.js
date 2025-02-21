@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const moment = require('moment');
 
 const nodemailer = require('nodemailer');
-const { MongoClient, ObjectId } = require("mongodb");  //从 mongodb 模块中导入 MongoClient 和 ObjectId 对象，用于原生 MongoDB 驱动程序的连接和操作
+const { MongoClient, ObjectId } = require("mongodb"); 
 const app = express();
 const port = 3000;
 const cors = require('cors');
@@ -45,28 +45,26 @@ async function connectToDB() {
 
 
 
-const upload = multer(); // 不指定存储位置，使用内存存储
-// 上传照片的 API
+const upload = multer(); 
 
-// 上传照片的 API
+
+
 app.post('/uploadPhoto', upload.single('photo'), async (req, res) => {
   try {
     const db = await connectToDB();
     const flightCollection = db.collection('users');
 
-    const { userId } = req.body; // 从请求体中获取 userId
-    const fileBuffer = req.file.buffer; // 获取文件的二进制数据
+    const { userId } = req.body;
+    const fileBuffer = req.file.buffer; 
 
-    // 检查用户是否存在
+
     const existingUser = await flightCollection.findOne({ _id: new ObjectId(userId) });
     if (!existingUser) {
       return res.status(400).json({ message: 'User not found' });
     }
 
-    // 如果用户已有照片，删除原来的照片（如果需要）
     if (existingUser.photoPath) {
-      // 这里可以选择是否删除原来的照片
-      // 例如，如果你将照片存储在 GridFS 中，可以在这里删除
+
     }
 
 
@@ -88,16 +86,16 @@ app.get('/getPhoto/:userId', async (req, res) => {
     const db = await connectToDB();
     const flightCollection = db.collection('users');
 
-    const { userId } = req.params; // 从请求参数中获取 userId
+    const { userId } = req.params; 
     const existingUser = await flightCollection.findOne({ _id: new ObjectId(userId) });
 
     if (!existingUser || !existingUser.photo) {
       return res.status(404).json({ message: 'User not found or no photo available' });
     }
 
-    // 将二进制数据转换为 Base64 字符串
+
     const photoBase64 = existingUser.photo.toString('base64');
-    const photoPath = `data:image/jpeg;base64,${photoBase64}`; // 根据实际的 MIME 类型设置
+    const photoPath = `data:image/jpeg;base64,${photoBase64}`; 
 
     res.status(200).json({ photoPath });
   } catch (error) {
@@ -125,14 +123,14 @@ app.post('/register', async (req, res) => {
 
     }
 
-    // 检查数据库中是否已存在相同邮箱账号
+    
     const existingUser = await userCollection.findOne({ email: userData.email });
     
     if (existingUser) {
       return res.status(400).json({ message: 'Email is already registered' });
     }
     
-    // 如果邮箱账号不存在冲突且密码匹配，则插入新用户数据
+
     await userCollection.insertOne(userData);
     
     res.status(200).json({ message: 'User registered successfully' });
@@ -177,29 +175,28 @@ app.put('/changePassword', async (req, res) => {
 
     const { userId, oldPassword, newPassword, confirmPassword } = req.body;
 
-    // 检查请求体中的必需字段
     if (!userId || !oldPassword || !newPassword || !confirmPassword) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // 检查新密码和确认密码是否匹配
+    
     if (newPassword !== confirmPassword) {
       return res.status(400).json({ error: 'New password and confirmation do not match' });
     }
 
-    // 检查用户是否存在
+    
     const user = await userCollection.findOne({ _id: new ObjectId(userId)});
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // 检查旧密码是否匹配
+    
     if (user.password !== oldPassword) {
       return res.status(400).json({ error: 'Old password is incorrect' });
     }
 
-    // 更新用户密码（直接使用明文密码）
+    
     await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { password: newPassword } });
 
     res.status(200).json({ message: 'Password updated successfully' });
@@ -214,13 +211,13 @@ function generateFlightNumber() {
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const numbers = '0123456789';
 
-  // 生成前三位大写字母
+  
   let flightNumber = '';
   for (let i = 0; i < 3; i++) {
     flightNumber += letters.charAt(Math.floor(Math.random() * letters.length));
   }
 
-  // 生成后三位数字
+  
   for (let i = 0; i < 3; i++) {
     flightNumber += numbers.charAt(Math.floor(Math.random() * numbers.length));
   }
@@ -235,10 +232,10 @@ app.post('/createFlight', async (req, res) => {
 
     const { ticketType, date, departureTime, arrivalTime, departureLocation, arrivalLocation, economyClassPrice, businessClassPrice } = req.body;
 
-    // 生成航班号
+    
     const flightNumber = generateFlightNumber();
 
-    // Create economy class flight data
+    // Create economy class fligh
     const economyFlightData = {
       ticketType,
       flightNumber,
@@ -382,19 +379,19 @@ app.post('/createFlightbook', async (req, res) => {
     await discountCollection.updateOne({ code: discountValue }, { $set: { isUsed: true } });
 
 
-// 创建邮件发送器
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'zmhaoo2@gmail.com', // 您的 Gmail 地址
-    pass: 'yjzj xdme bovq ouua' // 您的 Gmail 密码或应用专用密码
+    user: 'zmhaoo2@gmail.com', 
+    pass: 'yjzj xdme bovq ouua' 
   }
 });
 
 
 const mailOptions = {
   from: 'zmhaoo2@gmail.com',
-  to: 'zmhaoo@gmail.com', // 您要发送的目标邮箱
+  to: 'zmhaoo@gmail.com', 
   subject: 'Flight Booking Confirmation',
   html: `
     <div style="font-family: Arial, sans-serif; line-height: 1.4;">
@@ -432,7 +429,7 @@ const mailOptions = {
   `
 };
 
-    // 等待邮件发送完成
+   
     await transporter.sendMail(mailOptions);
 
     res.status(200).json({ message: 'FlightBooking information created successfully and email sent' });
@@ -525,7 +522,7 @@ app.post('/getSelectedSeatsByFlight', async (req, res) => {
     const flightbookCollection = db.collection('flightbook');
     const { flightId, flightNumber, departureTime, arrivalTime, departureLocation, arrivalLocation, ticketPrice } = req.body;
 
-    // 在 flightbook 表中搜索匹配的数据
+
     const selectedSeats = await flightbookCollection.distinct('seat', {
       flightId,
       flightNumber,
@@ -548,24 +545,24 @@ app.post('/deleteFlightById', async (req, res) => {
     const db = await connectToDB();
     const flightCollection = db.collection('flightbook');
 
-    const { flightId, email, fullName, flightNumber } = req.body; // 从请求体中获取用户信息
+    const { flightId, email, fullName, flightNumber } = req.body; 
 
-    // 删除机票
+  
     const deleteResult = await flightCollection.deleteOne({ _id: new ObjectId(flightId) });
 
     if (deleteResult.deletedCount > 0) {
-      // 创建邮件发送器
+   
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: 'zmhaoo2@gmail.com', // 您的 Gmail 地址
-          pass: 'yjzj xdme bovq ouua' // 您的 Gmail 密码或应用专用密码
+          user: 'zmhaoo2@gmail.com', 
+          pass: 'yjzj xdme bovq ouua' 
         }
       });
 
       const mailOptions = {
         from: 'zmhaoo2@gmail.com',
-        to: 'zmhaoo@gmail.com', // 使用用户的邮箱
+        to: 'zmhaoo@gmail.com', 
         subject: 'Flight Cancellation Confirmation',
         html: `
           <div style="font-family: Arial, sans-serif; line-height: 1.4;">
@@ -583,7 +580,7 @@ app.post('/deleteFlightById', async (req, res) => {
         `
       };
       
-      // 等待邮件发送完成
+     
       await transporter.sendMail(mailOptions);
 
       res.status(200).json({ message: 'Flight deleted successfully and cancellation email sent' });
@@ -613,8 +610,8 @@ const confirmationCodes = {};
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'zmhaoo2@gmail.com', // 您的 Gmail 地址
-    pass: 'yjzj xdme bovq ouua' // 您的 Gmail 密码或应用专用密码
+    user: 'zmhaoo2@gmail.com', 
+    pass: 'yjzj xdme bovq ouua' 
   }
 });
 
@@ -631,7 +628,7 @@ app.post('/requestPasswordReset', async (req, res) => {
   // Send the confirmation code to the user's email
   const mailOptions = {
     from: 'zmhaoo2@gmail.com',
-    to: 'zmhaoo@gmail.com', // 使用用户的邮箱
+    to: 'zmhaoo@gmail.com', 
     subject: 'Password Reset Confirmation Code',
     text: `Your confirmation code is: ${confirmationCode}`
   };
@@ -654,15 +651,13 @@ app.post('/resetPassword', async (req, res) => {
   // Check if the confirmation code is valid
   if (confirmationCodes[email] && confirmationCodes[email] === confirmationCode) {
     try {
-      // 直接将新密码存储到数据库中（不使用 bcrypt）
-      await flightCollection.updateOne({ email }, { $set: { password: newPassword } });
 
-      // 移除确认代码
+      await flightCollection.updateOne({ email }, { $set: { password: newPassword } });
       delete confirmationCodes[email];
 
       res.status(200).json({ message: 'Password has been reset successfully.' });
     } catch (error) {
-      console.error('Error updating password:', error); // 打印完整的错误信息
+      console.error('Error updating password:', error); 
       res.status(500).json({ error: 'Internal server error.' });
     }
   } else {
@@ -677,30 +672,25 @@ app.post('/applyDiscountCode', async (req, res) => {
     const db = await connectToDB();
     const discountCollection = db.collection('discount');
 
-    // 查找折扣码
-    const discount = await discountCollection.findOne({ code: discountValue }); // 使用 code 查找
+  
+    const discount = await discountCollection.findOne({ code: discountValue }); 
 
-    // 检查折扣码是否存在
+
     if (!discount) {
       return res.status(400).json({ error: 'Invalid discount code' });
     }
 
-    // 检查折扣码是否已被使用
+
     if (discount.isUsed) {
       return res.status(400).json({ error: 'This discount code has already been used' });
     }
 
-    // 获取折扣值并转换为数字
-    const discountPercentage = parseFloat(discount.discountValue); // 将 "10%" 转换为 10
-    const discountAmount = (discountPercentage / 100) * originalPrice; // 计算折扣金额
+    const discountPercentage = parseFloat(discount.discountValue); 
+    const discountAmount = (discountPercentage / 100) * originalPrice; 
 
-    // 计算折扣后的价格
+
     const discountedPrice = originalPrice - discountAmount;
 
-    // 更新折扣码为已使用
-   // await discountCollection.updateOne({ code: discountValue }, { $set: { isUsed: true } });
-
-    // 返回折扣后的价格
     res.status(200).json({ discountedPrice });
   } catch (error) {
     console.log('Error applying discount code', error);
@@ -712,22 +702,22 @@ app.post('/applyDiscountCode', async (req, res) => {
 
 app.post('/addDiscountCode', async (req, res) => {
   const db = await connectToDB();
-  const discountCodesCollection = db.collection('discount'); // 存储折扣码的集合
+  const discountCodesCollection = db.collection('discount'); 
 
-  const { code, discountValue, isUsed } = req.body; // 从请求体中提取折扣码信息
+  const { code, discountValue, isUsed } = req.body; 
 
   try {
-    // 检查折扣码信息是否完整
+    
     if (!code || discountValue === undefined || isUsed === undefined) {
       return res.status(400).json({ error: 'Code, discount value, and usage status are required.' });
     }
 
-    // 将折扣码存储到 discountCodes 集合中
+    
     await discountCodesCollection.insertOne({
-      code,            // 折扣码
-      discountValue,  // 折扣优惠价
-      isUsed,         // 是否使用过
-      createdAt: new Date() // 可选：记录创建时间
+      code,            
+      discountValue,  
+      isUsed,         
+      createdAt: new Date() 
     });
 
     res.status(200).json({ message: 'Discount code added successfully.' });
@@ -740,20 +730,20 @@ app.post('/addDiscountCode', async (req, res) => {
 
 app.post('/validateTicketQRCode', async (req, res) => {
   const db = await connectToDB();
-  const ticketsCollection = db.collection('tickets'); // 存储机票信息的集合
+  const ticketsCollection = db.collection('tickets'); 
 
-  const { qrCode } = req.body; // 从请求体中提取二维码信息
+  const { qrCode } = req.body; 
 
   try {
-    // 检查二维码是否提供
+    
     if (!qrCode) {
       return res.status(400).json({ error: 'QR code is required.' });
     }
 
-    // 查询数据库中是否存在该二维码对应的机票信息
+    
     const ticket = await ticketsCollection.findOne({ qrCode });
 
-    // 如果找到机票信息，返回 true；否则返回 false
+    
     if (ticket) {
       return res.status(200).json({ valid: true });
     } else {
@@ -770,23 +760,23 @@ app.post('/searchBookbyadmin', async (req, res) => {
     const db = await connectToDB();
     const flightCollection = db.collection('flightbook');
 
-    // 从请求体中提取电子邮件并转换为字符串
+    
     const email = req.body.email ? req.body.email.toString() : '';
 
-    // 如果没有提供电子邮件，返回 400 错误
+    
     if (email.trim() === '') {
       return res.status(400).json({ message: 'Email is required.' });
     }
 
-    // 构建查询条件
+    
     const query = {
-      email: { $regex: email, $options: 'i' } // 使用正则表达式进行不区分大小写的匹配
+      email: { $regex: email, $options: 'i' } 
     };
 
-    // 打印查询条件以进行调试
+    
     console.log('Query:', JSON.stringify(query, null, 2));
 
-    // 查询数据库
+    
     const flights = await flightCollection.find(query).toArray();
 
     if (flights.length > 0) {

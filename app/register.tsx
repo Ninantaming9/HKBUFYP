@@ -12,7 +12,7 @@ import { globals } from '@/styles/_global';
 import { router } from 'expo-router';
 import axios from 'axios';
 import { API_URL } from '../backend/address';
-import Icon from 'react-native-vector-icons/FontAwesome'; // 假设您选择了FontAwesome图标库
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 export default function Login() {

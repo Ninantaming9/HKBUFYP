@@ -6,7 +6,7 @@ import { Input } from '@/components/Input';
 import { Text } from '@/components/Text';
 import { VStack } from '@/components/VStack';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-// import { useAuth } from '@/context/AuthContext';
+
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import { globals } from '@/styles/_global';
 import { router } from 'expo-router';
@@ -18,9 +18,9 @@ import { API_URL } from '../backend/address';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 export default function Login() {
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // 新增状态变量
+  const [email, setEmail] = useState('admin@gmail.com');
+  const [password, setPassword] = useState('123456');
+  const [showPassword, setShowPassword] = useState(false); 
   const handleSubmit = async () => {
     try {
       const userData = {
@@ -44,8 +44,8 @@ export default function Login() {
               await AsyncStorage.setItem('userRole', JSON.stringify(response.data.role));
               await AsyncStorage.setItem('userEmail', JSON.stringify(response.data.email));
               console.log(response);
-              // 根据用户角色跳转到不同页面
-              const userRole = response.data.role; // 假设角色信息在 response.data.role 中
+              
+              const userRole = response.data.role; 
 
               router.push('/(tabs)/search');
             }
@@ -106,7 +106,7 @@ export default function Login() {
                 <Input
                   value={password}
                   onChangeText={setPassword}
-                  secureTextEntry={!showPassword} // 根据状态变量控制密码可见性
+                  secureTextEntry={!showPassword} 
                   placeholder="Password"
                   placeholderTextColor="darkgray"
                   autoCapitalize="none"
@@ -120,7 +120,7 @@ export default function Login() {
                   style={{
                     position: 'absolute',
                     right: 10,
-                    top: 12, // 调整位置以适应输入框
+                    top: 12, 
                   }}
                 >
                   <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={30} color="gray" />

@@ -30,7 +30,7 @@ const flightCreat = () => {
     const [date, setdate] = useState('');
     const [photoPath, setPhotoPath] = useState<string | null>(null);
     const [userRole, setUserRole] = useState(null);
-    // const router = useRouter(); // 使用 useRouter 获取 router 实例
+
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
     const route = useRoute();
@@ -76,12 +76,12 @@ const flightCreat = () => {
           }
           const result = await response.json();
     
-          // 使用 Alert.alert 显示成功消息
+
           Alert.alert('Flight created successfully', result.message, [
             {
               text: 'OK',
               onPress: () => {
-                // 用户点击 OK 后跳转到座位页面
+
                 router.push('/(tabs)/search');
               },
             },
@@ -140,11 +140,11 @@ const flightCreat = () => {
 
     const timeOptions = generateTimeOptions();
 
-    // 获取用户照片的函数
+   
     const fetchUserPhoto = async (userId: string) => {
         const response = await axios.get(`${API_URL}/getPhoto/${userId}`);
 
-        setPhotoPath(response.data.photoPath); // 更新状态
+        setPhotoPath(response.data.photoPath); 
 
     };
 
@@ -357,7 +357,7 @@ const flightCreat = () => {
 
             );
         } else {
-            return null; // 处理其他角色或情况
+            return null; 
         }
     };
     return (
@@ -470,7 +470,7 @@ const flightCreat = () => {
                                     mode="date"
                                     onConfirm={handleConfirm}
                                     onCancel={hideDatePicker}
-                                // minimumDate={new Date()} // 设置最小日期为今天
+                       
                                 />
                             </View>
                             {/* Seat */}
