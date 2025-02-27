@@ -84,11 +84,11 @@ export default function TabLayout() {
                 }}
             />
                   <Tabs.Screen
-                name="manage"
+                name="chatroom"
                 options={{
-                    title: 'manage',
+                    title: 'Chat',
                     tabBarIcon: ({ color, focused }) => (
-                        <TabBarIcon name={focused ? 'ticket' : 'ticket-outline'} color={color} />
+                        <TabBarIcon name={focused ? 'chatbubble' : 'chatbubble-outline'} color={color} />
                     ),
                 }}
                 key={refreshKey}
