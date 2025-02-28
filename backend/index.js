@@ -790,5 +790,88 @@ app.post('/searchBookbyadmin', async (req, res) => {
   }
 });
 
+app.post('/addFriend', async (req, res) => {
+  let db;
+  try {
+    db = await connectToDB();
+    const friendsCollection = db.collection('friends');
 
+    const { userEmail, friendEmail } = req.body;
 
+    if (!userEmail || !friendEmail) {
+      return res.status(400).json({ message: 'User email and friend email are required.' });
+    }
+
+    // 查找要添加的好友是否存在
+    const friend = await db.collection('users').findOne({ email: friendEmail });
+
+    if (!friend) {
+      return res.status(404).json({ message: 'Friend not found.' });
+    }
+
+    // 检查用户是否已经是好友
+    const existingFriendship = await friendsCollection.findOne({
+      userEmail: userEmail,
+      friendEmail: friendEmail
+    });
+
+    if (existingFriendship) {
+      return res.status(400).json({ message: 'You are already friends.' });
+    }
+
+    // 添加好友关系
+    const newFriendship = {
+      userEmail: userEmail,
+      friendEmail: friendEmail,
+      fullname: friend.fullname, // 存储好友的全名
+      photo: friend.photo, // 存储好友的头像二进制数据
+      createdAt: new Date()
+    };
+
+    await friendsCollection.insertOne(newFriendship);
+    
+    // 返回成功响应
+    return res.status(201).json({ message: 'Friend added successfully.', friendship: newFriendship });
+  } catch (error) {
+    console.log('Error adding friend', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    // Ensure the database connection is closed if it was opened
+    if (db) {
+      await db.close();
+    }
+  }
+});
+
+app.get('/getFriends', async (req, res) => {
+  try {
+    const db = await connectToDB();
+    const friendsCollection = db.collection('friends');
+
+    // 从查询参数中获取 userEmail
+    const userEmail = req.query.userEmail ? req.query.userEmail.toString() : '';
+
+    // 检查 userEmail 是否为空
+    if (userEmail.trim() === '') {
+      return res.status(400).json({ message: 'User email is required.' });
+    }
+
+    // 使用 JSON 查询
+    const query = {
+      userEmail: userEmail // 直接使用 userEmail 进行精确匹配
+    };
+
+    console.log('Query:', JSON.stringify(query, null, 2));
+
+    const friends = await friendsCollection.find(query).toArray();
+
+    if (friends.length > 0) {
+      res.status(200).json({ friends });
+    } else {
+      res.status(404).json({ message: 'No friends found for this user.' });
+    }
+  } catch (error) {
+    console.log('Error retrieving friends', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});

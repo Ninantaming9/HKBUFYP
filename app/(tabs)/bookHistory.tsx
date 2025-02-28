@@ -51,11 +51,11 @@ export default function searchresult() {
         const storedUserRole = await AsyncStorage.getItem('userRole');
 
         if (storedFullName) {
-          setFullName(JSON.parse(storedFullName)); 
+          setFullName(JSON.parse(storedFullName));
         }
 
         if (storedUserRole) {
-          setUserRole(JSON.parse(storedUserRole)); 
+          setUserRole(JSON.parse(storedUserRole));
         }
 
         const userId = await AsyncStorage.getItem('userId');
@@ -96,32 +96,79 @@ export default function searchresult() {
       );
     });
   };
-
   const handleSearch = async () => {
+    // 检查是否有搜索内容
+    if (!email.trim()) {
+      alert('please input message'); // 弹出提示框
+      return; // 结束函数执行
+    }
+
     try {
       const response = await fetch(`${API_URL}/searchBookbyadmin`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', 
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: email.trim(), 
+          email: email.trim(),
         }),
       });
 
+      // 检查响应是否成功
       if (!response.ok) {
         const errorData = await response.json();
         const errorMessage = errorData.message || 'An error occurred while searching.';
-        throw new Error(errorMessage);
+        throw new Error(errorMessage); // 抛出错误
       }
 
-      const data = await response.json(); 
+      const data = await response.json();
 
-      setBookHistory(data); 
-      setModalVisible(false); 
-      setEmail(''); 
+      // 检查是否有匹配的内容
+      if (!Array.isArray(data)) {
+        alert('error'); // 弹出提示框
+        return;
+      }
+
+      // 这里检查数据长度
+      if (data.length === 0) {
+        alert('not match message'); // 弹出提示框
+      } else {
+        // 直接检查是否有匹配的 email
+        const hasMatchingEmail = data.some(item => item.email === email.trim());
+        if (!hasMatchingEmail) {
+          alert('not match message'); // 弹出提示框
+        } else {
+          setBookHistory(data);
+        }
+      }
+
+      setModalVisible(false);
+      setEmail('');
     } catch (err) {
-      console.error(err); 
+
+      const errorMessage = (err as Error).message || 'some thing';
+
+      if (errorMessage) {
+        Alert.alert(
+          'error',
+          errorMessage,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                setModalVisible(false);
+                setEmail('');
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      }
+
+
+
+
+
     }
   };
 
@@ -162,17 +209,17 @@ export default function searchresult() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ flightId }), 
+        body: JSON.stringify({ flightId }),
       });
 
       if (response.ok) {
         const flightDetails = await response.json();
-        console.log('Flight Details:', flightDetails._id); 
+        console.log('Flight Details:', flightDetails._id);
 
 
         router.push({
           pathname: "/ticketDetails",
-          params: { flightId: flightDetails._id }, 
+          params: { flightId: flightDetails._id },
         });
 
       } else {
@@ -331,7 +378,7 @@ export default function searchresult() {
             <View>
               {bookHistory.map((flight, index) => (
                 <TouchableOpacity key={index} onPress={() => {
-             
+
                   handleContinue(flight._id);
                 }} style={{ width: '100%', backgroundColor: 'white', marginTop: 20, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 20 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>

@@ -43,7 +43,6 @@ export default function Login() {
               await AsyncStorage.setItem('user', JSON.stringify(response.data.fullname));
               await AsyncStorage.setItem('userRole', JSON.stringify(response.data.role));
               await AsyncStorage.setItem('userEmail', JSON.stringify(response.data.email));
-              console.log(response);
               
               const userRole = response.data.role; 
 

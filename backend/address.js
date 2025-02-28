@@ -2,5 +2,5 @@
 
 //export const API_URL = 'http://192.168.219.161:3000';
 
-export const API_URL = 'http://192.168.1.102:3000';
+export const API_URL = 'http://158.182.192.121:3000';
 
