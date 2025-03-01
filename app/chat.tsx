@@ -16,15 +16,16 @@ import axios from 'axios';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 const MyAccountScreen = () => {
-    const [fullName, setFullName] = useState(null);
+
     const [imageUri, setImageUri] = useState(null);
     const [userId, setUserId] = useState('');
-    const [photo, setPhoto] = useState(null);
+
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [photoPath, setPhotoPath] = useState<string | null>(null);
 
+  const route = useRoute(); 
     const [number1, Setnumber1] = useState('Edit Password');
     const [number2, Setnumber2] = useState('Logout');
     const [number3, Setnumber3] = useState('Detail  Account');
@@ -35,8 +36,16 @@ const MyAccountScreen = () => {
         { id: 3, name: 'Charlie', photo: 'https://example.com/photo3.jpg' },
         // Add more fake users as needed
     ];
+    interface RouteParams {
+        flightId: string;
+        fullname: string; // Add fullname to the type
+        photo:string;
+        friendEmail: string;
+    }
+    const router = useRouter();
+   // const { userEmail, friendEmail, fullname, photo } = router.query;
 
-
+   const { fullname, flightId,photo ,friendEmail} = route.params as RouteParams;
 
     const handleChoosePhoto = async () => {
         console.log('photo use');
@@ -113,30 +122,30 @@ const MyAccountScreen = () => {
     };
 
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
+    // useEffect(() => {
+    //     const fetchUserData = async () => {
+    //         try {
 
-                const userId = await AsyncStorage.getItem('userId');
-                const storedFullName = await AsyncStorage.getItem('user');
-
-
-                if (userId) {
-                    fetchUserPhoto(userId);
-                    setUserId(userId);
-                }
+    //             const userId = await AsyncStorage.getItem('userId');
+    //             const storedFullName = await AsyncStorage.getItem('user');
 
 
-                if (storedFullName) {
-                    setFullName(JSON.parse(storedFullName));
-                }
-            } catch (error) {
-                console.error('Error fetching user data', error);
-            }
-        };
+    //             if (userId) {
+    //                 fetchUserPhoto(userId);
+    //                 setUserId(userId);
+    //             }
 
-        fetchUserData();
-    }, []);
+
+    //             if (storedFullName) {
+    //                 setFullName(JSON.parse(storedFullName));
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching user data', error);
+    //         }
+    //     };
+
+    //     fetchUserData();
+    // }, []);
 
 
 
@@ -197,15 +206,16 @@ const MyAccountScreen = () => {
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <View style={{ marginRight: 10 }}>
                                     <View style={{ overflow: 'hidden' }}>
-                                        {photoPath ? (
-                                            <Image source={{ uri: photoPath }} style={{ width: 40, height: 40, borderWidth: 2, borderColor: 'white', borderRadius: 32 }} />
+                                        {photo ? (
+                                           
+                                           <Image source={{ uri: `data:image/jpeg;base64,${photo}` }} className="w-16 h-16 border-2 border-white rounded-full" />
                                         ) : (
                                             <Image source={require('../assets/images/favicon.png')} style={{ width: 64, height: 64, borderWidth: 2, borderColor: 'white', borderRadius: 32 }} />
                                         )}
                                     </View>
                                 </View>
                                 <View>
-                                    <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}>{fullName}</Text>
+                                    <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}>{fullname}</Text>
                                     <Text style={{ fontSize: 12, color: '#90EE90', fontWeight: '500' }}>Online</Text>
 
                                 </View>

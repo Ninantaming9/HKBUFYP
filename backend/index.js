@@ -446,11 +446,7 @@ app.post('/findFlightId', async (req, res) => {
   try {
     const db = await connectToDB();
     const flightCollection = db.collection('flight');
-
     const { flightId } = req.body; 
-
-
-
     const flight = await flightCollection.findOne({ _id: new ObjectId(flightId) });
     if (flight) {
       res.status(200).json(flight); 
@@ -462,6 +458,34 @@ app.post('/findFlightId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.post('/findFriends', async (req, res) => {
+  try {
+    const db = await connectToDB();
+    const flightCollection = db.collection('friends');
+    const { friendId } = req.body; 
+    console.log('Received friendId:', friendId); // Debugging line
+
+    const friend = await flightCollection.findOne({ _id: new ObjectId(friendId) });
+    if (friend) {
+
+      const response = {
+        userEmail: friend.userEmail, // 这里可以根据需要动态获取
+        friendEmail: friend.friendEmail, // 假设 friend 对象中有 email 字段
+        fullname: friend.fullname,
+        photo: friend.photo,
+      };
+      res.status(200).json(response); 
+    } else {
+      res.status(404).json({ message: 'Friend not found.' });
+    }
+  } catch (error) {
+    console.log('Error finding friend', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 
 
