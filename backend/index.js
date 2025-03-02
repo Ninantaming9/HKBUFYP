@@ -818,6 +818,7 @@ app.post('/searchBookbyadmin', async (req, res) => {
   }
 });
 
+
 app.post('/addFriend', async (req, res) => {
   let db;
   try {
@@ -839,16 +840,19 @@ app.post('/addFriend', async (req, res) => {
 
     // 检查用户是否已经是好友
     const existingFriendship = await friendsCollection.findOne({
-      userEmail: userEmail,
-      friendEmail: friendEmail
+      $or: [
+        { userEmail: userEmail, friendEmail: friendEmail },
+        { userEmail: friendEmail, friendEmail: userEmail }
+      ]
     });
 
     if (existingFriendship) {
       return res.status(400).json({ message: 'You are already friends.' });
     }
-
+    
+    const user = await db.collection('users').findOne({ email: userEmail });
     // 添加好友关系
-    const newFriendship = {
+    const newFriendship1 = {
       userEmail: userEmail,
       friendEmail: friendEmail,
       fullname: friend.fullname, // 存储好友的全名
@@ -856,10 +860,20 @@ app.post('/addFriend', async (req, res) => {
       createdAt: new Date()
     };
 
-    await friendsCollection.insertOne(newFriendship);
+    const newFriendship2 = {
+      userEmail: friendEmail,
+      friendEmail: userEmail,
+      fullname: user.fullname, // 存储用户的全名
+      photo: user.photo, // 存储用户的头像二进制数据
+      createdAt: new Date()
+    };
+
+    // 插入两条好友关系
+    await friendsCollection.insertOne(newFriendship1);
+    await friendsCollection.insertOne(newFriendship2);
     
     // 返回成功响应
-    return res.status(201).json({ message: 'Friend added successfully.', friendship: newFriendship });
+    return res.status(201).json({ message: 'Friend added successfully.', friendships: [newFriendship1, newFriendship2] });
   } catch (error) {
     console.log('Error adding friend', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -870,6 +884,9 @@ app.post('/addFriend', async (req, res) => {
     }
   }
 });
+
+
+
 
 app.get('/getFriends', async (req, res) => {
   try {
