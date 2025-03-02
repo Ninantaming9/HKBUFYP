@@ -903,7 +903,7 @@ app.get('/getFriends', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
+// 发送聊天消息
 app.post('/chatMessage', async (req, res) => {
   try {
     const { senderemail, receiveremail, content } = req.body;
@@ -914,7 +914,7 @@ app.post('/chatMessage', async (req, res) => {
     }
 
     // 插入消息到数据库
-    const db = await connectToDB(); // 确保连接到数据库
+    const db = await connectToDB();
     await db.collection('messages').insertOne({
       senderemail,
       receiveremail,
@@ -933,6 +933,7 @@ app.post('/chatMessage', async (req, res) => {
   }
 });
 
+// Socket.IO 连接
 io.on('connection', (socket) => {
   console.log('A user connected');
 
@@ -941,31 +942,37 @@ io.on('connection', (socket) => {
   });
 });
 
-app.get('/chatHistory', async (req, res) => {
-  const db = await connectToDB();
-  const { userEmail, friendEmail } = req.query;
+
+app.post('/chathistory', async (req, res) => {
   try {
-    const chatHistory = await db.collection('messages')
-      .find({
-        $or: [
-          { senderId: userEmail, receiverId: friendEmail }, // 更新字段名
-          { senderId: friendEmail, receiverId: userEmail }  // 更新字段名
-        ]
-      })
-      .sort({ timestamp: 1 }) // 按时间排序
-      .toArray();
+    const { useremail, receiveremail } = req.body; // 从请求体中获取数据
 
-    // 根据发送者和接收者的角色调整消息的显示位置
-    const formattedChatHistory = chatHistory.map(message => {
-      return {
-        ...message,
-        position: message.senderId === userEmail ? 'right' : 'left' // 更新字段名
-      };
-    });
+    // 检查必需的字段是否存在
+    if (!useremail || !receiveremail) {
+      return res.status(400).json({ message: 'User email and receiver email are required.' });
+    }
 
-    res.json(formattedChatHistory);
+    console.log('Received body:', req.body); // 添加日志
+
+    // 连接到数据库
+    const db = await connectToDB();
+    
+    // 从数据库中查询与特定用户相关的消息
+    const messages = await db.collection('messages').find({
+      $or: [
+        { senderemail: useremail, receiveremail: receiveremail },
+        { senderemail: receiveremail, receiveremail: useremail }
+      ]
+    }).toArray();
+
+    console.log('Retrieved messages:', messages); // 添加日志
+
+    // 发送成功响应
+    res.status(200).json({ message: 'Messages retrieved successfully', data: messages });
   } catch (error) {
-    console.error('Error fetching chat history:', error);
-    res.status(500).send('Internal Server Error');
+    console.log('Error retrieving chat messages', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+

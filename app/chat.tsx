@@ -49,22 +49,22 @@ const MyAccountScreen = () => {
             setLoading(true); // 在开始请求之前设置加载状态
             try {
                 console.log("Fetching chat history for:", { userEmail, friendEmail });
-                const response = await axios.get(`${API_URL}/chatHistory`, {
-                    params: { userEmail, friendEmail },
+                const response = await axios.post(`${API_URL}/chathistory`, {
+                    useremail: userEmail, // 确保这里的字段名是正确的
+                    receiveremail: friendEmail,
                 });
-                setChatHistory(response.data);
+                setChatHistory(response.data.data); // 假设响应数据在 data 属性中
                 console.log("Fetched chat history:", response.data); // 打印获取的聊天记录
             } catch (error) {
                 setError('Error fetching chat history');
-                console.error("Error fetching chat history:", error);
             } finally {
                 setLoading(false); // 请求完成后重置加载状态
             }
         };
-
+    
         fetchChatHistory();
     }, [userEmail, friendEmail]);
-
+    
     useEffect(() => {
         const fetchUserEmailAndFriends = async () => {
             try {
@@ -246,11 +246,7 @@ const MyAccountScreen = () => {
                 </View>
 
 
-                <View>
-                    <Text style={{ fontSize: 20, color: 'black', fontWeight: 'bold' }}>{friendEmail}</Text>
-                    <Text style={{ fontSize: 12, color: '#90EE90', fontWeight: '500' }}>Online</Text>
-
-                </View>
+            
 
 
             </View>
