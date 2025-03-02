@@ -32,11 +32,11 @@ const MyAccountScreen = () => {
 
     interface Message {
         _id: string;
-        senderEmail: string;
-        friendEmail: string;
+        senderemail: string;
+        receiveremail: string;
         content: string;
         timestamp: string;
-        position: 'left' | 'right'; // 用于显示位置
+
     }
 
     interface ChatHistoryProps {
@@ -181,9 +181,24 @@ const MyAccountScreen = () => {
     const handleEditaccount = () => {
         router.push('/login');
     };
+    
     const sendMessage = async () => {
         if (message.trim()) {
+            // 创建新消息对象，确保包含所有必需的属性
+            const newMessage: Message = {
+                _id: generateUniqueId(), // 生成唯一 ID 的函数
+                content: message,
+                senderemail: userEmail,
+                receiveremail: friendEmail,
+                timestamp: new Date().toISOString(),
+             
+            };
+    
+            // 先将新消息添加到 chatHistory
+            setChatHistory(prevChatHistory => [...prevChatHistory, newMessage]);
+    
             try {
+                // 发送消息到后端
                 const response = await axios.post(`${API_URL}/chatMessage`, {
                     senderemail: userEmail,
                     receiveremail: friendEmail,
@@ -193,9 +208,19 @@ const MyAccountScreen = () => {
                 setMessage(''); // 清空输入框
             } catch (error) {
                 console.error('Error sending message:', error);
+                // 如果发送失败，可以选择从 chatHistory 中移除刚刚添加的消息
+                setChatHistory(prevChatHistory => prevChatHistory.filter(msg => msg._id !== newMessage._id));
             }
         }
     };
+    
+    // 生成唯一 ID 的示例函数
+    const generateUniqueId = () => {
+        return Math.random().toString(36).substr(2, 9); // 生成一个简单的随机字符串
+    };
+    
+
+
     return (
         <View style={{ flex: 1, width: '100%', height: '100%', position: 'relative', backgroundColor: 'white' }}>
             {/* background */}
@@ -245,34 +270,31 @@ const MyAccountScreen = () => {
 
                 </View>
 
-
-            
-
-
             </View>
-
-            <ScrollView style={{ width: '100%', position: 'relative', zIndex: 2 }}>
-            </ScrollView>
-            <FlatList
-                data={chatHistory}
-                renderItem={({ item }) => (
-                    <View style={{
-                        flexDirection: item.senderEmail === userEmail ? 'row-reverse' : 'row',
-                        justifyContent: item.friendEmail === userEmail ? 'flex-end' : 'flex-start',
-                        marginVertical: 5,
-                    }}>
-                        <Text style={{
-                            backgroundColor: item.senderEmail === userEmail ? '#d1e7dd' : '#f8d7da',
-                            padding: 10,
-                            borderRadius: 5,
-                            maxWidth: '80%', // 限制消息宽度
+            
+            <ScrollView style={{ width: '100%', position: 'relative', zIndex: 2, paddingTop: 20 }}>
+                {chatHistory
+                    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()) // 按时间升序排序
+                    .map((item, index) => (
+                        <View key={index} style={{
+                            flexDirection: 'row',
+                            justifyContent: item.senderemail === userEmail ? 'flex-end' : 'flex-start',
+                            marginVertical: 5,
                         }}>
-                            {item.senderEmail === userEmail ? `Me: ${item.content}` : `${item.senderEmail}: ${item.content}`}
-                        </Text>
-                    </View>
-                )}
-                keyExtractor={(item, index) => index.toString()}
-            />
+                            <Text style={{
+                                backgroundColor: item.senderemail === userEmail ? '#d1e7dd' : '#f8d7da',
+                                padding: 10,
+                                borderRadius: 5,
+                                maxWidth: '80%', // 限制消息宽度
+                            }}>
+                                {`${item.content}`}
+                            </Text>
+                        </View>
+                    ))}
+            </ScrollView>
+
+
+          
 
             <View className="flex flex-row items-center p-2 border border-blue-500 rounded bg-gray-100 mt-30 justifyContent: 'flex-end'" style={{ width: '87%' }}>
                 <View className="flex flex-row flex-grow items-center">
