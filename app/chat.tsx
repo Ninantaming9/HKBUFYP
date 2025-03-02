@@ -1,51 +1,86 @@
-import { View, Text, TouchableOpacity, Image, ScrollView, Animated, Alert, TextInput } from 'react-native'
+import { View, Text, TouchableOpacity, Image, ScrollView, Animated, Alert, TextInput, FlatList } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { router, useRouter } from 'expo-router'
 import { Ionicons, AntDesign, MaterialIcons, FontAwesome } from '@expo/vector-icons'
 import { useFonts } from 'expo-font';
-
 import Constants from "expo-constants";
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from '../backend/address';
-
 import { launchImageLibrary } from 'react-native-image-picker';
 import * as ImagePicker from 'expo-image-picker';
-
 import axios from 'axios';
-
 import Icon from 'react-native-vector-icons/MaterialIcons';
 const MyAccountScreen = () => {
-
-    const [imageUri, setImageUri] = useState(null);
     const [userId, setUserId] = useState('');
-
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [showModal, setShowModal] = useState(false);
+    // const [loading, setLoading] = useState(false);
     const [photoPath, setPhotoPath] = useState<string | null>(null);
-
-  const route = useRoute(); 
-    const [number1, Setnumber1] = useState('Edit Password');
-    const [number2, Setnumber2] = useState('Logout');
-    const [number3, Setnumber3] = useState('Detail  Account');
+    const route = useRoute();
     const [message, setMessage] = useState('');
-    const fakeUsers = [
-        { id: 1, name: 'Alice', photo: 'https://example.com/photo1.jpg' },
-        { id: 2, name: 'Bob', photo: 'https://example.com/photo2.jpg' },
-        { id: 3, name: 'Charlie', photo: 'https://example.com/photo3.jpg' },
-        // Add more fake users as needed
-    ];
+    const [userEmail, setUserEmail] = useState('');
+    const router = useRouter();
+    const { fullname, flightId, photo, friendEmail } = route.params as RouteParams;
+    const [chatHistory, setChatHistory] = useState<Message[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
     interface RouteParams {
         flightId: string;
         fullname: string; // Add fullname to the type
-        photo:string;
+        photo: string;
         friendEmail: string;
     }
-    const router = useRouter();
-   // const { userEmail, friendEmail, fullname, photo } = router.query;
 
-   const { fullname, flightId,photo ,friendEmail} = route.params as RouteParams;
+    interface Message {
+        _id: string;
+        senderEmail: string;
+        friendEmail: string;
+        content: string;
+        timestamp: string;
+        position: 'left' | 'right'; // 用于显示位置
+    }
+
+    interface ChatHistoryProps {
+        userEmail: string;
+        friendEmail: string;
+    }
+
+    useEffect(() => {
+        const fetchChatHistory = async () => {
+            setLoading(true); // 在开始请求之前设置加载状态
+            try {
+                console.log("Fetching chat history for:", { userEmail, friendEmail });
+                const response = await axios.get(`${API_URL}/chatHistory`, {
+                    params: { userEmail, friendEmail },
+                });
+                setChatHistory(response.data);
+                console.log("Fetched chat history:", response.data); // 打印获取的聊天记录
+            } catch (error) {
+                setError('Error fetching chat history');
+                console.error("Error fetching chat history:", error);
+            } finally {
+                setLoading(false); // 请求完成后重置加载状态
+            }
+        };
+
+        fetchChatHistory();
+    }, [userEmail, friendEmail]);
+
+    useEffect(() => {
+        const fetchUserEmailAndFriends = async () => {
+            try {
+                // Retrieve user email from AsyncStorage
+                const storedUserEmail = await AsyncStorage.getItem('userEmail');
+                if (storedUserEmail) {
+                    const email = JSON.parse(storedUserEmail);
+                    setUserEmail(email);
+                }
+            } catch (error) {
+                console.error('Error fetching user data', error);
+            }
+        };
+        fetchUserEmailAndFriends();
+    }, []); // Empty dependency array to run only once on mount
+
 
     const handleChoosePhoto = async () => {
         console.log('photo use');
@@ -122,32 +157,6 @@ const MyAccountScreen = () => {
     };
 
 
-    // useEffect(() => {
-    //     const fetchUserData = async () => {
-    //         try {
-
-    //             const userId = await AsyncStorage.getItem('userId');
-    //             const storedFullName = await AsyncStorage.getItem('user');
-
-
-    //             if (userId) {
-    //                 fetchUserPhoto(userId);
-    //                 setUserId(userId);
-    //             }
-
-
-    //             if (storedFullName) {
-    //                 setFullName(JSON.parse(storedFullName));
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching user data', error);
-    //         }
-    //     };
-
-    //     fetchUserData();
-    // }, []);
-
-
 
 
     const handleLogout = () => {
@@ -169,22 +178,24 @@ const MyAccountScreen = () => {
     const handleLogoutConfirmed = () => {
         router.push('/login');
     };
-
-
-
     const handleEditaccount = () => {
         router.push('/login');
     };
-
-
-
-    const sendMessage = () => {
+    const sendMessage = async () => {
         if (message.trim()) {
-            console.log('发送消息:', message);
-            setMessage(''); 
+            try {
+                const response = await axios.post(`${API_URL}/chatMessage`, {
+                    senderemail: userEmail,
+                    receiveremail: friendEmail,
+                    content: message,
+                });
+                console.log('Message sent successfully:', response.data);
+                setMessage(''); // 清空输入框
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
         }
     };
-
     return (
         <View style={{ flex: 1, width: '100%', height: '100%', position: 'relative', backgroundColor: 'white' }}>
             {/* background */}
@@ -207,8 +218,8 @@ const MyAccountScreen = () => {
                                 <View style={{ marginRight: 10 }}>
                                     <View style={{ overflow: 'hidden' }}>
                                         {photo ? (
-                                           
-                                           <Image source={{ uri: `data:image/jpeg;base64,${photo}` }} className="w-16 h-16 border-2 border-white rounded-full" />
+
+                                            <Image source={{ uri: `data:image/jpeg;base64,${photo}` }} className="w-16 h-16 border-2 border-white rounded-full" />
                                         ) : (
                                             <Image source={require('../assets/images/favicon.png')} style={{ width: 64, height: 64, borderWidth: 2, borderColor: 'white', borderRadius: 32 }} />
                                         )}
@@ -230,15 +241,43 @@ const MyAccountScreen = () => {
                             </View>
                         </TouchableOpacity>
                     </View>
+
+
                 </View>
 
 
+                <View>
+                    <Text style={{ fontSize: 20, color: 'black', fontWeight: 'bold' }}>{friendEmail}</Text>
+                    <Text style={{ fontSize: 12, color: '#90EE90', fontWeight: '500' }}>Online</Text>
+
+                </View>
 
 
-                {/* end header */}
             </View>
+
             <ScrollView style={{ width: '100%', position: 'relative', zIndex: 2 }}>
             </ScrollView>
+            <FlatList
+                data={chatHistory}
+                renderItem={({ item }) => (
+                    <View style={{
+                        flexDirection: item.senderEmail === userEmail ? 'row-reverse' : 'row',
+                        justifyContent: item.friendEmail === userEmail ? 'flex-end' : 'flex-start',
+                        marginVertical: 5,
+                    }}>
+                        <Text style={{
+                            backgroundColor: item.senderEmail === userEmail ? '#d1e7dd' : '#f8d7da',
+                            padding: 10,
+                            borderRadius: 5,
+                            maxWidth: '80%', // 限制消息宽度
+                        }}>
+                            {item.senderEmail === userEmail ? `Me: ${item.content}` : `${item.senderEmail}: ${item.content}`}
+                        </Text>
+                    </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+            />
+
             <View className="flex flex-row items-center p-2 border border-blue-500 rounded bg-gray-100 mt-30 justifyContent: 'flex-end'" style={{ width: '87%' }}>
                 <View className="flex flex-row flex-grow items-center">
                     <TextInput
@@ -258,9 +297,8 @@ const MyAccountScreen = () => {
                     </View>
                 </View>
                 <TouchableOpacity onPress={sendMessage} className="ml-2 rounded px-4 py-2 bg-transparent">
-                    <Icon name="send" size={30} color="#007BFF" /> 
+                    <Icon name="send" size={30} color="#007BFF" />
                 </TouchableOpacity>
-
             </View>
 
         </View>

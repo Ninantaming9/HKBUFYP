@@ -1,12 +1,16 @@
 const express = require('express');
+const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const moment = require('moment');
-
+const http = require('http');
+const server = http.createServer(app);
+const socketIo = require('socket.io'); // 确保在使用之前导入 socket.io
+const io = socketIo(server);
 const nodemailer = require('nodemailer');
 const { MongoClient, ObjectId } = require("mongodb"); 
-const app = express();
+
 const port = 3000;
 const cors = require('cors');
 require('dotenv').config();
@@ -897,5 +901,71 @@ app.get('/getFriends', async (req, res) => {
   } catch (error) {
     console.log('Error retrieving friends', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/chatMessage', async (req, res) => {
+  try {
+    const { senderemail, receiveremail, content } = req.body;
+
+    // 检查必需的字段是否存在
+    if (!senderemail || !receiveremail || !content) {
+      return res.status(400).json({ message: 'Sender email, receiver email, and content are required.' });
+    }
+
+    // 插入消息到数据库
+    const db = await connectToDB(); // 确保连接到数据库
+    await db.collection('messages').insertOne({
+      senderemail,
+      receiveremail,
+      content,
+      timestamp: new Date(),
+    });
+
+    // 通过 Socket.IO 发送消息
+    io.emit('chatMessage', { senderemail, receiveremail, content });
+
+    // 发送成功响应
+    res.status(201).json({ message: 'Message sent successfully', data: { senderemail, receiveremail, content } });
+  } catch (error) {
+    console.log('Error sending chat message', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
+app.get('/chatHistory', async (req, res) => {
+  const db = await connectToDB();
+  const { userEmail, friendEmail } = req.query;
+  try {
+    const chatHistory = await db.collection('messages')
+      .find({
+        $or: [
+          { senderId: userEmail, receiverId: friendEmail }, // 更新字段名
+          { senderId: friendEmail, receiverId: userEmail }  // 更新字段名
+        ]
+      })
+      .sort({ timestamp: 1 }) // 按时间排序
+      .toArray();
+
+    // 根据发送者和接收者的角色调整消息的显示位置
+    const formattedChatHistory = chatHistory.map(message => {
+      return {
+        ...message,
+        position: message.senderId === userEmail ? 'right' : 'left' // 更新字段名
+      };
+    });
+
+    res.json(formattedChatHistory);
+  } catch (error) {
+    console.error('Error fetching chat history:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
