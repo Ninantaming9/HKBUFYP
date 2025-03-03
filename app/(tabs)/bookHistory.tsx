@@ -164,11 +164,6 @@ export default function searchresult() {
           { cancelable: false }
         );
       }
-
-
-
-
-
     }
   };
 

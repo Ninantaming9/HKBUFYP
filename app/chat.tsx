@@ -273,25 +273,51 @@ const MyAccountScreen = () => {
             </View>
             
             <ScrollView style={{ width: '100%', position: 'relative', zIndex: 2, paddingTop: 20 }}>
-                {chatHistory
-                    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()) // 按时间升序排序
-                    .map((item, index) => (
-                        <View key={index} style={{
-                            flexDirection: 'row',
-                            justifyContent: item.senderemail === userEmail ? 'flex-end' : 'flex-start',
-                            marginVertical: 5,
+    {chatHistory
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()) // 按时间升序排序
+        .map((item, index) => {
+            const currentTimestamp = new Date(item.timestamp).getTime();
+            const previousTimestamp = index > 0 ? new Date(chatHistory[index - 1].timestamp).getTime() : null;
+
+            // 计算时间间隔
+            const showTimestamp = previousTimestamp === null || (currentTimestamp - previousTimestamp) > 10 * 60 * 1000;
+
+            // 格式化日期为 YYYY/MM/DD
+            const date = new Date(item.timestamp);
+            const formattedDate = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
+
+            // 格式化时间为 12小时制
+            const hours = date.getHours();
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedTime = `${hours % 12 || 12}:${minutes}${ampm}`; // 12小时制格式化
+
+            return (
+                <View key={index} style={{ marginVertical: 5 }}>
+                    {showTimestamp && (
+                        <Text style={{ textAlign: 'center', marginVertical: 5, fontWeight: 'bold' }}>
+                            {`${formattedDate} ${formattedTime}`}
+                        </Text>
+                    )}
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: item.senderemail === userEmail ? 'flex-end' : 'flex-start',
+                    }}>
+                        <Text style={{
+                            backgroundColor: item.senderemail === userEmail ? '#d1e7dd' : '#f8d7da',
+                            padding: 10,
+                            borderRadius: 5,
+                            maxWidth: '80%', // 限制消息宽度
                         }}>
-                            <Text style={{
-                                backgroundColor: item.senderemail === userEmail ? '#d1e7dd' : '#f8d7da',
-                                padding: 10,
-                                borderRadius: 5,
-                                maxWidth: '80%', // 限制消息宽度
-                            }}>
-                                {`${item.content}`}
-                            </Text>
-                        </View>
-                    ))}
-            </ScrollView>
+                            {`${item.content}`}
+                        </Text>
+                    </View>
+                </View>
+            );
+        })}
+</ScrollView>
+
+
 
 
           

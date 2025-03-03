@@ -240,6 +240,10 @@ const MyAccountScreen = () => {
 };
 
 
+const handleChat = () => {
+ 
+};
+
   return (
     <View style={{ flex: 1, width: '100%', height: '100%', position: 'relative', backgroundColor: 'white' }}>
       {/* background */}
@@ -259,14 +263,13 @@ const MyAccountScreen = () => {
           </TouchableOpacity>
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
-
-            <TouchableOpacity onPress={() => router.push("/chat")}>
+          <TouchableOpacity onPress={handleChat}>
               <View style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
-                <AntDesign name="sharealt" size={20} color="black" />
+                <AntDesign name="adduser" size={20} color="black" />
               </View>
             </TouchableOpacity>
-
           </View>
+
         </View>
         {/* end header */}
       </View>
