@@ -10,6 +10,9 @@ const socketIo = require('socket.io'); // 确保在使用之前导入 socket.io
 const io = socketIo(server);
 const nodemailer = require('nodemailer');
 const { MongoClient, ObjectId } = require("mongodb"); 
+const stripe = require('stripe')('sk_test_51QdSLJGT44XrrjFfVpOWy3qowZsBnYSwYZRZLjaNJvLvhb5X5EtWbvrWxIGUpOEXhAU4FYoNPf6A2vnWXPQreVUU00LnxSQrgD');
+
+
 
 const port = 3000;
 const cors = require('cors');
@@ -993,3 +996,60 @@ app.post('/chathistory', async (req, res) => {
 });
 
 
+
+
+app.post('/paymentshow', async (req, res) => {
+  const { amount } = req.body; // 从前端获取金额等参数
+
+  try {
+    const customer = await stripe.customers.create();
+    const ephemeralKey = await stripe.ephemeralKeys.create(
+      { customer: customer.id },
+      { apiVersion: '2020-08-27' }
+    );
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount, // 以分为单位
+      currency: 'usd',
+      customer: customer.id,
+    });
+
+    res.send({
+      paymentIntent: paymentIntent.client_secret,
+      ephemeralKey: ephemeralKey.secret,
+      customer: customer.id,
+    });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+
+
+
+app.post('/paymentsheet', async (req, res) => {
+  try {
+    const amount =req.body.amount;
+    const customer = await stripe.customers.create();
+    const ephemeralKey = await stripe.ephemeralKeys.create(
+      { customer: customer.id },
+      { apiVersion: '2024-12-18.acacia' }
+    );
+    
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount, // 以分为单位，1099 HKD = 10.99 HKD
+      currency: 'hkd', // 使用港元
+      customer: customer.id,
+      payment_method_types: ['card'], // 确保使用支持 HKD 的支付方式
+    });
+
+    res.json({
+      paymentIntent: paymentIntent.client_secret,
+      ephemeralKey: ephemeralKey.secret,
+      customer: customer.id,
+      publishableKey: 'pk_test_51QdSLJGT44XrrjFfURnKLFyMM4GeBo6Y0V6iGvekm2Uw14COHroe1oZq8Rv2MS6iajU5ZIi2uKkeBDBNsHHlV13E0004GnafaB'
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
