@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, ScrollView, Animated, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, Image, ScrollView, Animated, Alert, Modal, TextInput } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { router, useRouter } from 'expo-router'
 import { Ionicons, AntDesign, MaterialIcons, FontAwesome } from '@expo/vector-icons'
@@ -32,7 +32,8 @@ const MyAccountScreen = () => {
   const [userEmail, setUserEmail] = useState(null);
   //const userEmail = 'zmhaoo@gmail.com'; // 替换为当前用户的邮箱
   const router = useRouter(); // Initialize the router
-
+  const [searchQuery, setSearchQuery] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
 
   interface Friend {
@@ -45,33 +46,33 @@ const MyAccountScreen = () => {
   }
 
 
-  useEffect(() => {
-    const fetchUserEmailAndFriends = async () => {
-      try {
-        // Retrieve user email from AsyncStorage
-        const storedUserEmail = await AsyncStorage.getItem('userEmail');
-        if (storedUserEmail) {
-          const email = JSON.parse(storedUserEmail);
-          setUserEmail(email);
+  const fetchUserEmailAndFriends = async () => {
+    try {
+      // Retrieve user email from AsyncStorage
+      const storedUserEmail = await AsyncStorage.getItem('userEmail');
+      if (storedUserEmail) {
+        const email = JSON.parse(storedUserEmail);
+        setUserEmail(email);
 
-          // Fetch friends after setting the user email
-          const response = await axios.get(`${API_URL}/getFriends/`, {
-            params: { userEmail: email },
-          });
-          setFriends(response.data.friends);
-        }
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          setError(err.response?.data.message || 'Error fetching friends');
-        } else {
-          setError('An unexpected error occurred');
-        }
+        // Fetch friends after setting the user email
+        const response = await axios.get(`${API_URL}/getFriends/`, {
+          params: { userEmail: email },
+        });
+        setFriends(response.data.friends);
       }
-    };
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data.message || 'Error fetching friends');
+      } else {
+        setError('An unexpected error occurred');
+      }
+    }
+  };
 
-    fetchUserEmailAndFriends();
-  }, []); // Empty dependency array to run only once on mount
-
+    useEffect(() => {
+      fetchUserEmailAndFriends();
+    }, []); // Empty dependency array to run only once on mount
+  
   const handleChoosePhoto = async () => {
     console.log('photo use');
 
@@ -212,37 +213,82 @@ const MyAccountScreen = () => {
 
   const handleClick = async (friendId: any) => {
     try {
-        const response = await fetch(`${API_URL}/findFriends`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ friendId }), 
+      const response = await fetch(`${API_URL}/findFriends`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ friendId }),
+      });
+      if (response.ok) {
+        const friendsDetails = await response.json();
+        router.push({
+          pathname: "/chat",
+          params: {
+            userEmail: friendsDetails.userEmail,
+            friendEmail: friendsDetails.friendEmail,
+            fullname: friendsDetails.fullname,
+            photo: friendsDetails.photo,
+          },
         });
-        if (response.ok) {
-            const friendsDetails = await response.json();
-            router.push({
-                pathname: "/chat",
-                params: { 
-                    userEmail: friendsDetails.userEmail,
-                    friendEmail: friendsDetails.friendEmail,
-                    fullname: friendsDetails.fullname,
-                    photo: friendsDetails.photo,
-                }, 
-            });
-        } else {
-            const errorData = await response.json();
-            console.log('Error finding friend:', errorData.message);
-        }
+      } else {
+        const errorData = await response.json();
+
+        alert('Error finding friend: ' + errorData.message); // 弹窗提示
+      }
     } catch (error) {
-        console.error('Error:', error);
+     
+      
     }
-};
+  };
+  
 
 
-const handleChat = () => {
- 
-};
+
+  const handleChat = () => {
+    setModalVisible(true); // 显示搜索框
+  };
+
+  const handleSearch = (text: React.SetStateAction<string>) => {
+    setSearchQuery(text);
+  };
+
+  const handleConfirm = async () => {    
+    // 调用后端 API 添加好友
+    try {
+      const response = await fetch(`${API_URL}/addFriend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userEmail: userEmail,
+          friendEmail: searchQuery,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert('not have match friend: ' + errorData.message); // 弹窗提示
+        // 处理错误，例如显示错误消息
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Friend added successfully:', data);
+    
+      // 添加好友成功后，重新获取好友列表
+      await fetchUserEmailAndFriends(); // 调用获取好友的函数
+
+    } catch (error) {
+      console.error('Error adding friend:', error);
+      // 处理网络错误
+    } finally {
+      setSearchQuery(''); // 清空搜索框
+      setModalVisible(false); // 关闭弹出框
+    }
+  };
+
 
   return (
     <View style={{ flex: 1, width: '100%', height: '100%', position: 'relative', backgroundColor: 'white' }}>
@@ -263,11 +309,45 @@ const handleChat = () => {
           </TouchableOpacity>
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
-          <TouchableOpacity onPress={handleChat}>
+            <TouchableOpacity onPress={handleChat}>
               <View style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
                 <AntDesign name="adduser" size={20} color="black" />
               </View>
             </TouchableOpacity>
+
+            {/* 弹出搜索框 */}
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => setModalVisible(false)}
+            >
+              <View className='flex-1 justify-center items-center bg-transparent'>
+                <View className='w-11/12 bg-white rounded-lg p-4'>
+                  <TextInput
+                    className='h-10 border border-gray-300 rounded-md bg-opacity-50 p-2'
+                    placeholder="Search User"
+                    placeholderTextColor="gray"
+                    value={searchQuery}
+                    onChangeText={handleSearch}
+                  />
+                  <View className='flex-row justify-between mt-4'>
+                    <TouchableOpacity
+                      onPress={() => setModalVisible(false)}
+                      className='bg-red-500 rounded-md p-2 flex-1 mr-1'
+                    >
+                      <Text className='text-white text-center'>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handleConfirm}
+                      className='bg-blue-500 rounded-md p-2 flex-1 ml-1'
+                    >
+                      <Text className='text-white text-center'>Confirm</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
           </View>
 
         </View>
@@ -299,27 +379,27 @@ const handleChat = () => {
           </View>
 
           {friends.map((friends, index) => (
-        <TouchableOpacity key={index} onPress={() => handleClick(friends._id)}>
-          
-          <View className='flex-row justify-between items-center px-2' style={{ marginTop: 30 }}>
-            <View className='w-1/2 flex-row h-14'>
-              <View className='pr-2'>
-                <View className='overflow-hidden'>
-                  {friends.photo ? (
-                    <Image source={{ uri: `data:image/jpeg;base64,${friends.photo}` }} className="w-16 h-16 border-2 border-white rounded-full" />
-                  ) : (
-                    <Image source={require('../../assets/images/favicon.png')} className="w-16 h-16 border-2 border-white rounded-full" />
-                  )}
+            <TouchableOpacity key={index} onPress={() => handleClick(friends._id)}>
+
+              <View className='flex-row justify-between items-center px-2' style={{ marginTop: 30 }}>
+                <View className='w-1/2 flex-row h-14'>
+                  <View className='pr-2'>
+                    <View className='overflow-hidden'>
+                      {friends.photo ? (
+                        <Image source={{ uri: `data:image/jpeg;base64,${friends.photo}` }} className="w-16 h-16 border-2 border-white rounded-full" />
+                      ) : (
+                        <Image source={require('../../assets/images/favicon.png')} className="w-16 h-16 border-2 border-white rounded-full" />
+                      )}
+                    </View>
+                  </View>
+                  <View>
+                    <Text className='text-base text-neutral-400 font-medium'>Welcome Back</Text>
+                    <Text className='text-xl text-black font-bold'>{friends.fullname}</Text>
+                  </View>
                 </View>
               </View>
-              <View>
-                <Text className='text-base text-neutral-400 font-medium'>Welcome Back</Text>
-                <Text className='text-xl text-black font-bold'>{friends.fullname}</Text>
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
-      ))}
+            </TouchableOpacity>
+          ))}
 
 
 

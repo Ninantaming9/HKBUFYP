@@ -878,17 +878,11 @@ app.post('/addFriend', async (req, res) => {
     // 返回成功响应
     return res.status(201).json({ message: 'Friend added successfully.', friendships: [newFriendship1, newFriendship2] });
   } catch (error) {
-    console.log('Error adding friend', error);
+
     return res.status(500).json({ error: 'Internal server error' });
-  } finally {
-    // Ensure the database connection is closed if it was opened
-    if (db) {
-      await db.close();
-    }
-  }
+  } 
+  
 });
-
-
 
 
 app.get('/getFriends', async (req, res) => {
