@@ -23,6 +23,7 @@ const MyAccountScreen = () => {
     const [chatHistory, setChatHistory] = useState<Message[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [lastSentMessage, setLastSentMessage] = useState<Message | null>(null); // 修改类型
     interface RouteParams {
         flightId: string;
         fullname: string; // Add fullname to the type
@@ -61,10 +62,10 @@ const MyAccountScreen = () => {
                 setLoading(false); // 请求完成后重置加载状态
             }
         };
-    
+
         fetchChatHistory();
     }, [userEmail, friendEmail]);
-    
+
     useEffect(() => {
         const fetchUserEmailAndFriends = async () => {
             try {
@@ -156,9 +157,6 @@ const MyAccountScreen = () => {
 
     };
 
-
-
-
     const handleLogout = () => {
         Alert.alert(
             'Confirm Logout',
@@ -181,7 +179,7 @@ const MyAccountScreen = () => {
     const handleEditaccount = () => {
         router.push('/login');
     };
-    
+
     const sendMessage = async () => {
         if (message.trim()) {
             // 创建新消息对象，确保包含所有必需的属性
@@ -191,12 +189,12 @@ const MyAccountScreen = () => {
                 senderemail: userEmail,
                 receiveremail: friendEmail,
                 timestamp: new Date().toISOString(),
-             
+
             };
-    
+
             // 先将新消息添加到 chatHistory
             setChatHistory(prevChatHistory => [...prevChatHistory, newMessage]);
-    
+
             try {
                 // 发送消息到后端
                 const response = await axios.post(`${API_URL}/chatMessage`, {
@@ -213,12 +211,12 @@ const MyAccountScreen = () => {
             }
         }
     };
-    
+
     // 生成唯一 ID 的示例函数
     const generateUniqueId = () => {
         return Math.random().toString(36).substr(2, 9); // 生成一个简单的随机字符串
     };
-    
+
 
 
     return (
@@ -271,56 +269,56 @@ const MyAccountScreen = () => {
                 </View>
 
             </View>
-            
+
             <ScrollView style={{ width: '100%', position: 'relative', zIndex: 2, paddingTop: 20 }}>
-    {chatHistory
-        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()) // 按时间升序排序
-        .map((item, index) => {
-            const currentTimestamp = new Date(item.timestamp).getTime();
-            const previousTimestamp = index > 0 ? new Date(chatHistory[index - 1].timestamp).getTime() : null;
+                {chatHistory
+                    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()) // 按时间升序排序
+                    .map((item, index) => {
+                        const currentTimestamp = new Date(item.timestamp).getTime();
+                        const previousTimestamp = index > 0 ? new Date(chatHistory[index - 1].timestamp).getTime() : null;
 
-            // 计算时间间隔
-            const showTimestamp = previousTimestamp === null || (currentTimestamp - previousTimestamp) > 10 * 60 * 1000;
+                        // 计算时间间隔
+                        const showTimestamp = previousTimestamp === null || (currentTimestamp - previousTimestamp) > 10 * 60 * 1000;
 
-            // 格式化日期为 YYYY/MM/DD
-            const date = new Date(item.timestamp);
-            const formattedDate = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
+                        // 格式化日期为 YYYY/MM/DD
+                        const date = new Date(item.timestamp);
+                        const formattedDate = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
 
-            // 格式化时间为 12小时制
-            const hours = date.getHours();
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            const formattedTime = `${hours % 12 || 12}:${minutes}${ampm}`; // 12小时制格式化
+                        // 格式化时间为 12小时制
+                        const hours = date.getHours();
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        const formattedTime = `${hours % 12 || 12}:${minutes}${ampm}`; // 12小时制格式化
 
-            return (
-                <View key={index} style={{ marginVertical: 5 }}>
-                    {showTimestamp && (
-                        <Text style={{ textAlign: 'center', marginVertical: 5, fontWeight: 'bold' }}>
-                            {`${formattedDate} ${formattedTime}`}
-                        </Text>
-                    )}
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: item.senderemail === userEmail ? 'flex-end' : 'flex-start',
-                    }}>
-                        <Text style={{
-                            backgroundColor: item.senderemail === userEmail ? '#d1e7dd' : '#f8d7da',
-                            padding: 10,
-                            borderRadius: 5,
-                            maxWidth: '80%', // 限制消息宽度
-                        }}>
-                            {`${item.content}`}
-                        </Text>
-                    </View>
-                </View>
-            );
-        })}
-</ScrollView>
-
-
+                        return (
+                            <View key={index} style={{ marginVertical: 5 }}>
+                                {showTimestamp && (
+                                    <Text style={{ textAlign: 'center', marginVertical: 5, fontWeight: 'bold' }}>
+                                        {`${formattedDate} ${formattedTime}`}
+                                    </Text>
+                                )}
+                                <View style={{
+                                    flexDirection: 'row',
+                                    justifyContent: item.senderemail === userEmail ? 'flex-end' : 'flex-start',
+                                }}>
+                                    <Text style={{
+                                        backgroundColor: item.senderemail === userEmail ? '#d1e7dd' : '#f8d7da',
+                                        padding: 10,
+                                        borderRadius: 5,
+                                        maxWidth: '80%', // 限制消息宽度
+                                    }}>
+                                        {`${item.content}`}
+                                    </Text>
+                                </View>
+                            </View>
+                        );
+                    })}
+            </ScrollView>
 
 
-          
+
+
+
 
             <View className="flex flex-row items-center p-2 border border-blue-500 rounded bg-gray-100 mt-30 justifyContent: 'flex-end'" style={{ width: '87%' }}>
                 <View className="flex flex-row flex-grow items-center">

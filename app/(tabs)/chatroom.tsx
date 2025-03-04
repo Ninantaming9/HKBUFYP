@@ -393,8 +393,9 @@ const MyAccountScreen = () => {
                     </View>
                   </View>
                   <View>
-                    <Text className='text-base text-neutral-400 font-medium'>Welcome Back</Text>
+                    {/* <Text className='text-base text-neutral-400 font-medium'>Welcome Back</Text> */}
                     <Text className='text-xl text-black font-bold'>{friends.fullname}</Text>
+                    
                   </View>
                 </View>
               </View>

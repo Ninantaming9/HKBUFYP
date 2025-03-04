@@ -1022,7 +1022,16 @@ app.post('/paymentshow', async (req, res) => {
 
 app.post('/paymentsheet', async (req, res) => {
   try {
-    const amount =req.body.amount;
+    // 从请求体中获取金额并转换为数字
+    const amountInYuan = parseFloat(req.body.amount); // 将字符串转换为数字
+
+    // 检查金额是否有效
+    if (isNaN(amountInYuan) || amountInYuan <= 0) {
+      return res.status(400).json({ error: 'Invalid amount' });
+    }
+
+    const amountInCents = Math.round(amountInYuan * 100); // 转换为分并四舍五入
+
     const customer = await stripe.customers.create();
     const ephemeralKey = await stripe.ephemeralKeys.create(
       { customer: customer.id },
@@ -1030,7 +1039,7 @@ app.post('/paymentsheet', async (req, res) => {
     );
     
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount, // 以分为单位，1099 HKD = 10.99 HKD
+      amount: amountInCents, // 使用转换后的金额
       currency: 'hkd', // 使用港元
       customer: customer.id,
       payment_method_types: ['card'], // 确保使用支持 HKD 的支付方式
@@ -1047,3 +1056,4 @@ app.post('/paymentsheet', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+

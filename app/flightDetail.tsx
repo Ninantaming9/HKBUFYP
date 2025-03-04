@@ -42,13 +42,14 @@ const FlightDetailScreen = () => {
   const [dateBirth, setDateBirth] = useState("");
   const [mobile, setMobile] = useState("");
   const [passport, setPassport] = useState("");
-  const [totalPrice, setTotalPrice] = useState("");
+
   const [nationality, setNationality] = useState("");
   const [date, setdate] = useState('');
   const [discount, setDiscount] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const [payableAmount, setpayableAmount] = useState(600);
+
+  const [totalPrice, setTotalPrice] = useState("");
 
   const publishableKey = 'pk_test_51QdSLJGT44XrrjFfURnKLFyMM4GeBo6Y0V6iGvekm2Uw14COHroe1oZq8Rv2MS6iajU5ZIi2uKkeBDBNsHHlV13E0004GnafaB';
 
@@ -58,7 +59,7 @@ const FlightDetailScreen = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ amount: payableAmount }),
+      body: JSON.stringify({ amount: totalPrice }),
     });
   
     if (!response.ok) {
@@ -113,7 +114,7 @@ const FlightDetailScreen = () => {
     if (error) {
       Alert.alert(`Error code: ${error.code}`, error.message);
     } else {
-      Alert.alert('Success', 'Your order is confirmed!');
+      await handleSubmit();
     }
   };
 
@@ -235,7 +236,6 @@ const FlightDetailScreen = () => {
       console.error(error);
     }
   };
-
 
 
   const handleCheckDiscountCode = async () => {
