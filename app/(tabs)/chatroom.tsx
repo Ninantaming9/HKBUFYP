@@ -34,7 +34,16 @@ const MyAccountScreen = () => {
   const router = useRouter(); // Initialize the router
   const [searchQuery, setSearchQuery] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [lastMessages, setLastMessages] = useState([]);
 
+  interface Message {
+    receiveremail: string;
+    senderemail: string;
+    senderId: string;
+    _id: string;
+    content: string;
+  }
 
   interface Friend {
     _id: string; // 假设每个好友都有一个唯一的 id
@@ -147,6 +156,36 @@ const MyAccountScreen = () => {
 
   };
 
+  useEffect(() => {
+    const fetchLastMessages = async () => {
+      setError(null); // 重置错误状态
+      try {
+        const response = await fetch(`${API_URL}/getLastMessages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userEmail }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Something went wrong');
+        }
+
+        const data: Message[] = await response.json();
+        console.log('Fetched Messages:', data); // 调试信息
+        setMessages(data);
+        console.log('Fetched Messages:', data); // 查看获取的消息数据
+      } catch (err) {
+
+      }
+    };
+
+    if (userEmail) {
+      fetchLastMessages();
+    }
+  }, [userEmail]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -378,29 +417,44 @@ const MyAccountScreen = () => {
             </View>
           </View>
 
-          {friends.map((friends, index) => (
-            <TouchableOpacity key={index} onPress={() => handleClick(friends._id)}>
+          <View>
+  {error && <Text style={{ color: 'red' }}>{error}</Text>}
+  {friends.map((friend) => {
+  const lastMessage = messages.find(
+    (message) => 
+      (message._id === friend.friendEmail && message.content) || 
+      (message._id === userEmail && message.content)
+  );
 
-              <View className='flex-row justify-between items-center px-2' style={{ marginTop: 30 }}>
-                <View className='w-1/2 flex-row h-14'>
-                  <View className='pr-2'>
-                    <View className='overflow-hidden'>
-                      {friends.photo ? (
-                        <Image source={{ uri: `data:image/jpeg;base64,${friends.photo}` }} className="w-16 h-16 border-2 border-white rounded-full" />
-                      ) : (
-                        <Image source={require('../../assets/images/favicon.png')} className="w-16 h-16 border-2 border-white rounded-full" />
-                      )}
-                    </View>
-                  </View>
-                  <View>
-                    {/* <Text className='text-base text-neutral-400 font-medium'>Welcome Back</Text> */}
-                    <Text className='text-xl text-black font-bold'>{friends.fullname}</Text>
-                    
-                  </View>
-                </View>
+  console.log("Messages: " + JSON.stringify(messages)); // Log messages for debugging
+  console.log("Last Message: " + JSON.stringify(lastMessage)); // Log lastMessage for debugging
+
+    return (
+      <TouchableOpacity key={friend._id} onPress={() => handleClick(friend._id)}>
+        <View className='flex-row justify-between items-center px-2' style={{ marginTop: 30 }}>
+          <View className='w-1/2 flex-row h-14'>
+            <View className='pr-2'>
+              <View className='overflow-hidden'>
+                {friend.photo ? (
+                  <Image source={{ uri: `data:image/jpeg;base64,${friend.photo}` }} className="w-16 h-16 border-2 border-white rounded-full" />
+                ) : (
+                  <Image source={require('../../assets/images/favicon.png')} className="w-16 h-16 border-2 border-white rounded-full" />
+                )}
               </View>
-            </TouchableOpacity>
-          ))}
+            </View>
+            <View>
+        
+              <Text className='text-xl text-black font-bold'>{friend.fullname}</Text>
+              <Text className='text-base text-neutral-400 font-medium'>
+                {lastMessage ? lastMessage.content : '没有消息'}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  })}
+</View>
 
 
 
