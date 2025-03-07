@@ -10,7 +10,7 @@ const socketIo = require('socket.io'); // 确保在使用之前导入 socket.io
 const io = socketIo(server);
 const nodemailer = require('nodemailer');
 const { MongoClient, ObjectId } = require("mongodb"); 
-const stripe = require('stripe')('sk_test_51QdSLJGT44XrrjFfVpOWy3qowZsBnYSwYZRZLjaNJvLvhb5X5EtWbvrWxIGUpOEXhAU4FYoNPf6A2vnWXPQreVUU00LnxSQrgD');
+const stripe = require('stripe')('sk_test_51R02UUR3E9eq8yl0fVUX2ckqB0nJFktPNpOs1rXtZ7di4ylA1jssHwgw5oyj8xLdHzEXj2vdxv5a1NqBCJwL551u00oav1f1ki');
 
 
 
@@ -1049,7 +1049,7 @@ app.post('/paymentsheet', async (req, res) => {
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
       customer: customer.id,
-      publishableKey: 'pk_test_51QdSLJGT44XrrjFfURnKLFyMM4GeBo6Y0V6iGvekm2Uw14COHroe1oZq8Rv2MS6iajU5ZIi2uKkeBDBNsHHlV13E0004GnafaB'
+      publishableKey: 'pk_test_51R02UUR3E9eq8yl01jM5teLmWAuzcpgOPGejTtWoc55HasvWOOGSCbLZ34btPh6VOEIYksP5yoCzeDQYuWgx5rlm00GbVcrOjt'
     });
   } catch (error) {
     console.error(error);

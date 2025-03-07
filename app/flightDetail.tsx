@@ -18,7 +18,7 @@ import { IntentCreationCallbackParams } from '@stripe/stripe-react-native/lib/ty
 
 const App = () => {
   return (
-    <StripeProvider publishableKey="pk_test_51QdSLJGT44XrrjFfURnKLFyMM4GeBo6Y0V6iGvekm2Uw14COHroe1oZq8Rv2MS6iajU5ZIi2uKkeBDBNsHHlV13E0004GnafaB">
+    <StripeProvider publishableKey="pk_test_51R02UUR3E9eq8yl01jM5teLmWAuzcpgOPGejTtWoc55HasvWOOGSCbLZ34btPh6VOEIYksP5yoCzeDQYuWgx5rlm00GbVcrOjt">
       <FlightDetailScreen />
     </StripeProvider>
   );
@@ -51,7 +51,7 @@ const FlightDetailScreen = () => {
 
   const [totalPrice, setTotalPrice] = useState("");
 
-  const publishableKey = 'pk_test_51QdSLJGT44XrrjFfURnKLFyMM4GeBo6Y0V6iGvekm2Uw14COHroe1oZq8Rv2MS6iajU5ZIi2uKkeBDBNsHHlV13E0004GnafaB';
+  const publishableKey = 'pk_test_51R02UUR3E9eq8yl01jM5teLmWAuzcpgOPGejTtWoc55HasvWOOGSCbLZ34btPh6VOEIYksP5yoCzeDQYuWgx5rlm00GbVcrOjt';
 
   const fetchPaymentSheetParams = async () => {
     const response = await fetch(`${API_URL}/paymentsheet`, {
