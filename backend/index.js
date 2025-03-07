@@ -1057,3 +1057,51 @@ app.post('/paymentsheet', async (req, res) => {
   }
 });
 
+app.post('/getLastMessages', async (req, res) => {
+  const db = await connectToDB();
+  const messagesCollection = db.collection('messages'); 
+
+  const { userEmail } = req.body; // 从请求体中获取 userEmail
+
+  try {
+    if (!userEmail) {
+      return res.status(400).json({ error: 'userEmail is required.' }); // 不需要 JSON.stringify
+    }
+
+    // 获取所有与该用户的好友的最后一条消息
+    const lastMessages = await messagesCollection.aggregate([
+      {
+        $match: {
+          $or: [
+            { senderemail: userEmail },
+            { receiveremail: userEmail }
+          ]
+        }
+      },
+      {
+        $sort: { _id: -1 } // 按照消息 ID 降序排序
+      },
+      {
+        $group: {
+          _id: {
+            $cond: [
+              { $eq: ['$senderemail', userEmail] },
+              '$receiveremail',
+              '$senderemail'
+            ]
+          },
+          content: { $first: '$content' } // 获取每个好友的最后一条消息内容
+        }
+      }
+    ]).toArray();
+
+    if (lastMessages.length > 0) {
+      return res.status(200).json(lastMessages); // 不需要 JSON.stringify
+    } else {
+      return res.status(404).json({ error: 'No messages found for the user.' }); // 不需要 JSON.stringify
+    }
+  } catch (error) {
+    console.error('Error retrieving last messages:', error);
+    res.status(500).json({ error: 'Internal server error.' }); // 不需要 JSON.stringify
+  }
+});
