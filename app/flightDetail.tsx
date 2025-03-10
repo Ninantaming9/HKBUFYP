@@ -54,6 +54,7 @@ const FlightDetailScreen = () => {
   const publishableKey = 'pk_test_51R02UUR3E9eq8yl01jM5teLmWAuzcpgOPGejTtWoc55HasvWOOGSCbLZ34btPh6VOEIYksP5yoCzeDQYuWgx5rlm00GbVcrOjt';
 
   const fetchPaymentSheetParams = async () => {
+    console.log("asdsada")
     const response = await fetch(`${API_URL}/paymentsheet`, {
       method: 'POST',
       headers: {
@@ -61,7 +62,7 @@ const FlightDetailScreen = () => {
       },
       body: JSON.stringify({ amount: totalPrice }),
     });
-  
+    console.log("sadasddddd")
     if (!response.ok) {
       console.error('Failed to fetch payment sheet params:', response.statusText);
       throw new Error('Failed to fetch payment sheet params');
@@ -75,8 +76,7 @@ const FlightDetailScreen = () => {
       customer,
     };
   };
-  
-  const initializePaymentSheet = async () => {
+  const initializePaymentSheet = async (retries = 3) => {
     try {
       const {
         paymentIntent,
@@ -97,26 +97,40 @@ const FlightDetailScreen = () => {
         }
       });
   
-      if (!error) {
-        setLoading(true);
-      } else {
+      if (error) {
         console.error('Error initializing payment sheet:', error);
+      } else {
+        console.log('Payment sheet initialized successfully.');
+        setLoading(true);
       }
     } catch (error) {
       console.error('Error in initializePaymentSheet:', error);
+      if (retries > 0) {
+        console.log(`Retrying... (${3 - retries + 1})`);
+        await new Promise(res => setTimeout(res, 2000)); // Wait for 2 seconds before retrying
+        return initializePaymentSheet(retries - 1);
+      }
     }
   };
   
-
+  
+  
   const openPaymentSheet = async () => {
-    const { error } = await presentPaymentSheet();
-
-    if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
-    } else {
-      await handleSubmit();
+    try {
+      console.log('Attempting to present payment sheet...');
+      const { error } = await presentPaymentSheet();
+      
+      if (error) {
+      
+      } else {
+        console.log('Payment sheet presented successfully.');
+        await handleSubmit();
+      }
+    } catch (error) {
+      console.error('Error in openPaymentSheet:', error);
     }
   };
+  
 
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
