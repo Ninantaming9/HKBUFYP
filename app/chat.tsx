@@ -313,6 +313,7 @@ const MyAccountScreen = () => {
                             </View>
                         );
                     })}
+                     <View style={{ height: 20 }} /> 
             </ScrollView>
 
 
