@@ -909,9 +909,7 @@ app.get('/getFriends', async (req, res) => {
 
     if (friends.length > 0) {
       res.status(200).json({ friends });
-    } else {
-      res.status(404).json({ message: 'No friends found for this user.' });
-    }
+    } 
   } catch (error) {
     console.log('Error retrieving friends', error);
     res.status(500).json({ error: 'Internal server error' });

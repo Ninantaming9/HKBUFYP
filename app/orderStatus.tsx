@@ -2,7 +2,7 @@ import { View, Text, Pressable, TextInput, FlatList, ScrollView, TouchableOpacit
 import React, { useEffect, useState } from "react";
 
 import axios from "axios";
-import { apiToken } from "../../utils/api";
+import { apiToken } from "../utils/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HeaderSearchResult from "@/components/HeaderSearchResult";
 import {
@@ -11,9 +11,9 @@ import {
 } from "react-native-heroicons/outline";
 import { AntDesign, Feather, FontAwesome5, MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
-import { API_URL } from '../../backend/address';
+import { API_URL } from '../backend/address';
 
-export default function searchresult() {
+export default function orderStatus() {
   const [bookHistory, setBookHistory] = useState<Flightbook[]>([]);
   const [loading, setLoading] = useState(true);
   const [flightCount, setFlightCount] = useState(0);
@@ -258,7 +258,7 @@ export default function searchresult() {
               </Pressable>
               <View className="w-[60%] justify-center items-center flex-row">
                 <Text className="text-white  font-extrabold text-lg">
-                  Book History
+                  Order Status
                 </Text>
               </View>
               <View>

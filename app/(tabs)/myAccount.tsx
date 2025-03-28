@@ -287,7 +287,7 @@ const MyAccountScreen = () => {
               </TouchableOpacity>}
 
               
-              <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
+              <TouchableOpacity onPress={() => router.push("/orderStatus")}  style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#370ca9', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                     <AntDesign name="setting" size={20} color="#fff" />
@@ -298,6 +298,20 @@ const MyAccountScreen = () => {
                   </View>
                 </View>
               </TouchableOpacity>
+
+
+              <TouchableOpacity onPress={() => router.push("/orderStatus")}  style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 } }>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#370ca9', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <AntDesign name="shoppingcart" size={20} color="#fff" />
+                  </View>
+                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text style={{ fontSize: 16, color: '#000' }}>Order Status</Text>
+                    <Ionicons name='chevron-forward' size={24} color="black" />
+                  </View>
+                </View>
+              </TouchableOpacity>
+
 
               <TouchableOpacity onPress={() => handleLogout()} style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
