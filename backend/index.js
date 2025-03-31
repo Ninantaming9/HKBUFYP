@@ -357,7 +357,7 @@ app.post('/createFlightbook', async (req, res) => {
     const flightbookCollection = db.collection('flightbook'); 
     const discountCollection = db.collection('discount');
 
-    const { fullName, dateBirth, nationality, passport, mobile, ticketType, flightNumber, date, departureTime, arrivalTime, departureLocation, arrivalLocation, cabinClass, ticketPrice, seat, totalPrice, userId, email,discountValue,isUsed } = req.body;
+    const { fullName, dateBirth, nationality, passport, mobile, ticketType, flightNumber, date, departureTime, arrivalTime, departureLocation, arrivalLocation, cabinClass, ticketPrice, seat, totalPrice, userId, email,discountValue,isUsed,isPaymoney} = req.body;
      
     const flightbookData = {
       userId,
@@ -379,7 +379,8 @@ app.post('/createFlightbook', async (req, res) => {
       seat,
       totalPrice,
       discountValue,
-      isUsed
+      isUsed,
+      isPaymoney
     };
     console.log('Flightbook data:', flightbookData);
     await flightbookCollection.insertOne(flightbookData);

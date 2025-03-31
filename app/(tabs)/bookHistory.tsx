@@ -41,6 +41,7 @@ export default function searchresult() {
     nationality: string,
     passport: string,
     mobile: string,
+    isPaymoney : string,
   }
 
   useEffect(() => {
@@ -96,6 +97,8 @@ export default function searchresult() {
       );
     });
   };
+
+
   const handleSearch = async () => {
     // 检查是否有搜索内容
     if (!email.trim()) {
@@ -261,6 +264,7 @@ export default function searchresult() {
                   Book History
                 </Text>
               </View>
+
               <View>
                 {userRole === 'user' ? (
                   <View>
@@ -310,13 +314,14 @@ export default function searchresult() {
                             className="mt-4 bg-red-500 text-white rounded-md p-2 flex justify-center items-center"
                           >
                             <Text className="text-white">Cancel</Text>
-                          </TouchableOpacity>Cancel
+                          </TouchableOpacity>
                         </View>
                       </View>
                     </Modal>
                   </View>
                 )}
               </View>
+
             </View>
           </View>
 
@@ -371,77 +376,77 @@ export default function searchresult() {
             {/* show content card */}
 
             <View>
-              {bookHistory.map((flight, index) => (
-                <TouchableOpacity key={index} onPress={() => {
-
-                  handleContinue(flight._id);
-                }} style={{ width: '100%', backgroundColor: 'white', marginTop: 20, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 20 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <MaterialIcons name="flight" size={24} color="green" />
-                      <Text style={{ paddingLeft: 10, fontSize: 16, fontWeight: '500' }}>{flight.flightNumber}</Text>
-                    </View>
-                    <Text style={{ paddingLeft: 10, fontSize: 16, fontWeight: '500' }}>Date: {flight.date}</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 15 }}>
-                    <View style={{ width: '30%' }}>
-                      <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2 }}>{flight.departureTime}</Text>
-                      <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray' }}>{flight.departureLocation}</Text>
-                    </View>
-                    {/* Flight connection line logic can be added here */}
-                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-                        <View style={{ width: 15, height: 15, borderRadius: 10, borderWidth: 1, borderColor: 'green', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                          <View style={{ width: 5, height: 5, backgroundColor: 'green', borderRadius: 10, borderWidth: 1, borderColor: 'gray' }}></View>
-                        </View>
-                      </View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, position: 'relative' }}>
-                        <View style={{ width: '50%', height: 1, backgroundColor: 'gray' }}></View>
-                        <MaterialIcons name="flight" size={24} color="green" />
-                        <View style={{ width: '50%', height: 1, backgroundColor: 'gray' }}></View>
-                      </View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-                        <View style={{ width: 15, height: 15, borderRadius: 10, borderWidth: 1, borderColor: 'green', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                          <View style={{ width: 5, height: 5, backgroundColor: 'green', borderRadius: 10, borderWidth: 1, borderColor: 'gray' }}></View>
-                        </View>
-                      </View>
-                    </View>
-                    <View style={{ width: '30%' }}>
-                      <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2, textAlign: 'right' }}>{flight.arrivalTime}</Text>
-                      <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray', textAlign: 'right' }}>{flight.arrivalLocation}</Text>
-                    </View>
-                  </View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, paddingTop: 15, borderTopColor: '#EAEAEA', borderTopWidth: 1 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
-                      <Text>Total Price</Text>
-                      <Text style={{ fontSize: 16, fontWeight: '500', marginLeft: 5 }}>${flight.totalPrice}</Text>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
-                      <TouchableOpacity onPress={() => handleViewQRCode(flight._id)}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
-                          <AntDesign name="qrcode" size={16} color="#66b3f8" />
-                          <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>View QR Code</Text>
-                        </View>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#f87f66', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5 }}>
-                          <AntDesign name="delete" size={16} color="#f87f66" />
-                          <Text style={{ color: '#f87f66', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>
-                            {userRole === 'user' ? 'Cancel' : 'Delete'}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
-
-
-
-            </View>
+                     {bookHistory.map((flight, index) => (
+                       <TouchableOpacity key={index} onPress={() => {
+                         handleContinue(flight._id);
+                       }} style={{ width: '100%', backgroundColor: 'white', marginTop: 20, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 20 }}>
+                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                             <MaterialIcons name="flight" size={24} color="green" />
+                             <Text style={{ paddingLeft: 10, fontSize: 16, fontWeight: '500' }}>{flight.flightNumber}</Text>
+                           </View>
+                           <Text style={{ paddingLeft: 10, fontSize: 16, fontWeight: '500' }}>Date: {flight.date}</Text>
+                         </View>
+                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 15 }}>
+                           <View style={{ width: '30%' }}>
+                             <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2 }}>{flight.departureTime}</Text>
+                             <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray' }}>{flight.departureLocation}</Text>
+                           </View>
+                           {/* Flight connection line logic can be added here */}
+                           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+                               <View style={{ width: 15, height: 15, borderRadius: 10, borderWidth: 1, borderColor: 'green', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                 <View style={{ width: 5, height: 5, backgroundColor: 'green', borderRadius: 10, borderWidth: 1, borderColor: 'gray' }}></View>
+                               </View>
+                             </View>
+                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, position: 'relative' }}>
+                               <View style={{ width: '50%', height: 1, backgroundColor: 'gray' }}></View>
+                               <MaterialIcons name="flight" size={24} color="green" />
+                               <View style={{ width: '50%', height: 1, backgroundColor: 'gray' }}></View>
+                             </View>
+                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+                               <View style={{ width: 15, height: 15, borderRadius: 10, borderWidth: 1, borderColor: 'green', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                 <View style={{ width: 5, height: 5, backgroundColor: 'green', borderRadius: 10, borderWidth: 1, borderColor: 'gray' }}></View>
+                               </View>
+                             </View>
+                           </View>
+                           <View style={{ width: '30%' }}>
+                             <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2, textAlign: 'right' }}>{flight.arrivalTime}</Text>
+                             <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray', textAlign: 'right' }}>{flight.arrivalLocation}</Text>
+                           </View>
+                         </View>
+                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, paddingTop: 15, borderTopColor: '#EAEAEA', borderTopWidth: 1 }}>
+                           <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
+                             <Text>Total Price</Text>
+                             <Text style={{ fontSize: 16, fontWeight: '500', marginLeft: 5 }}>${flight.totalPrice}</Text>
+                           </View>
+       
+                           {flight.isPaymoney ? (
+                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
+                                 <TouchableOpacity onPress={() => handleViewQRCode(flight._id)}>
+                                   <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
+                                     <AntDesign name="qrcode" size={16} color="#66b3f8" />
+                                     <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>Uncompleted orders</Text>
+                                   </View>
+                                 </TouchableOpacity>
+         
+                                 <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
+                                   <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#f87f66', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5 }}>
+                                     <AntDesign name="delete" size={16} color="#f87f66" />
+                                     <Text style={{ color: '#f87f66', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>
+                                       {userRole === 'user' ? 'Cancel' : 'Delete'}
+                                     </Text>
+                                   </View>
+                                 </TouchableOpacity>
+                               </View>
+                           ) : (
+                             <Text style={{ fontSize: 16, fontWeight: '500', color: 'green' }}>Finish</Text>
+                           )}                    
+                         </View>
+                       </TouchableOpacity>
+                     ))}
+                   </View>
+          
           </View>
 
         </ScrollView>

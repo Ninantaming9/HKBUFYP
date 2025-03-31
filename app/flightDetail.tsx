@@ -238,7 +238,8 @@ const FlightDetailScreen = () => {
         ticketPrice: flightDetails.ticketPrice,
         seat: selectedSeats,
         discountValue: discount,
-        isUsed: true
+        isUsed: true,
+        isPaymoney:true
       };
 
       console.log('Flight Details:', flightDetails);
@@ -293,6 +294,9 @@ const FlightDetailScreen = () => {
     }
   };
 
+
+
+
   // const fetchPaymentSheetParams = async () => {
   //   try {
   //     const response = await fetch(`${API_URL}/paymentshow`, {
@@ -326,6 +330,71 @@ const FlightDetailScreen = () => {
   
   
   
+  const handleUnfinishedBook = async () => {
+    try {
+      Alert.alert(
+        "Hints",
+        "The order is not completed. Do you want to jump to a new page?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel"
+          },
+          {
+            text: "Confirm",
+            onPress: async () => {
+              await handleNopaymoney(); // 调用 handleSubmit 函数
+            }
+          }
+        ]
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+
+  const handleNopaymoney = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      const userData = {
+        userId: userId,
+        email: email,
+        fullName: fullName,
+        dateBirth: dateBirth,
+        mobile: mobile,
+        passport: passport,
+        nationality: nationality,
+        flightNumber: flightDetails.flightNumber,
+        ticketType: flightDetails.ticketType,
+        date: flightDetails.date,
+        departureLocation: flightDetails.departureLocation,
+        arrivalLocation: flightDetails.arrivalLocation,
+        cabinClass: flightDetails.cabinClass,
+        departureTime: flightDetails.departureTime,
+        arrivalTime: flightDetails.arrivalTime,
+        totalPrice: totalPrice,
+        ticketPrice: flightDetails.ticketPrice,
+        seat: selectedSeats,
+        discountValue: discount,
+        isUsed: true,
+        isPaymoney: false
+      };
+  
+      console.log('Flight Details:', flightDetails);
+      const response = await axios.post(`${API_URL}/createFlightbook`, userData);
+      console.log('Flight Details:', flightDetails);
+      console.log(response.data);
+      
+      // 插入成功后跳转页面
+      router.push("/(tabs)/search");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
 
   return (
     <View style={{ flex: 1, width: '100%', backgroundColor: '#EAEAEA' }}>
@@ -403,13 +472,11 @@ const FlightDetailScreen = () => {
           </TouchableOpacity>
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
-
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleUnfinishedBook} >
               <View style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
-                <AntDesign name="sharealt" size={20} color="black" />
+                <AntDesign name="home" size={20} color="black" />
               </View>
             </TouchableOpacity>
-
           </View>
         </View>
 
