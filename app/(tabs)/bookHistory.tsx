@@ -230,7 +230,10 @@ export default function searchresult() {
   };
 
   const handleViewQRCode = (flightId: string) => {
-    router.push("/login");
+    router.push({
+      pathname: "/reflight",
+      params: { flightBookId:flightId },
+    });
     console.log(`Viewing QR Code for flight ID: ${flightId}`);
   };
 
@@ -422,25 +425,26 @@ export default function searchresult() {
                            </View>
        
                            {flight.isPaymoney ? (
-                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
-                                 <TouchableOpacity onPress={() => handleViewQRCode(flight._id)}>
-                                   <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
-                                     <AntDesign name="qrcode" size={16} color="#66b3f8" />
-                                     <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>Uncompleted orders</Text>
-                                   </View>
-                                 </TouchableOpacity>
-         
-                                 <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
-                                   <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#f87f66', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5 }}>
-                                     <AntDesign name="delete" size={16} color="#f87f66" />
-                                     <Text style={{ color: '#f87f66', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>
-                                       {userRole === 'user' ? 'Cancel' : 'Delete'}
-                                     </Text>
-                                   </View>
-                                 </TouchableOpacity>
-                               </View>
-                           ) : (
                              <Text style={{ fontSize: 16, fontWeight: '500', color: 'green' }}>Finish</Text>
+                                
+                           ) : (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
+                            <TouchableOpacity  onPress={() => handleViewQRCode(flight._id)}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
+                                <AntDesign name="qrcode" size={16} color="#66b3f8" />
+                                <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>Uncompleted orders</Text>
+                              </View>
+                            </TouchableOpacity>
+    
+                            <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#f87f66', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5 }}>
+                                <AntDesign name="delete" size={16} color="#f87f66" />
+                                <Text style={{ color: '#f87f66', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>
+                                  {userRole === 'user' ? 'Cancel' : 'Delete'}
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
                            )}                    
                          </View>
                        </TouchableOpacity>

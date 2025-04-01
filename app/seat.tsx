@@ -246,6 +246,7 @@ const renderSeats1 = (cabinClass: string | undefined) => {
       pathname: "/flightDetail",
       params: { selectedSeats, flightId }, 
     });
+    
   };
 
   return (

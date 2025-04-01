@@ -10,7 +10,7 @@ import {
   ChevronDoubleRightIcon,
 } from "react-native-heroicons/outline";
 import { AntDesign, Feather, FontAwesome5, MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons";
-import { router, useFocusEffect } from "expo-router";
+import { router, useFocusEffect, useRouter } from "expo-router";
 import { API_URL } from '../backend/address';
 
 export default function orderStatus() {
@@ -23,7 +23,8 @@ export default function orderStatus() {
   const [userRole, setUserRole] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
+  const router = useRouter();
+  
   interface Flightbook {
     _id: string;
     flightNumber: string;
@@ -214,8 +215,8 @@ export default function orderStatus() {
 
 
         router.push({
-          pathname: "/ticketDetails",
-          params: { flightId: flightDetails._id },
+          pathname: "/login",
+          params: { flightBookId: flightDetails._id },
         });
 
       } else {
@@ -228,7 +229,11 @@ export default function orderStatus() {
   };
 
   const handleViewQRCode = (flightId: string) => {
-    router.push("/login");
+    router.push({
+      pathname: "/flightDetail",
+      //params: {  flightId }, 
+    });
+    
     console.log(`Viewing QR Code for flight ID: ${flightId}`);
   };
 
@@ -419,7 +424,7 @@ export default function orderStatus() {
 
                     {flight.isPaymoney ? (
                           <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
-                          <TouchableOpacity onPress={() => handleViewQRCode(flight._id)}>
+                        <TouchableOpacity onPress={() => router.push("/flightDetail")}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
                               <AntDesign name="qrcode" size={16} color="#66b3f8" />
                               <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>Uncompleted orders</Text>

@@ -503,9 +503,6 @@ app.post('/findFlightBookId', async (req, res) => {
     const flightCollection = db.collection('flightbook');
 
     const { flightId } = req.body; 
-
-    
-
     const flight = await flightCollection.findOne({ _id: new ObjectId(flightId) });
     if (flight) {
       res.status(200).json(flight);
@@ -1104,5 +1101,62 @@ app.post('/getLastMessages', async (req, res) => {
   } catch (error) {
     console.error('Error retrieving last messages:', error);
     res.status(500).json({ error: 'Internal server error.' }); // 不需要 JSON.stringify
+  }
+});
+
+// 更新 flightbook 是否支付
+app.put('/updateFlightBook', async (req, res) => {
+  try {
+    const db = await connectToDB();
+    const flightCollection = db.collection('flightbook');
+
+    const { flightId } = req.body; // 从请求体中获取 flightId
+    console.log('Searching for flight with ID:', flightId);
+    // 查找 flightbook
+    const existingFlight = await flightCollection.findOne({ _id: new ObjectId(flightId) });
+    if (!existingFlight) {
+      return res.status(404).json({ message: 'Flight not found.' });
+    }
+    console.log('Existing flight:', existingFlight);
+    // 检查当前 isPaymoney 的值
+    if (existingFlight.isPaymoney === true) {
+      return res.status(400).json({ message: 'Payment status is already true.' });
+    }
+
+    // 更新 flightbook，将 isPaymoney 设置为 true
+    const result = await flightCollection.updateOne(
+      { _id: new ObjectId(flightId) },
+      { $set: { isPaymoney: true } } // 直接设置 isPaymoney 为 true
+    );
+
+    if (result.modifiedCount > 0) {
+      return res.status(200).json({ message: 'Flight updated successfully.' });
+    } else {
+      return res.status(400).json({ message: 'No changes made to the flight.' });
+    }
+  } catch (error) {
+    console.log('Error updating flight', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+
+
+//re
+app.post('/findReFlightBookId', async (req, res) => {
+  try {
+    const db = await connectToDB();
+    const flightCollection = db.collection('flightbook');
+
+    const { flightBookId } = req.body; // 使用 flightBookId
+    const flight = await flightCollection.findOne({ _id: new ObjectId(flightBookId) }); // 查找航班
+    if (flight) {
+      res.status(200).json(flight);
+    } else {
+      res.status(404).json({ message: 'Flight not found.' });
+    }
+  } catch (error) {
+    console.log('Error booking flight', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
