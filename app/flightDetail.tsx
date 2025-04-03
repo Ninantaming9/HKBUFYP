@@ -1,4 +1,4 @@
-import { View, Text, useWindowDimensions, TextInput, ScrollView, TouchableOpacity, Image, Alert } from 'react-native'
+import { View, Text, useWindowDimensions, TextInput, ScrollView, TouchableOpacity, Image, Alert, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Constants from "expo-constants";
 import Svg, { Defs, Path, LinearGradient, Stop } from "react-native-svg";
@@ -47,7 +47,14 @@ const FlightDetailScreen = () => {
   const [date, setdate] = useState('');
   const [discount, setDiscount] = useState('');
   const [loading, setLoading] = useState(false);
-  
+  const [userRole, setUserRole] = useState(null); 
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userNewId, setNewUserId] = useState<string | null>(null);
+  const [userNewFullname, setUserNewFullname] = useState<string | null>(null);
+  const [userRemail, setuserRemail] = useState<string | null>(null);
+ const [modalVisible, setModalVisible] = useState<boolean>(false); // 控制模态框的可见性
+  const [newEmail, setNewEmail] = useState<string>(''); // 新电子邮件输入
+
 
   const [totalPrice, setTotalPrice] = useState("");
 
@@ -113,23 +120,28 @@ const FlightDetailScreen = () => {
     }
   };
   
-  
-  
+
   const openPaymentSheet = async () => {
     try {
       console.log('Attempting to present payment sheet...');
       const { error } = await presentPaymentSheet();
       
       if (error) {
-      
+        console.error('Error presenting payment sheet:', error);
       } else {
         console.log('Payment sheet presented successfully.');
-        await handleSubmit();
+        if (userRole === 'admin') {
+        
+        } else {
+          await handleSubmit(); // 如果是user，执行handleSubmit
+        }
       }
     } catch (error) {
       console.error('Error in openPaymentSheet:', error);
     }
   };
+  
+
   
 
   const hideDatePicker = () => {
@@ -169,6 +181,17 @@ const FlightDetailScreen = () => {
 
         const storedFullName = await AsyncStorage.getItem('user');
         const storedUserEmail = await AsyncStorage.getItem('userEmail');
+        const storedUserId = await AsyncStorage.getItem('userId'); 
+        const storedUserRole = await AsyncStorage.getItem('userRole');
+
+        if (storedUserRole) {
+          setUserRole(JSON.parse(storedUserRole));
+        }
+
+        if (storedUserId) {
+          setUserId(storedUserId);
+        }
+        console.log("qqqqqqqqqqqqqqqqqq"+storedUserId)
 
         if (storedFullName) {
           setFullName(JSON.parse(storedFullName));
@@ -243,6 +266,9 @@ const FlightDetailScreen = () => {
       };
 
       console.log('Flight Details:', flightDetails);
+
+ 
+
       const response = await axios.post(`${API_URL}/createFlightbook`, userData);
       console.log('Flight Details:', flightDetails);
       console.log(response.data);
@@ -251,6 +277,52 @@ const FlightDetailScreen = () => {
       console.error(error);
     }
   };
+  
+  const handleSubmitByadmin = async (userNewId: string | null, userNewFullname: string | null, userRemail: string | null) => { // 
+    try {
+    //  const userId = await AsyncStorage.getItem('userId');
+      const userData = {
+        userId: userNewId,
+        email: userRemail,
+        fullName: userNewFullname,
+        dateBirth: dateBirth,
+        mobile: mobile,
+        passport: passport,
+        nationality: nationality,
+        flightNumber: flightDetails.flightNumber,
+        ticketType: flightDetails.ticketType,
+        date: flightDetails.date,
+        departureLocation: flightDetails.departureLocation,
+        arrivalLocation: flightDetails.arrivalLocation,
+        cabinClass: flightDetails.cabinClass,
+        departureTime: flightDetails.departureTime,
+        arrivalTime: flightDetails.arrivalTime,
+        totalPrice: totalPrice,
+        ticketPrice: flightDetails.ticketPrice,
+        seat: selectedSeats,
+        discountValue: discount,
+        isUsed: true,
+        isPaymoney:false
+      };
+
+      console.log('Flight Details:', flightDetails);
+
+      console.log("zzzzzzzzzzzz"+email)
+      console.log("fffffffffffffff"+newEmail)
+      
+      console.log("gggggggggggggggggg"+userId)
+      console.log("hhhhhhhhhhhhhhhhhhh"+userNewId)
+
+      const response = await axios.post(`${API_URL}/createFlightbook`, userData);
+      console.log('Flight Details:', flightDetails);
+      console.log(response.data);
+      router.push("/bookconfirm");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
 
 
   const handleCheckDiscountCode = async () => {
@@ -285,14 +357,73 @@ const FlightDetailScreen = () => {
   };
 
   
+
   const handlePayment = async () => {
     try {
-      await initializePaymentSheet();
-      await openPaymentSheet();
-    } catch (error) {
+      if (userRole === 'admin') {
+        // console.log("qqqqqqqqqqqqqqqq"+userId);
+        // console.log("qqqqqqqqqqqqqqqqqqq"+userRole);
 
+        setModalVisible(true); // 显示模态框
+    
+       // console.log("asdsadasdasdasdsa"+userId)
+      } else {
+
+      await initializePaymentSheet(); // 初始化支付流程
+      await openPaymentSheet(); // 打开支付表单
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
     }
   };
+
+  const confirmEmail = async () => {
+    try {
+      const response = await fetch(`${API_URL}/findUserIdByEmail`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: newEmail }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) { 
+        setEmail(newEmail); // 更新状态
+        setModalVisible(false); // 关闭模态框
+        setNewUserId(data.userId); // 设置找到的用户ID
+        setUserNewFullname(data.fullName); // 设置找到的用户ID
+
+        setuserRemail(data.email); // 设置找到的用户ID
+        
+
+        console.log("6456456546" + data.email);
+        
+        console.log("dsadasdsad42342" + data.Email);
+        
+        console.log("dsadasdsad" + data.userId);
+        console.log("kkkkkkkkkkkkk" + userNewId); // 这里可能仍然是 null
+        setNewEmail(''); // 清空输入
+      } else {
+        Alert.alert('错误', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching user ID:', error);
+      Alert.alert('错误', '无法获取用户ID');
+    } finally {
+     
+    }
+  };
+
+
+  useEffect(() => {
+    if (userNewId) {
+        handleSubmitByadmin(userNewId, userNewFullname,userRemail); // 传递 userNewFullname
+    }
+}, [userNewId]);
+
+
 
 
 
@@ -570,16 +701,50 @@ const FlightDetailScreen = () => {
                 </View>
                  <Text style={{fontSize:18,fontWeight:500,color:'#fa5e3e'}}>${totalPrice}</Text>
             </View>*/}
-            <StripeProvider publishableKey={publishableKey}>
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <TouchableOpacity onPress={handlePayment}>
-                  <View style={{ backgroundColor: 'orange', padding: 20, borderRadius: 10, marginBottom: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                    <MaterialIcons name="next-plan" size={30} color="white" />
-                    <Text style={{ fontWeight: 'bold', fontSize: 20, color: '#fff', textAlign: 'center' }}>Finished</Text>
-                  </View>
+         <StripeProvider publishableKey={publishableKey}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity onPress={handlePayment}>
+          <View style={{ backgroundColor: 'orange', padding: 20, borderRadius: 10, marginBottom: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+            <MaterialIcons name="next-plan" size={30} color="white" />
+            <Text style={{ fontWeight: 'bold', fontSize: 20, color: '#fff', textAlign: 'center' }}>Finished</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* 模态框 */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <View className="w-[80%] h-[30%] bg-white rounded-lg p-6 shadow-lg">
+              <Text>请输入新的电子邮件:</Text>
+              <TextInput
+                className="border border-gray-300 rounded-md p-3 flex-1 mb-4"
+                placeholder="新的电子邮件"
+                value={newEmail}
+                onChangeText={setNewEmail}
+              />
+              <View className="flex-row justify-between">
+                <TouchableOpacity
+                  onPress={confirmEmail}
+                  className="bg-blue-500 text-white rounded-md p-2 flex justify-center items-center"
+                >
+                  <Text className="text-white">确认</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  className="bg-red-500 text-white rounded-md p-2 flex justify-center items-center"
+                >
+                  <Text className="text-white">取消</Text>
                 </TouchableOpacity>
               </View>
-            </StripeProvider>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </StripeProvider>
           
           </View>
         </View>

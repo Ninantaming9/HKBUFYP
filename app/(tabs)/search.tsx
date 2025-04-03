@@ -228,6 +228,8 @@ const FlightScreen = () => {
                         fetchUserPhoto(storedUserId);
                         setUserId(storedUserId); 
                     }
+
+                    console.log("dasasdasdsa"+storedUserId)
                     if (storedUserRole) {
 
                         setUserRole(JSON.parse(storedUserRole)); // 

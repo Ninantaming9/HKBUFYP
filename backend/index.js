@@ -543,6 +543,29 @@ app.post('/findUserID', async (req, res) => {
   }
 });
 
+//根据email 找userid
+app.post('/findUserIdByEmail', async (req, res) => {
+  try {
+    const db = await connectToDB();
+    const userCollection = db.collection('users'); // 假设用户信息存储在 'users' 集合中
+
+    const { email } = req.body; // 使用 email
+    const user = await userCollection.findOne({ email: email }); // 查找用户
+
+    if (user) {
+      // 返回用户ID和全名
+      res.status(200).json({ userId: user._id, fullName: user.fullname, email:user.email });
+    } else {
+      res.status(404).json({ message: 'User not found.' });
+    }
+  } catch (error) {
+    console.log('Error finding user by email', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
 
 
 app.post('/getSelectedSeatsByFlight', async (req, res) => {
@@ -1160,3 +1183,5 @@ app.post('/findReFlightBookId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
