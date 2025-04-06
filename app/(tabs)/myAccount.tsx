@@ -27,7 +27,7 @@ const MyAccountScreen = () => {
   const [number1, Setnumber1] = useState('Edit Password');
   const [number2, Setnumber2] = useState('Logout');
   const [number3, Setnumber3] = useState('Detail  Account');
-  
+  const [userRole, setUserRole] = useState(null);
 
   const handleChoosePhoto = async () => {
     console.log('photo use');
@@ -109,14 +109,18 @@ const MyAccountScreen = () => {
      
         const userId = await AsyncStorage.getItem('userId'); 
         const storedFullName = await AsyncStorage.getItem('user'); 
-
+        const storedUserRole = await AsyncStorage.getItem('userRole'); 
       
         if (userId) {
           fetchUserPhoto(userId);
           setUserId(userId); 
         }
 
-    
+        if (storedUserRole) {
+
+          setUserRole(JSON.parse(storedUserRole)); // 
+      }
+
         if (storedFullName) {
           setFullName(JSON.parse(storedFullName)); 
         }
@@ -166,6 +170,27 @@ const MyAccountScreen = () => {
     Montserrat: require("../../assets/fonts/Montserrat/static/Montserrat-Regular.ttf"),
 
   });
+
+  const renderContent = () => {
+    if (userRole === 'admin') {
+        return (
+          <TouchableOpacity onPress={() => router.push("/orderStatus")}  style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 } }>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#370ca9', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+              <AntDesign name="shoppingcart" size={20} color="#fff" />
+            </View>
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: 16, color: '#000' }}>Order Status</Text>
+              <Ionicons name='chevron-forward' size={24} color="black" />
+            </View>
+          </View>
+        </TouchableOpacity>
+        );
+    } else {
+        return null; // 如果是 user，则不显示任何内容
+    }
+};
+
   return (
     <View style={{ flex: 1, width: '100%', height: '100%', position: 'relative', backgroundColor: 'white' }}>
       {/* background */}
@@ -225,54 +250,7 @@ const MyAccountScreen = () => {
           <View style={{ flex: 1, paddingTop: 30, height: '100%' }}>
 
             <View style={{ width: '100%', backgroundColor: '#fff', borderTopRightRadius: 30, borderTopLeftRadius: 30, padding: 30 }}>
-              {/* <TouchableOpacity style={{width:'100%',paddingHorizontal:10,paddingVertical:15}}>
-                                        <View style={{flexDirection:'row',alignItems:'center',gap:10}}>
-                                            <View style={{width:35,height:35,borderRadius:8,backgroundColor:'#066ce7',flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
-                                              <AntDesign name="wechat" size={20} color="#fff" />
-                                              
-                                            </View>
-                                            <View style={{flex:1,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                                                <Text style={{fontSize:16,fontFamily:'Montserrat',color:'#000'}}>Start a Chat</Text>
-                                                <Ionicons name='chevron-forward' size={24} color="black" />
-                                                
-                                            </View>
-                                        </View>
-                                      </TouchableOpacity> */}
-              {/* <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#e7c506', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-
-                    <AntDesign name="edit" size={20} color="#fff" />
-                  </View>
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>Edit Profle</Text>
-                    <Ionicons name='chevron-forward' size={24} color="black" />
-                  </View>
-                </View>
-              </TouchableOpacity> */}
-              {/* <TouchableOpacity onPress={() => router.push("/changePassword")} style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#facb1d', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <FontAwesome name="sign-out" size={20} color="#fff" />
-                  </View>
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000', lineHeight: 24 }}>Edit Password</Text>
-                    <Ionicons name='chevron-forward' size={24} color="black" />
-                  </View>
-                </View>
-              </TouchableOpacity> */}
-
-              {/* <TouchableOpacity style={{width:'100%',paddingHorizontal:10,paddingVertical:15}}>
-                                        <View style={{flexDirection:'row',alignItems:'center',gap:10}}>
-                                            <View style={{width:35,height:35,borderRadius:8,backgroundColor:'#feb149',flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
-                                              <AntDesign name="edit" size={20} color="#fff" />
-                                            </View>
-                                            <View style={{flex:1,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                                                <Text style={{fontSize:16,fontFamily:'Montserrat',color:'#000'}}>Expert replies</Text>
-                                                <Ionicons name='chevron-forward' size={24} color="black" />
-                                            </View>
-                                        </View>
-                                      </TouchableOpacity> */}
+  
               {<TouchableOpacity onPress={() => router.push("/changePassword")} style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#ae49fe', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -300,18 +278,9 @@ const MyAccountScreen = () => {
               </TouchableOpacity>
 
 
-              <TouchableOpacity onPress={() => router.push("/orderStatus")}  style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 } }>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#370ca9', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <AntDesign name="shoppingcart" size={20} color="#fff" />
-                  </View>
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, color: '#000' }}>Order Status</Text>
-                    <Ionicons name='chevron-forward' size={24} color="black" />
-                  </View>
-                </View>
-              </TouchableOpacity>
-
+              <View className='flex-1 justify-center items-center'>
+                {renderContent()}
+              </View>
 
               <TouchableOpacity onPress={() => handleLogout()} style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -334,25 +303,13 @@ const MyAccountScreen = () => {
                     <MaterialIcons name="edit" size={20} color="#fff" />
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>Log out</Text>
+                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>Sign out</Text>
                     <Ionicons name='chevron-forward' size={24} color="black" />
                   </View>
                 </View>
               </TouchableOpacity>
 
-              {/* <TouchableOpacity onPress={() => handleLogout()} style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#facb1d', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <FontAwesome name="sign-out" size={20} color="#fff" />
-                  </View>
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000', lineHeight: 24 }}>Logout</Text>
-                    <Ionicons name='chevron-forward' size={24} color="black" />
-                  </View>
-                </View>
-
-              </TouchableOpacity>
- */}
+    
 
             </View>
           </View>

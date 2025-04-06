@@ -425,7 +425,7 @@ export default function searchresult() {
                            </View>
        
                            {flight.isPaymoney ? (
-                             <Text style={{ fontSize: 16, fontWeight: '500', color: 'green' }}>Finish</Text>
+                             <Text style={{ fontSize: 16, fontWeight: '500', color: 'green' }}>Successes</Text>
                                 
                            ) : (
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>

@@ -12,7 +12,8 @@ import {
 import { AntDesign, Feather, FontAwesome5, MaterialCommunityIcons, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { router, useFocusEffect, useRouter } from "expo-router";
 import { API_URL } from '../backend/address';
-
+import { Picker } from "@react-native-picker/picker";
+import { PieChart } from 'react-native-chart-kit';
 export default function orderStatus() {
   const [bookHistory, setBookHistory] = useState<Flightbook[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +25,37 @@ export default function orderStatus() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
-  
+  const [displayText, setDisplayText] = useState("Today"); // 用于显示的文本
+  const [selectedOption, setSelectedOption] = useState('Today');
+  const [orderStats, setOrderStats] = useState<OrderStats>({
+    totalPrice: '0',
+    orderCount: '0',
+    timeCategories: {
+      morning: '0',
+      afternoon: '0',
+      evening: '0',
+    },
+    morningPercentage: '0',
+    afternoonPercentage: '0',
+    eveningPercentage: '0',
+  });
+
+
+
+  interface OrderStats {
+    totalPrice: string;
+    orderCount: string;
+    timeCategories: {
+      morning: string;
+      afternoon: string;
+      evening: string;
+    };
+    morningPercentage: string;
+    afternoonPercentage: string;
+    eveningPercentage: string;
+  }
+
+
   interface Flightbook {
     _id: string;
     flightNumber: string;
@@ -43,6 +74,76 @@ export default function orderStatus() {
     passport: string,
     mobile: string,
     isPaymoney: string,
+  }
+
+
+
+  const getDataForChart = () => {
+    const morningPercentage = parseFloat(orderStats.morningPercentage) || 0;
+    const afternoonPercentage = parseFloat(orderStats.afternoonPercentage) || 0;
+    const eveningPercentage = parseFloat(orderStats.eveningPercentage) || 0;
+
+    const data = [
+      {
+        name: '% Morning',
+        population: morningPercentage,
+        color: '#ff6384',
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 15,
+      },
+      {
+        name: '% Afternoon',
+        population: afternoonPercentage,
+        color: '#36a2eb',
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 15,
+      },
+      {
+        name: '% Evening',
+        population: eveningPercentage,
+        color: '#ffce56',
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 15,
+      },
+    ];
+
+    return data;
+  };
+
+
+
+  const fetchOrderStats = async (timeframe: string) => {
+    try {
+      const response = await fetch(`${API_URL}/getCompletedOrdersStats`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ timeframe }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data: OrderStats = await response.json();
+      setOrderStats(data);
+
+      console.log(data.afternoonPercentage)
+      console.log(data.eveningPercentage)
+      console.log(data.orderCount)
+      console.log(data.timeCategories)
+      console.log(data.totalPrice)
+
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error fetching order stats:', error);
+        Alert.alert('Error', `Failed to fetch order statistics: ${error.message}`);
+      } else {
+        console.error('Unexpected error:', error);
+        Alert.alert('Error', 'Failed to fetch order statistics: An unexpected error occurred.');
+      }
+    }
   }
 
   useEffect(() => {
@@ -169,7 +270,16 @@ export default function orderStatus() {
     }
   };
 
+  const handleConfirm = () => {
+    setDisplayText(selectedOption.charAt(0).toUpperCase() + selectedOption.slice(1)); // 更新显示文本
+    setModalVisible(false);
+    fetchOrderStats(selectedOption.toLowerCase()); // Fetch data based on selected option
+  };
 
+  useEffect(() => {
+    // 组件加载时默认获取今天的数据
+    fetchOrderStats('today');
+  }, []);
 
   const handleDeleteFlight = async (flightId: any, flightNumber: any, fullName: any) => {
     const isConfirmed = await showDeleteConfirmation();
@@ -233,7 +343,7 @@ export default function orderStatus() {
       pathname: "/flightDetail",
       //params: {  flightId }, 
     });
-    
+
     console.log(`Viewing QR Code for flight ID: ${flightId}`);
   };
 
@@ -280,15 +390,11 @@ export default function orderStatus() {
                   </View>
                 ) : (
                   <View className="flex-1 justify-center items-center">
-                    <TouchableOpacity onPress={() => setModalVisible(true)}>
-                      <MaterialCommunityIcons
-                        name="magnify"
-                        size={30}
-                        color="white"
-                      />
+                    <TouchableOpacity onPress={() => setModalVisible(true)} className="rounded-md p-2">
+                      <Text className="text-white" style={{ fontWeight: 'bold' }}>{displayText}</Text>
                     </TouchableOpacity>
 
-                    {/* 搜索框的模态框 */}
+                    {/* Picker的模态框 */}
                     <Modal
                       animationType="slide"
                       transparent={true}
@@ -296,26 +402,28 @@ export default function orderStatus() {
                       onRequestClose={() => setModalVisible(false)}
                     >
                       <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                        <View className="w-[80%] h-[15%] bg-white rounded-lg p-6 shadow-lg">
-                          <View className="flex-row gap-4 justify-start items-center px-2">
-                            <TextInput
-                              className="border border-gray-300 rounded-md p-3 flex-1"
-                              placeholder="Search by email or Fullname"
-                              value={email}
-                              onChangeText={setEmail}
-                            />
-                            <TouchableOpacity
-                              onPress={handleSearch}
-                              className="bg-blue-500 text-white rounded-md p-2 flex justify-center items-center"
-                            >
-                              <Text className="text-white">Search</Text>
+                        <View className="w-[80%] h-[30%] bg-white rounded-lg p-6 shadow-lg">
+                          <View className="flex-row justify-between items-center">
+                            <Text className="text-lg">Select Timeframe</Text>
+                            <TouchableOpacity onPress={() => setModalVisible(false)}>
+                              <Text className="text-red-500">Close</Text>
                             </TouchableOpacity>
                           </View>
+                          <View className="mt-4">
+                            <Picker
+                              selectedValue={selectedOption}
+                              onValueChange={(itemValue) => setSelectedOption(itemValue)}
+                            >
+                              <Picker.Item label="Today" value="Today" />
+                              <Picker.Item label="Month" value="Month" />
+                              <Picker.Item label="Year" value="Year" />
+                            </Picker>
+                          </View>
                           <TouchableOpacity
-                            onPress={() => setModalVisible(false)}
+                            onPress={handleConfirm} // 点击确认时调用 handleConfirm
                             className="mt-4 bg-red-500 text-white rounded-md p-2 flex justify-center items-center"
                           >
-                            <Text className="text-white">Cancel</Text>
+                            <Text className="text-white">Confirm</Text>
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -328,33 +436,7 @@ export default function orderStatus() {
 
 
           <View>
-            {/* <View className="flex-row justify-center items-center px-2 w-full">
-                <View className="w-[70%] justify-between items-center flex-row pb-2">
-                    <Text className="text-lg text-white font-extrabold capitalize">london</Text>
 
-                    <Feather name="arrow-right" size={24} color="white"></Feather>
-                    <Text className="text-lg text-white font-extrabold capitalize">fengchenp</Text>
-                </View>
-            </View> */}
-
-            {/* 
-            <View className="flex-row justify-center item-center px-2 w-full">
-                <View className="w-[80%] justify-between items-center flex-row">
-                    <Text className="text-sm text-neutral-400 font-extrabold">
-                        2023
-                    </Text>
-                    <Octicons name="dot-fill" size={10} color="white"/>
-
-                    <Text className="text-sm text-neutral-400 font-extrabold">
-                        Economy
-                    </Text>
-                    <Octicons name="dot-fill" size={10} color="white"/>
-                    <Text className="text-sm text-neutral-400 font-extrabold">
-                        333seat
-                    </Text>
-                </View>
-
-            </View> */}
           </View>
         </View>
 
@@ -377,76 +459,70 @@ export default function orderStatus() {
             {/* show content card */}
 
             <View>
-              {bookHistory.map((flight, index) => (
-                <TouchableOpacity key={index} onPress={() => {
-                  handleContinue(flight._id);
-                }} style={{ width: '100%', backgroundColor: 'white', marginTop: 20, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 20 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <MaterialIcons name="flight" size={24} color="green" />
-                      <Text style={{ paddingLeft: 10, fontSize: 16, fontWeight: '500' }}>{flight.flightNumber}</Text>
-                    </View>
-                    <Text style={{ paddingLeft: 10, fontSize: 16, fontWeight: '500' }}>Date: {flight.date}</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 15 }}>
-                    <View style={{ width: '30%' }}>
-                      <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2 }}>{flight.departureTime}</Text>
-                      <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray' }}>{flight.departureLocation}</Text>
-                    </View>
-                    {/* Flight connection line logic can be added here */}
-                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-                        <View style={{ width: 15, height: 15, borderRadius: 10, borderWidth: 1, borderColor: 'green', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                          <View style={{ width: 5, height: 5, backgroundColor: 'green', borderRadius: 10, borderWidth: 1, borderColor: 'gray' }}></View>
-                        </View>
-                      </View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, position: 'relative' }}>
-                        <View style={{ width: '50%', height: 1, backgroundColor: 'gray' }}></View>
-                        <MaterialIcons name="flight" size={24} color="green" />
-                        <View style={{ width: '50%', height: 1, backgroundColor: 'gray' }}></View>
-                      </View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-                        <View style={{ width: 15, height: 15, borderRadius: 10, borderWidth: 1, borderColor: 'green', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                          <View style={{ width: 5, height: 5, backgroundColor: 'green', borderRadius: 10, borderWidth: 1, borderColor: 'gray' }}></View>
-                        </View>
-                      </View>
-                    </View>
-                    <View style={{ width: '30%' }}>
-                      <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2, textAlign: 'right' }}>{flight.arrivalTime}</Text>
-                      <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray', textAlign: 'right' }}>{flight.arrivalLocation}</Text>
-                    </View>
-                  </View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, paddingTop: 15, borderTopColor: '#EAEAEA', borderTopWidth: 1 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
-                      <Text>Total Price</Text>
-                      <Text style={{ fontSize: 16, fontWeight: '500', marginLeft: 5 }}>${flight.totalPrice}</Text>
-                    </View>
 
-                    {flight.isPaymoney ? (
-                          <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}>
-                        <TouchableOpacity onPress={() => router.push("/flightDetail")}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#66b3f8', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5, marginRight: 10 }}>
-                              <AntDesign name="qrcode" size={16} color="#66b3f8" />
-                              <Text style={{ color: '#66b3f8', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>Uncompleted orders</Text>
-                            </View>
-                          </TouchableOpacity>
-  
-                          <TouchableOpacity key={index} onPress={() => handleDeleteFlight(flight._id, flight.flightNumber, fullName)}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#f87f66', borderRadius: 5, paddingVertical: 3, paddingHorizontal: 5 }}>
-                              <AntDesign name="delete" size={16} color="#f87f66" />
-                              <Text style={{ color: '#f87f66', fontWeight: '500', fontSize: 12, marginLeft: 3 }}>
-                                {userRole === 'user' ? 'Cancel' : 'Delete'}
-                              </Text>
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                    ) : (
-                      <Text style={{ fontSize: 16, fontWeight: '500', color: 'green' }}>Finish</Text>
-                    )}                    
+              <TouchableOpacity style={{ width: '100%', backgroundColor: 'white', marginTop: 20, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 20 }}>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 15 }}>
+                  <View style={{ width: '30%' }}>
+                    <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2 }}>{orderStats.orderCount}</Text>
+                    <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray' }}>Orders</Text>
                   </View>
-                </TouchableOpacity>
-              ))}
+                  {/* Flight connection line logic can be added here */}
+                  <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+                      <View style={{ width: 15, height: 15, borderRadius: 10, borderWidth: 1, borderColor: 'green', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ width: 5, height: 5, backgroundColor: 'green', borderRadius: 10, borderWidth: 1, borderColor: 'gray' }}></View>
+                      </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, position: 'relative' }}>
+                      <View style={{ width: '50%', height: 1, backgroundColor: 'gray' }}></View>
+                      <MaterialIcons name="flight" size={24} color="green" />
+                      <View style={{ width: '50%', height: 1, backgroundColor: 'gray' }}></View>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+                      <View style={{ width: 15, height: 15, borderRadius: 10, borderWidth: 1, borderColor: 'green', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ width: 5, height: 5, backgroundColor: 'green', borderRadius: 10, borderWidth: 1, borderColor: 'gray' }}></View>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={{ width: '30%' }}>
+                    <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2, textAlign: 'right' }}>${orderStats.totalPrice}</Text>
+                    <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray', textAlign: 'right' }}>Earnings</Text>
+                  </View>
+                </View>
+
+              </TouchableOpacity>
+
             </View>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 15 }}>
+              <View style={{ width: '30%' }}>
+                <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2 }}>Task Charts</Text>
+                <PieChart
+                  data={getDataForChart()}
+                  width={300} // 图表宽度
+                  height={220} // 图表高度
+                  chartConfig={{
+                    backgroundColor: '#ffffff',
+                    backgroundGradientFrom: '#ffffff',
+                    backgroundGradientTo: '#ffffff',
+                    decimalPlaces: 0, // 小数位数
+                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    style: {
+                      borderRadius: 16,
+                    },
+                  }}
+                  accessor="population" // 数据中用于表示比例的字段
+                  backgroundColor="transparent"
+                  paddingLeft="15" // 左侧内边距
+                  absolute // 绝对值
+                />
+              </View>
+
+
+            </View>
+
           </View>
 
         </ScrollView>

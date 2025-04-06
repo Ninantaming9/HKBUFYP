@@ -543,17 +543,16 @@ app.post('/findUserID', async (req, res) => {
   }
 });
 
-//根据email 找userid
 app.post('/findUserIdByEmail', async (req, res) => {
   try {
     const db = await connectToDB();
-    const userCollection = db.collection('users'); // 假设用户信息存储在 'users' 集合中
+    const userCollection = db.collection('users'); 
 
-    const { email } = req.body; // 使用 email
-    const user = await userCollection.findOne({ email: email }); // 查找用户
+    const { email } = req.body; 
+    const user = await userCollection.findOne({ email: email }); 
 
     if (user) {
-      // 返回用户ID和全名
+     
       res.status(200).json({ userId: user._id, fullName: user.fullname, email:user.email });
     } else {
       res.status(404).json({ message: 'User not found.' });
@@ -840,6 +839,7 @@ app.post('/searchBookbyadmin', async (req, res) => {
     console.log('Error finding flight bookings', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+  
 });
 
 
@@ -1128,6 +1128,7 @@ app.post('/getLastMessages', async (req, res) => {
 });
 
 // 更新 flightbook 是否支付
+
 app.put('/updateFlightBook', async (req, res) => {
   try {
     const db = await connectToDB();
@@ -1185,3 +1186,152 @@ app.post('/findReFlightBookId', async (req, res) => {
 });
 
 
+// app.post('/getCompletedOrdersStats', async (req, res) => {
+//   try {
+//     const db = await connectToDB();
+//     const flightCollection = db.collection('flightbook');
+
+//     // 获取当前日期
+//     const today = new Date();
+//     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+//     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+//     const startOfYear = new Date(today.getFullYear(), 0, 1);
+
+//     // 从请求体中获取时间范围
+//     const { timeframe } = req.body; // timeframe: 'today', 'month', 'year'
+//     let startDate;
+
+//     switch (timeframe) {
+//       case 'today':
+//         startDate = startOfToday;
+//         break;
+//       case 'month':
+//         startDate = startOfMonth;
+//         break;
+//       case 'year':
+//         startDate = startOfYear;
+//         break;
+//       default:
+//         return res.status(400).json({ message: 'Invalid timeframe specified.' });
+//     }
+
+//     // 将 startDate 转换为 ISO 字符串并只保留日期部分
+//     const startDateString = startDate.toISOString().split('T')[0];
+
+//     // 查找已完成的订单
+//     const completedOrders = await flightCollection.find({
+//       isPaymoney: true,
+//       date: { $gte: startDateString } // 根据时间范围过滤
+//     }).toArray();
+
+//     // 统计总价格和订单数量
+//     const totalPrice = completedOrders.reduce((sum, order) => sum + parseFloat(order.totalPrice), 0);
+//     const orderCount = completedOrders.length;
+
+//     // 调试输出
+//     const allOrders = await flightCollection.find({}).toArray();
+//     console.log('All Orders:', allOrders);
+//     console.log('Start Date:', startDate);
+//     console.log('Completed Orders:', completedOrders);
+
+//     return res.status(200).json({
+//       totalPrice,
+//       orderCount
+//     });
+//   } catch (error) {
+//     console.log('Error fetching completed orders stats', error);
+//     res.status(500).json({ error: 'Internal server error', details: error.message });
+//   }
+// });
+
+
+//dasdasd
+
+
+app.post('/getCompletedOrdersStats', async (req, res) => {
+  try {
+    const db = await connectToDB();
+    const flightCollection = db.collection('flightbook');
+
+    // 获取当前日期
+    const today = new Date();
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
+
+    // 从请求体中获取时间范围
+    const { timeframe } = req.body; // timeframe: 'today', 'month', 'year'
+    let startDate;
+
+    switch (timeframe) {
+      case 'today':
+        startDate = startOfToday;
+        break;
+      case 'month':
+        startDate = startOfMonth;
+        break;
+      case 'year':
+        startDate = startOfYear;
+        break;
+      default:
+        return res.status(400).json({ message: 'Invalid timeframe specified.' });
+    }
+
+    // 将 startDate 转换为 ISO 字符串并只保留日期部分
+    const startDateString = startDate.toISOString().split('T')[0];
+
+    // 查找已完成的订单
+    const completedOrders = await flightCollection.find({
+      isPaymoney: true,
+      date: { $gte: startDateString } // 根据时间范围过滤
+    }).toArray();
+
+    // 统计总价格和订单数量
+    const totalPrice = completedOrders.reduce((sum, order) => sum + parseFloat(order.totalPrice), 0);
+    const orderCount = completedOrders.length;
+
+    // 分类统计早上、下午和晚上的订单
+    const timeCategories = {
+      morning: 0,
+      afternoon: 0,
+      evening: 0
+    };
+
+    completedOrders.forEach(order => {
+      const departureHour = parseInt(order.departureTime.split(':')[0]);
+      const arrivalHour = parseInt(order.arrivalTime.split(':')[0]);
+
+      // 根据 departureTime 分类
+      if (departureHour >= 0 && departureHour < 12) {
+        timeCategories.morning++;
+      } else if (departureHour >= 12 && departureHour < 18) {
+        timeCategories.afternoon++;
+      } else {
+        timeCategories.evening++;
+      }
+    });
+
+    // 计算比例
+    const morningPercentage = (timeCategories.morning / orderCount) * 100 || 0;
+    const afternoonPercentage = (timeCategories.afternoon / orderCount) * 100 || 0;
+    const eveningPercentage = (timeCategories.evening / orderCount) * 100 || 0;
+
+    // 调试输出
+    const allOrders = await flightCollection.find({}).toArray();
+    console.log('All Orders:', allOrders);
+    console.log('Start Date:', startDate);
+    console.log('Completed Orders:', completedOrders);
+
+    return res.status(200).json({
+      totalPrice,
+      orderCount,
+      timeCategories,
+      morningPercentage,
+      afternoonPercentage,
+      eveningPercentage
+    });
+  } catch (error) {
+    console.log('Error fetching completed orders stats', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});

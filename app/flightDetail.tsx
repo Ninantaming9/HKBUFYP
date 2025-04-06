@@ -52,8 +52,8 @@ const FlightDetailScreen = () => {
   const [userNewId, setNewUserId] = useState<string | null>(null);
   const [userNewFullname, setUserNewFullname] = useState<string | null>(null);
   const [userRemail, setuserRemail] = useState<string | null>(null);
- const [modalVisible, setModalVisible] = useState<boolean>(false); // 控制模态框的可见性
-  const [newEmail, setNewEmail] = useState<string>(''); // 新电子邮件输入
+ const [modalVisible, setModalVisible] = useState<boolean>(false); 
+  const [newEmail, setNewEmail] = useState<string>(''); 
 
 
   const [totalPrice, setTotalPrice] = useState("");
@@ -127,19 +127,22 @@ const FlightDetailScreen = () => {
       const { error } = await presentPaymentSheet();
       
       if (error) {
-        console.error('Error presenting payment sheet:', error);
+       // console.error('Error presenting payment sheet:', error);
+        // 在这里可以处理错误，例如显示提示信息
+        return; // 直接返回，不执行后续代码
       } else {
         console.log('Payment sheet presented successfully.');
         if (userRole === 'admin') {
-        
+          // 如果是管理员，可以在这里执行管理员相关的操作
         } else {
-          await handleSubmit(); // 如果是user，执行handleSubmit
+          await handleSubmit(); // 如果是用户，执行handleSubmit
         }
       }
     } catch (error) {
       console.error('Error in openPaymentSheet:', error);
     }
   };
+  
   
 
   
@@ -393,73 +396,25 @@ const FlightDetailScreen = () => {
         setEmail(newEmail); // 更新状态
         setModalVisible(false); // 关闭模态框
         setNewUserId(data.userId); // 设置找到的用户ID
-        setUserNewFullname(data.fullName); // 设置找到的用户ID
-
-        setuserRemail(data.email); // 设置找到的用户ID
-        
-
-        console.log("6456456546" + data.email);
-        
-        console.log("dsadasdsad42342" + data.Email);
-        
-        console.log("dsadasdsad" + data.userId);
-        console.log("kkkkkkkkkkkkk" + userNewId); // 这里可能仍然是 null
+        setUserNewFullname(data.fullName); // 设置找到的用户全名
+        setuserRemail(data.email); // 设置找到的用户邮箱
         setNewEmail(''); // 清空输入
       } else {
-        Alert.alert('错误', data.message);
+        // 如果用户未找到，显示相应的错误消息
+        Alert.alert('error', data.message || 'user not find');
       }
     } catch (error) {
       console.error('Error fetching user ID:', error);
       Alert.alert('错误', '无法获取用户ID');
-    } finally {
-     
     }
   };
-
+  
 
   useEffect(() => {
     if (userNewId) {
         handleSubmitByadmin(userNewId, userNewFullname,userRemail); // 传递 userNewFullname
     }
 }, [userNewId]);
-
-
-
-
-
-
-  // const fetchPaymentSheetParams = async () => {
-  //   try {
-  //     const response = await fetch(`${API_URL}/paymentshow`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         amount: 1000, // 例如，10.00 美元
-  //       }),
-  //     });
-  
-  //     if (!response.ok) {
-  //       throw new Error('Network response was not ok');
-  //     }
-  
-  //     const { paymentIntent, ephemeralKey, customer } = await response.json();
-  //     console.log('Payment sheet params:', { paymentIntent, ephemeralKey, customer }); // 调试输出
-  
-  //     return {
-  //       paymentIntent,
-  //       ephemeralKey,
-  //       customer,
-  //     };
-  //   } catch (error) {
-  //     console.error('Error fetching payment sheet params:', error);
-  //     throw error; // 重新抛出错误以便后续处理
-  //   }
-  // };
-  
-  
-  
   
   const handleUnfinishedBook = async () => {
     try {
@@ -718,26 +673,26 @@ const FlightDetailScreen = () => {
           onRequestClose={() => setModalVisible(false)}
         >
           <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-            <View className="w-[80%] h-[30%] bg-white rounded-lg p-6 shadow-lg">
-              <Text>请输入新的电子邮件:</Text>
+            <View className="w-[80%] h-[19%] bg-white rounded-lg p-6 shadow-lg">
+              <Text> Email:</Text>
               <TextInput
                 className="border border-gray-300 rounded-md p-3 flex-1 mb-4"
-                placeholder="新的电子邮件"
+                placeholder="Booking Email Number"
                 value={newEmail}
                 onChangeText={setNewEmail}
               />
               <View className="flex-row justify-between">
                 <TouchableOpacity
                   onPress={confirmEmail}
-                  className="bg-blue-500 text-white rounded-md p-2 flex justify-center items-center"
+                  className="bg-blue-500 text-white rounded-md p-2 flex justify-center items-center w-40"
                 >
-                  <Text className="text-white">确认</Text>
+                  <Text className="text-white">Confirm</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => setModalVisible(false)}
-                  className="bg-red-500 text-white rounded-md p-2 flex justify-center items-center"
+                  className="bg-red-500 text-white rounded-md p-2 flex justify-center items-center w-40"
                 >
-                  <Text className="text-white">取消</Text>
+                  <Text className="text-white">Cancel</Text>
                 </TouchableOpacity>
               </View>
             </View>

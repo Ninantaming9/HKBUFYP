@@ -78,10 +78,10 @@ const MyAccountScreen = () => {
     }
   };
 
-    useEffect(() => {
-      fetchUserEmailAndFriends();
-    }, []); // Empty dependency array to run only once on mount
-  
+  useEffect(() => {
+    fetchUserEmailAndFriends();
+  }, []); // Empty dependency array to run only once on mount
+
   const handleChoosePhoto = async () => {
     console.log('photo use');
 
@@ -276,11 +276,11 @@ const MyAccountScreen = () => {
         alert('Error finding friend: ' + errorData.message); // 弹窗提示
       }
     } catch (error) {
-     
-      
+
+
     }
   };
-  
+
 
 
 
@@ -292,7 +292,7 @@ const MyAccountScreen = () => {
     setSearchQuery(text);
   };
 
-  const handleConfirm = async () => {    
+  const handleConfirm = async () => {
     // 调用后端 API 添加好友
     try {
       const response = await fetch(`${API_URL}/addFriend`, {
@@ -315,7 +315,7 @@ const MyAccountScreen = () => {
 
       const data = await response.json();
       console.log('Friend added successfully:', data);
-    
+
       // 添加好友成功后，重新获取好友列表
       await fetchUserEmailAndFriends(); // 调用获取好友的函数
 
@@ -332,7 +332,7 @@ const MyAccountScreen = () => {
   return (
     <View style={{ flex: 1, width: '100%', height: '100%', position: 'relative', backgroundColor: 'white' }}>
       {/* background */}
-      <View style={{ width: '100%', height: '17%', position: 'absolute', zIndex: 1 }}>
+      <View style={{ width: '100%', height: '19%', position: 'absolute', zIndex: 1 }}>
         {/* <Image source={require('../../assets/images/travel/1.jpg')} style={{width:'100%',height:'100%'}} /> */}
         <View style={{ backgroundColor: '#77fc89', width: '100%', height: '100%' }}>
 
@@ -418,43 +418,43 @@ const MyAccountScreen = () => {
           </View>
 
           <View>
-  {error && <Text style={{ color: 'red' }}>{error}</Text>}
-  {friends.map((friend) => {
-  const lastMessage = messages.find(
-    (message) => 
-      (message._id === friend.friendEmail && message.content) || 
-      (message._id === userEmail && message.content)
-  );
+            {error && <Text style={{ color: 'red' }}>{error}</Text>}
+            {friends.map((friend) => {
+              const lastMessage = messages.find(
+                (message) =>
+                  (message._id === friend.friendEmail && message.content) ||
+                  (message._id === userEmail && message.content)
+              );
 
-  console.log("Messages: " + JSON.stringify(messages)); // Log messages for debugging
-  console.log("Last Message: " + JSON.stringify(lastMessage)); // Log lastMessage for debugging
+              console.log("Messages: " + JSON.stringify(messages)); // Log messages for debugging
+              console.log("Last Message: " + JSON.stringify(lastMessage)); // Log lastMessage for debugging
 
-    return (
-      <TouchableOpacity key={friend._id} onPress={() => handleClick(friend._id)}>
-        <View className='flex-row justify-between items-center px-2' style={{ marginTop: 30 }}>
-          <View className='w-1/2 flex-row h-14'>
-            <View className='pr-2'>
-              <View className='overflow-hidden'>
-                {friend.photo ? (
-                  <Image source={{ uri: `data:image/jpeg;base64,${friend.photo}` }} className="w-16 h-16 border-2 border-white rounded-full" />
-                ) : (
-                  <Image source={require('../../assets/images/favicon.png')} className="w-16 h-16 border-2 border-white rounded-full" />
-                )}
-              </View>
-            </View>
-            <View>
-        
-              <Text className='text-xl text-black font-bold'>{friend.fullname}</Text>
-              <Text className='text-base text-neutral-400 font-medium'>
-                {lastMessage ? lastMessage.content : '没有消息'}
-              </Text>
-            </View>
+              return (
+                <TouchableOpacity key={friend._id} onPress={() => handleClick(friend._id)}>
+                  <View className='flex-row justify-between items-center px-2' style={{ marginTop: 30 }}>
+                    <View className='w-1/2 flex-row h-14'>
+                      <View className='pr-2'>
+                        <View className='overflow-hidden'>
+                          {friend.photo ? (
+                            <Image source={{ uri: `data:image/jpeg;base64,${friend.photo}` }} className="w-16 h-16 border-2 border-white rounded-full" />
+                          ) : (
+                            <Image source={require('../../assets/images/favicon.png')} className="w-16 h-16 border-2 border-white rounded-full" />
+                          )}
+                        </View>
+                      </View>
+                      <View>
+
+                        <Text className='text-xl text-black font-bold'>{friend.fullname}</Text>
+                        <Text className='text-base text-neutral-400 font-medium'>
+                          {lastMessage ? lastMessage.content : '没有消息'}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
-        </View>
-      </TouchableOpacity>
-    );
-  })}
-</View>
 
 
 

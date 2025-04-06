@@ -222,7 +222,7 @@ const MyAccountScreen = () => {
     return (
         <View style={{ flex: 1, width: '100%', height: '100%', position: 'relative', backgroundColor: 'white' }}>
             {/* background */}
-            <View style={{ width: '100%', height: '10%', position: 'absolute', zIndex: 1 }}>
+            <View style={{ width: '100%', height: '12%', position: 'absolute', zIndex: 1 }}>
 
                 <View style={{ backgroundColor: 'skyblue', width: '100%', height: '100%' }}>
 

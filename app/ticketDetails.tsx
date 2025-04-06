@@ -128,7 +128,7 @@ const FlightDetailScreen = () => {
         <ScrollView style={{width:'100%',height:'100%',position:'relative',zIndex:100, paddingBottom:50}}>
             <View style={{paddingTop:Constants.statusBarHeight+10,paddingHorizontal:20}}>
                 {/* Passenger Information (Thông tin hành khách): */}
-                <View style={{backgroundColor:'#fff',padding:20, borderRadius:10,marginBottom:20}}>
+                {/* <View style={{backgroundColor:'#fff',padding:20, borderRadius:10,marginBottom:20}}>
                         <View style={{flexDirection:'row',alignItems:'center',paddingBottom:10}}>
                             <FontAwesome name="user" size={24} color={'black'}/>
                             <Text style={{fontWeight:'bold',paddingLeft:10,fontSize:16}}>Passenger Information</Text>
@@ -170,7 +170,7 @@ const FlightDetailScreen = () => {
         editable={false}
       />
     </View>
-                </View>
+                </View> */}
 
                 {/* Flight Details (Chi tiết chuyến bay):: */}
                 <View style={{backgroundColor:'#fff',padding:20, borderRadius:10,marginBottom:20}}>
