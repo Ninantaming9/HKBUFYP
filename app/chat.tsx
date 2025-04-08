@@ -222,7 +222,7 @@ const MyAccountScreen = () => {
     return (
         <View style={{ flex: 1, width: '100%', height: '100%', position: 'relative', backgroundColor: 'white' }}>
             {/* background */}
-            <View style={{ width: '100%', height: '12%', position: 'absolute', zIndex: 1 }}>
+            <View style={{ width: '100%', height: '11.5%', position: 'absolute', zIndex: 1 }}>
 
                 <View style={{ backgroundColor: 'skyblue', width: '100%', height: '100%' }}>
 
@@ -330,14 +330,14 @@ const MyAccountScreen = () => {
                         onChangeText={setMessage}
                         multiline
                     />
-                    <View className="flex flex-row ml-2">
+                    {/* <View className="flex flex-row ml-2">
                         <TouchableOpacity>
                             <Icon name="attach-file" size={24} color="#007bff" />
                         </TouchableOpacity>
                         <TouchableOpacity className="ml-2">
                             <Icon name="insert-emoticon" size={24} color="#007bff" />
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </View>
                 <TouchableOpacity onPress={sendMessage} className="ml-2 rounded px-4 py-2 bg-transparent">
                     <Icon name="send" size={30} color="#007BFF" />

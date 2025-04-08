@@ -177,7 +177,7 @@ const MyAccountScreen = () => {
           <TouchableOpacity onPress={() => router.push("/orderStatus")}  style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 } }>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#370ca9', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-              <AntDesign name="shoppingcart" size={20} color="#fff" />
+            <MaterialIcons name="receipt" size={20} color="#fff" />
             </View>
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <Text style={{ fontSize: 16, color: '#000' }}>Order Status</Text>
@@ -255,7 +255,7 @@ const MyAccountScreen = () => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#ae49fe', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
 
-                    <MaterialIcons name="preview" size={20} color="#fff" />
+                  <MaterialIcons name="lock" size={20} color="#fff" />
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Text style={{ fontSize: 16, color: '#000' }}>Edit Password</Text>
@@ -282,14 +282,14 @@ const MyAccountScreen = () => {
                 {renderContent()}
               </View>
 
-              <TouchableOpacity onPress={() => handleLogout()} style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
+              <TouchableOpacity  onPress={() => router.push("/map")}style={{ width: '100%', paddingHorizontal: 10, paddingVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#000', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
 
-                    <MaterialIcons name="grid-view" size={20} color="#fff" />
+                  <MaterialIcons name="location-on" size={20} color="#fff" /> 
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>View QR code</Text>
+                    <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>Location</Text>
                     <Ionicons name='chevron-forward' size={24} color="black" />
                   </View>
                 </View>
@@ -300,7 +300,7 @@ const MyAccountScreen = () => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <View style={{ width: 35, height: 35, borderRadius: 8, backgroundColor: '#000', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
 
-                    <MaterialIcons name="edit" size={20} color="#fff" />
+                  <MaterialIcons name="logout" size={20} color="#fff" />
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Text style={{ fontSize: 16, fontFamily: 'Montserrat', color: '#000' }}>Sign out</Text>
