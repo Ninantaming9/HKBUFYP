@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+require('dotenv').config();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
@@ -11,12 +12,12 @@ const io = socketIo(server);
 const nodemailer = require('nodemailer');
 const { MongoClient, ObjectId } = require("mongodb"); 
 const stripe = require('stripe')('sk_test_51R02UUR3E9eq8yl0fVUX2ckqB0nJFktPNpOs1rXtZ7di4ylA1jssHwgw5oyj8xLdHzEXj2vdxv5a1NqBCJwL551u00oav1f1ki');
-
-
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = 'my_super_secret_key_123!';
 
 const port = 3000;
 const cors = require('cors');
-require('dotenv').config();
+
 const mongoUrl = process.env.db_url;
 const fs = require('fs');
 module.exports = { connectToDB };
@@ -25,7 +26,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 const multer = require('multer');
-const jwt = require('jsonwebtoken');
+
 
 app.listen(port, () => {
   console.log('Server running on port 3000');
@@ -165,13 +166,33 @@ app.post('/login', async (req, res) => {
     if (user.password !== password) {
       return res.status(401).json({ message: 'Invalid password' });
     }
-    res.status(200).json({ message: 'Login successful', userId: user._id,fullname: user.fullname,role:user.role, email: user.email  });
+
+    const token = jwt.sign(
+      { 
+        userId: user._id,
+        email: user.email,
+        role: user.role 
+      },
+      JWT_SECRET, // 直接使用导入的常量
+      { expiresIn: '1m' }
+    );
+
+    res.status(200).json({ 
+      message: 'Login successful', 
+      token,
+      userId: user._id,
+      fullname: user.fullname,
+      role: user.role, 
+      email: user.email  
+    });
   } catch (error) {
     console.log('Error logging in', error);
-    res.status(500).json({ message: 'Error logging in' });
+    res.status(500).json({ 
+      message: 'Error logging in',
+      error: error.message
+    });
   }
 });
-
 
 
 

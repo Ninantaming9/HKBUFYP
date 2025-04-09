@@ -463,9 +463,9 @@ export default function orderStatus() {
               <TouchableOpacity style={{ width: '100%', backgroundColor: 'white', marginTop: 20, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 20 }}>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 15 }}>
-                  <View style={{ width: '30%' }}>
+                  <View style={{ width: '30%'  }}>
                     <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2 }}>{orderStats.orderCount}</Text>
-                    <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray' }}>Orders</Text>
+                    <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray' , marginLeft: -15 }}>Orders</Text>
                   </View>
                   {/* Flight connection line logic can be added here */}
                   <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
@@ -487,7 +487,7 @@ export default function orderStatus() {
                   </View>
                   <View style={{ width: '30%' }}>
                     <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2, textAlign: 'right' }}>${orderStats.totalPrice}</Text>
-                    <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray', textAlign: 'right' }}>Earnings</Text>
+                    <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray', textAlign: 'right' , marginRight: -20 }}>Earnings</Text>
                   </View>
                 </View>
 
