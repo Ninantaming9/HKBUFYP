@@ -79,9 +79,9 @@ export default function orderStatus() {
 
 
   const getDataForChart = () => {
-    const morningPercentage = parseFloat(orderStats.morningPercentage) || 0;
-    const afternoonPercentage = parseFloat(orderStats.afternoonPercentage) || 0;
-    const eveningPercentage = parseFloat(orderStats.eveningPercentage) || 0;
+    const morningPercentage = Math.floor(parseFloat(orderStats.morningPercentage) || 0); 
+    const afternoonPercentage = Math.floor(parseFloat(orderStats.afternoonPercentage) || 0); 
+    const eveningPercentage = Math.floor(parseFloat(orderStats.eveningPercentage) || 0); 
 
     const data = [
       {
@@ -500,8 +500,8 @@ export default function orderStatus() {
                 <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2 }}>Task Charts</Text>
                 <PieChart
                   data={getDataForChart()}
-                  width={300} // 图表宽度
-                  height={220} // 图表高度
+                  width={350} // 图表宽度
+                  height={250} // 图表高度
                   chartConfig={{
                     backgroundColor: '#ffffff',
                     backgroundGradientFrom: '#ffffff',
@@ -510,7 +510,7 @@ export default function orderStatus() {
                     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                     style: {
-                      borderRadius: 16,
+                      borderRadius: 12,
                     },
                   }}
                   accessor="population" // 数据中用于表示比例的字段

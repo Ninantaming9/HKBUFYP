@@ -296,7 +296,8 @@ export default function searchresult() {
                       onRequestClose={() => setModalVisible(false)}
                     >
                       <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                        <View className="w-[80%] h-[15%] bg-white rounded-lg p-6 shadow-lg">
+                        <View className="w-[80%] h-[20%] bg-white rounded-lg p-6 shadow-lg">
+                          <Text className="mb-2 font-semibold">Search User History:</Text>
                           <View className="flex-row gap-4 justify-start items-center px-2">
                             <TextInput
                               className="border border-gray-300 rounded-md p-3 flex-1"

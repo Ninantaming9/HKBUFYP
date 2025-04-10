@@ -181,7 +181,7 @@ const MyAccountScreen = () => {
           setMessages(data);
         } catch (err) {
           //setError(err.message); // 处理错误
-          console.error('Error fetching messages:', err);
+         
         }
       };
 
@@ -365,6 +365,9 @@ const MyAccountScreen = () => {
               onRequestClose={() => setModalVisible(false)}
             >
               <View className='flex-1 justify-center items-center bg-transparent'>
+                <Text style={{ marginBottom: 8, fontWeight: 'bold',fontSize: 18  }}>
+                  Chat by user :
+                </Text>
                 <View className='w-11/12 bg-white rounded-lg p-4'>
                   <TextInput
                     className='h-10 border border-gray-300 rounded-md bg-opacity-50 p-2'
@@ -449,7 +452,7 @@ const MyAccountScreen = () => {
 
                         <Text className='text-xl text-black font-bold'>{friend.fullname}</Text>
                         <Text className='text-base text-neutral-400 font-medium'>
-                          {lastMessage ? lastMessage.content : '没有消息'}
+                          {lastMessage ? lastMessage.content : ''}
                         </Text>
                       </View>
                     </View>
