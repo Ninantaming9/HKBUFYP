@@ -176,7 +176,7 @@ export default function searchresult() {
     const isConfirmed = await showDeleteConfirmation();
     if (isConfirmed) {
       try {
-        const response = await axios.post(`${API_URL}/deleteFlightById`, { flightId, flightNumber, fullName });
+        const response = await axios.post(`${API_URL}/deleteFlightById`, { email,flightId, flightNumber, fullName });
 
         if (response.status === 200) {
           alert('Flight deleted successfully');
@@ -192,8 +192,7 @@ export default function searchresult() {
           alert('Flight not found or deletion failed');
         }
       } catch (error) {
-        console.error('Error deleting flight:', error);
-        alert('An error occurred while deleting the flight');
+       //
       }
     }
   };

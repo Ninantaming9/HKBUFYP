@@ -40,7 +40,7 @@ export default function Login() {
   
       const response = await axios.post(`${API_URL}/login`, userData)
         .catch(error => {
-          console.error('Login request failed:', error);
+         
           throw error;
         });
   
@@ -108,7 +108,6 @@ export default function Login() {
         ]);
       }
     } catch (error) {
-      console.error('Login error:', error);
       Alert.alert('Login Failed', 'An error occurred during login');
     }
   };

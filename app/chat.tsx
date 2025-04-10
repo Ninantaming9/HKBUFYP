@@ -11,9 +11,11 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { io } from 'socket.io-client';
 const MyAccountScreen = () => {
     const [userId, setUserId] = useState('');
     // const [loading, setLoading] = useState(false);
+    const socket = io(API_URL);
     const [photoPath, setPhotoPath] = useState<string | null>(null);
     const route = useRoute();
     const [message, setMessage] = useState('');
@@ -44,6 +46,18 @@ const MyAccountScreen = () => {
         userEmail: string;
         friendEmail: string;
     }
+
+
+    useEffect(() => {
+        socket.on('chatMessage', (message) => {
+            setChatHistory(prevChatHistory => [...prevChatHistory, message]);
+        });
+
+        return () => {
+            socket.off('chatMessage'); // 清理事件监听器
+        };
+    }, []);
+
 
     useEffect(() => {
         const fetchChatHistory = async () => {

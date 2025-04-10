@@ -174,7 +174,7 @@ app.post('/login', async (req, res) => {
         role: user.role 
       },
       JWT_SECRET, // 直接使用导入的常量
-      { expiresIn: '1m' }
+      { expiresIn: '1h' }
     );
 
     res.status(200).json({ 
@@ -186,7 +186,7 @@ app.post('/login', async (req, res) => {
       email: user.email  
     });
   } catch (error) {
-    console.log('Error logging in', error);
+   
     res.status(500).json({ 
       message: 'Error logging in',
       error: error.message
@@ -420,7 +420,7 @@ const transporter = nodemailer.createTransport({
 
 const mailOptions = {
   from: 'zmhaoo2@gmail.com',
-  to: 'zmhaoo@gmail.com', 
+  to: email, 
   subject: 'Flight Booking Confirmation',
   html: `
     <div style="font-family: Arial, sans-serif; line-height: 1.4;">
@@ -700,7 +700,7 @@ app.post('/requestPasswordReset', async (req, res) => {
   // Send the confirmation code to the user's email
   const mailOptions = {
     from: 'zmhaoo2@gmail.com',
-    to: 'zmhaoo@gmail.com', 
+    to: email, 
     subject: 'Password Reset Confirmation Code',
     text: `Your confirmation code is: ${confirmationCode}`
   };
