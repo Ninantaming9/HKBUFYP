@@ -486,7 +486,7 @@ export default function orderStatus() {
                     </View>
                   </View>
                   <View style={{ width: '30%' }}>
-                    <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2, textAlign: 'right' }}>${orderStats.totalPrice}</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '500', paddingVertical: 2, textAlign: 'right' }}>  ${Math.floor(parseFloat(orderStats.totalPrice))}</Text>
                     <Text style={{ fontSize: 16, fontWeight: '500', paddingVertical: 2, color: 'gray', textAlign: 'right' , marginRight: -20 }}>Earnings</Text>
                   </View>
                 </View>

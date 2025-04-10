@@ -8,7 +8,7 @@ import Constants from "expo-constants";
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from '../../backend/address';
-
+import { useFocusEffect } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -156,37 +156,40 @@ const MyAccountScreen = () => {
 
   };
 
-  useEffect(() => {
-    const fetchLastMessages = async () => {
-      setError(null); // 重置错误状态
-      try {
-        const response = await fetch(`${API_URL}/getLastMessages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userEmail }),
-        });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Something went wrong');
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchLastMessages = async () => {
+        setError(null); // 重置错误状态
+        try {
+          const response = await fetch(`${API_URL}/getLastMessages`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userEmail }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Something went wrong');
+          }
+
+          const data = await response.json();
+          console.log('Fetched Messages:', data); // 调试信息
+          setMessages(data);
+        } catch (err) {
+          //setError(err.message); // 处理错误
+          console.error('Error fetching messages:', err);
         }
+      };
 
-        const data: Message[] = await response.json();
-        console.log('Fetched Messages:', data); // 调试信息
-        setMessages(data);
-        console.log('Fetched Messages:', data); // 查看获取的消息数据
-      } catch (err) {
-
+      if (userEmail) {
+        fetchLastMessages();
       }
-    };
-
-    if (userEmail) {
-      fetchLastMessages();
-    }
-  }, [userEmail]);
-
+    }, [userEmail]) // 依赖项
+  );
   useEffect(() => {
     const fetchUserData = async () => {
       try {
