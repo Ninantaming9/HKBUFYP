@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const moment = require('moment');
 const http = require('http');
 const server = http.createServer(app);
-const socketIo = require('socket.io'); // 确保在使用之前导入 socket.io
+const socketIo = require('socket.io'); 
 const io = socketIo(server);
 const nodemailer = require('nodemailer');
 const { MongoClient, ObjectId } = require("mongodb"); 
@@ -173,7 +173,7 @@ app.post('/login', async (req, res) => {
         email: user.email,
         role: user.role 
       },
-      JWT_SECRET, // 直接使用导入的常量
+      JWT_SECRET,
       { expiresIn: '1h' }
     );
 
@@ -499,8 +499,8 @@ app.post('/findFriends', async (req, res) => {
     if (friend) {
 
       const response = {
-        userEmail: friend.userEmail, // 这里可以根据需要动态获取
-        friendEmail: friend.friendEmail, // 假设 friend 对象中有 email 字段
+        userEmail: friend.userEmail, 
+        friendEmail: friend.friendEmail, 
         fullname: friend.fullname,
         photo: friend.photo,
       };
@@ -876,14 +876,14 @@ app.post('/addFriend', async (req, res) => {
       return res.status(400).json({ message: 'User email and friend email are required.' });
     }
 
-    // 查找要添加的好友是否存在
+ 
     const friend = await db.collection('users').findOne({ email: friendEmail });
 
     if (!friend) {
       return res.status(404).json({ message: 'Friend not found.' });
     }
 
-    // 检查用户是否已经是好友
+ 
     const existingFriendship = await friendsCollection.findOne({
       $or: [
         { userEmail: userEmail, friendEmail: friendEmail },
@@ -896,28 +896,27 @@ app.post('/addFriend', async (req, res) => {
     }
     
     const user = await db.collection('users').findOne({ email: userEmail });
-    // 添加好友关系
+
     const newFriendship1 = {
       userEmail: userEmail,
       friendEmail: friendEmail,
-      fullname: friend.fullname, // 存储好友的全名
-      photo: friend.photo, // 存储好友的头像二进制数据
+      fullname: friend.fullname, 
+      photo: friend.photo, 
       createdAt: new Date()
     };
 
     const newFriendship2 = {
       userEmail: friendEmail,
       friendEmail: userEmail,
-      fullname: user.fullname, // 存储用户的全名
-      photo: user.photo, // 存储用户的头像二进制数据
+      fullname: user.fullname, 
+      photo: user.photo, 
       createdAt: new Date()
     };
 
-    // 插入两条好友关系
+
     await friendsCollection.insertOne(newFriendship1);
     await friendsCollection.insertOne(newFriendship2);
     
-    // 返回成功响应
     return res.status(201).json({ message: 'Friend added successfully.', friendships: [newFriendship1, newFriendship2] });
   } catch (error) {
 
@@ -932,17 +931,16 @@ app.get('/getFriends', async (req, res) => {
     const db = await connectToDB();
     const friendsCollection = db.collection('friends');
 
-    // 从查询参数中获取 userEmail
+
     const userEmail = req.query.userEmail ? req.query.userEmail.toString() : '';
 
-    // 检查 userEmail 是否为空
+
     if (userEmail.trim() === '') {
       return res.status(400).json({ message: 'User email is required.' });
     }
 
-    // 使用 JSON 查询
     const query = {
-      userEmail: userEmail // 直接使用 userEmail 进行精确匹配
+      userEmail: userEmail 
     };
 
     console.log('Query:', JSON.stringify(query, null, 2));
@@ -957,17 +955,17 @@ app.get('/getFriends', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-// 发送聊天消息
+
 app.post('/chatMessage', async (req, res) => {
   try {
     const { senderemail, receiveremail, content } = req.body;
 
-    // 检查必需的字段是否存在
+
     if (!senderemail || !receiveremail || !content) {
       return res.status(400).json({ message: 'Sender email, receiver email, and content are required.' });
     }
 
-    // 插入消息到数据库
+
     const db = await connectToDB();
     await db.collection('messages').insertOne({
       senderemail,
@@ -976,10 +974,10 @@ app.post('/chatMessage', async (req, res) => {
       timestamp: new Date(),
     });
 
-    // 通过 Socket.IO 发送消息
+  
     io.emit('chatMessage', { senderemail, receiveremail, content });
 
-    // 发送成功响应
+
     res.status(201).json({ message: 'Message sent successfully', data: { senderemail, receiveremail, content } });
   } catch (error) {
     console.log('Error sending chat message', error);
@@ -987,7 +985,6 @@ app.post('/chatMessage', async (req, res) => {
   }
 });
 
-// Socket.IO 连接
 io.on('connection', (socket) => {
   console.log('A user connected');
 
@@ -999,19 +996,18 @@ io.on('connection', (socket) => {
 
 app.post('/chathistory', async (req, res) => {
   try {
-    const { useremail, receiveremail } = req.body; // 从请求体中获取数据
+    const { useremail, receiveremail } = req.body; 
 
-    // 检查必需的字段是否存在
     if (!useremail || !receiveremail) {
       return res.status(400).json({ message: 'User email and receiver email are required.' });
     }
 
     console.log('Received body:', req.body); // 添加日志
 
-    // 连接到数据库
+
     const db = await connectToDB();
     
-    // 从数据库中查询与特定用户相关的消息
+
     const messages = await db.collection('messages').find({
       $or: [
         { senderemail: useremail, receiveremail: receiveremail },
@@ -1019,9 +1015,9 @@ app.post('/chathistory', async (req, res) => {
       ]
     }).toArray();
 
-    console.log('Retrieved messages:', messages); // 添加日志
+    console.log('Retrieved messages:', messages); 
 
-    // 发送成功响应
+
     res.status(200).json({ message: 'Messages retrieved successfully', data: messages });
   } catch (error) {
     console.log('Error retrieving chat messages', error);
@@ -1033,7 +1029,7 @@ app.post('/chathistory', async (req, res) => {
 
 
 app.post('/paymentshow', async (req, res) => {
-  const { amount } = req.body; // 从前端获取金额等参数
+  const { amount } = req.body; 
 
   try {
     const customer = await stripe.customers.create();
@@ -1042,7 +1038,7 @@ app.post('/paymentshow', async (req, res) => {
       { apiVersion: '2020-08-27' }
     );
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount, // 以分为单位
+      amount: amount, 
       currency: 'usd',
       customer: customer.id,
     });
@@ -1062,15 +1058,15 @@ app.post('/paymentshow', async (req, res) => {
 
 app.post('/paymentsheet', async (req, res) => {
   try {
-    // 从请求体中获取金额并转换为数字
-    const amountInYuan = parseFloat(req.body.amount); // 将字符串转换为数字
+ 
+    const amountInYuan = parseFloat(req.body.amount); 
 
-    // 检查金额是否有效
+   
     if (isNaN(amountInYuan) || amountInYuan <= 0) {
       return res.status(400).json({ error: 'Invalid amount' });
     }
 
-    const amountInCents = Math.round(amountInYuan * 100); // 转换为分并四舍五入
+    const amountInCents = Math.round(amountInYuan * 100); 
 
     const customer = await stripe.customers.create();
     const ephemeralKey = await stripe.ephemeralKeys.create(
@@ -1079,10 +1075,10 @@ app.post('/paymentsheet', async (req, res) => {
     );
     
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountInCents, // 使用转换后的金额
-      currency: 'hkd', // 使用港元
+      amount: amountInCents, 
+      currency: 'hkd', 
       customer: customer.id,
-      payment_method_types: ['card'], // 确保使用支持 HKD 的支付方式
+      payment_method_types: ['card'], 
     });
 
     res.json({
@@ -1103,14 +1099,14 @@ app.post('/getLastMessages', async (req, res) => {
   const db = await connectToDB();
   const messagesCollection = db.collection('messages'); 
 
-  const { userEmail } = req.body; // 从请求体中获取 userEmail
+  const { userEmail } = req.body; 
 
   try {
     if (!userEmail) {
-      return res.status(400).json({ error: 'userEmail is required.' }); // 不需要 JSON.stringify
+      return res.status(400).json({ error: 'userEmail is required.' }); 
     }
 
-    // 获取所有与该用户的好友的最后一条消息
+
     const lastMessages = await messagesCollection.aggregate([
       {
         $match: {
@@ -1121,7 +1117,7 @@ app.post('/getLastMessages', async (req, res) => {
         }
       },
       {
-        $sort: { _id: -1 } // 按照消息 ID 降序排序
+        $sort: { _id: -1 } 
       },
       {
         $group: {
@@ -1132,46 +1128,45 @@ app.post('/getLastMessages', async (req, res) => {
               '$senderemail'
             ]
           },
-          content: { $first: '$content' } // 获取每个好友的最后一条消息内容
+          content: { $first: '$content' } 
         }
       }
     ]).toArray();
 
     if (lastMessages.length > 0) {
-      return res.status(200).json(lastMessages); // 不需要 JSON.stringify
+      return res.status(200).json(lastMessages); 
     } else {
-      return res.status(404).json({ error: 'No messages found for the user.' }); // 不需要 JSON.stringify
+      return res.status(404).json({ error: 'No messages found for the user.' }); 
     }
   } catch (error) {
     console.error('Error retrieving last messages:', error);
-    res.status(500).json({ error: 'Internal server error.' }); // 不需要 JSON.stringify
+    res.status(500).json({ error: 'Internal server error.' }); 
   }
 });
 
-// 更新 flightbook 是否支付
 
 app.put('/updateFlightBook', async (req, res) => {
   try {
     const db = await connectToDB();
     const flightCollection = db.collection('flightbook');
 
-    const { flightId } = req.body; // 从请求体中获取 flightId
+    const { flightId } = req.body; 
     console.log('Searching for flight with ID:', flightId);
-    // 查找 flightbook
+
     const existingFlight = await flightCollection.findOne({ _id: new ObjectId(flightId) });
     if (!existingFlight) {
       return res.status(404).json({ message: 'Flight not found.' });
     }
     console.log('Existing flight:', existingFlight);
-    // 检查当前 isPaymoney 的值
+
     if (existingFlight.isPaymoney === true) {
       return res.status(400).json({ message: 'Payment status is already true.' });
     }
 
-    // 更新 flightbook，将 isPaymoney 设置为 true
+   
     const result = await flightCollection.updateOne(
       { _id: new ObjectId(flightId) },
-      { $set: { isPaymoney: true } } // 直接设置 isPaymoney 为 true
+      { $set: { isPaymoney: true } } 
     );
 
     if (result.modifiedCount > 0) {
@@ -1187,14 +1182,14 @@ app.put('/updateFlightBook', async (req, res) => {
 
 
 
-//re
+
 app.post('/findReFlightBookId', async (req, res) => {
   try {
     const db = await connectToDB();
     const flightCollection = db.collection('flightbook');
 
-    const { flightBookId } = req.body; // 使用 flightBookId
-    const flight = await flightCollection.findOne({ _id: new ObjectId(flightBookId) }); // 查找航班
+    const { flightBookId } = req.body; 
+    const flight = await flightCollection.findOne({ _id: new ObjectId(flightBookId) }); 
     if (flight) {
       res.status(200).json(flight);
     } else {
@@ -1207,66 +1202,6 @@ app.post('/findReFlightBookId', async (req, res) => {
 });
 
 
-// app.post('/getCompletedOrdersStats', async (req, res) => {
-//   try {
-//     const db = await connectToDB();
-//     const flightCollection = db.collection('flightbook');
-
-//     // 获取当前日期
-//     const today = new Date();
-//     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-//     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-//     const startOfYear = new Date(today.getFullYear(), 0, 1);
-
-//     // 从请求体中获取时间范围
-//     const { timeframe } = req.body; // timeframe: 'today', 'month', 'year'
-//     let startDate;
-
-//     switch (timeframe) {
-//       case 'today':
-//         startDate = startOfToday;
-//         break;
-//       case 'month':
-//         startDate = startOfMonth;
-//         break;
-//       case 'year':
-//         startDate = startOfYear;
-//         break;
-//       default:
-//         return res.status(400).json({ message: 'Invalid timeframe specified.' });
-//     }
-
-//     // 将 startDate 转换为 ISO 字符串并只保留日期部分
-//     const startDateString = startDate.toISOString().split('T')[0];
-
-//     // 查找已完成的订单
-//     const completedOrders = await flightCollection.find({
-//       isPaymoney: true,
-//       date: { $gte: startDateString } // 根据时间范围过滤
-//     }).toArray();
-
-//     // 统计总价格和订单数量
-//     const totalPrice = completedOrders.reduce((sum, order) => sum + parseFloat(order.totalPrice), 0);
-//     const orderCount = completedOrders.length;
-
-//     // 调试输出
-//     const allOrders = await flightCollection.find({}).toArray();
-//     console.log('All Orders:', allOrders);
-//     console.log('Start Date:', startDate);
-//     console.log('Completed Orders:', completedOrders);
-
-//     return res.status(200).json({
-//       totalPrice,
-//       orderCount
-//     });
-//   } catch (error) {
-//     console.log('Error fetching completed orders stats', error);
-//     res.status(500).json({ error: 'Internal server error', details: error.message });
-//   }
-// });
-
-
-//dasdasd
 
 
 app.post('/getCompletedOrdersStats', async (req, res) => {
@@ -1274,14 +1209,13 @@ app.post('/getCompletedOrdersStats', async (req, res) => {
     const db = await connectToDB();
     const flightCollection = db.collection('flightbook');
 
-    // 获取当前日期
+
     const today = new Date();
     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const startOfYear = new Date(today.getFullYear(), 0, 1);
 
-    // 从请求体中获取时间范围
-    const { timeframe } = req.body; // timeframe: 'today', 'month', 'year'
+    const { timeframe } = req.body; 
     let startDate;
 
     switch (timeframe) {
@@ -1298,20 +1232,19 @@ app.post('/getCompletedOrdersStats', async (req, res) => {
         return res.status(400).json({ message: 'Invalid timeframe specified.' });
     }
 
-    // 将 startDate 转换为 ISO 字符串并只保留日期部分
+
     const startDateString = startDate.toISOString().split('T')[0];
 
-    // 查找已完成的订单
+
     const completedOrders = await flightCollection.find({
       isPaymoney: true,
-      date: { $gte: startDateString } // 根据时间范围过滤
+      date: { $gte: startDateString } 
     }).toArray();
 
-    // 统计总价格和订单数量
+    
     const totalPrice = completedOrders.reduce((sum, order) => sum + parseFloat(order.totalPrice), 0);
     const orderCount = completedOrders.length;
 
-    // 分类统计早上、下午和晚上的订单
     const timeCategories = {
       morning: 0,
       afternoon: 0,
@@ -1322,7 +1255,7 @@ app.post('/getCompletedOrdersStats', async (req, res) => {
       const departureHour = parseInt(order.departureTime.split(':')[0]);
       const arrivalHour = parseInt(order.arrivalTime.split(':')[0]);
 
-      // 根据 departureTime 分类
+
       if (departureHour >= 0 && departureHour < 12) {
         timeCategories.morning++;
       } else if (departureHour >= 12 && departureHour < 18) {
@@ -1332,12 +1265,12 @@ app.post('/getCompletedOrdersStats', async (req, res) => {
       }
     });
 
-    // 计算比例
+ 
     const morningPercentage = (timeCategories.morning / orderCount) * 100 || 0;
     const afternoonPercentage = (timeCategories.afternoon / orderCount) * 100 || 0;
     const eveningPercentage = (timeCategories.evening / orderCount) * 100 || 0;
 
-    // 调试输出
+
     const allOrders = await flightCollection.find({}).toArray();
     console.log('All Orders:', allOrders);
     console.log('Start Date:', startDate);

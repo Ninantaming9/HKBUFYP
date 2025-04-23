@@ -21,8 +21,8 @@ import { AntDesign, Ionicons } from '@expo/vector-icons';
 
 
 export default function Login() {  
-  const [email, setEmail] = useState('admin@gmail.com');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); 
 
   const handleSubmit = async () => {
